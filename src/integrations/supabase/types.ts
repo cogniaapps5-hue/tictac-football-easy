@@ -14,16 +14,263 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attendance: {
+        Row: {
+          created_at: string
+          id: string
+          player_id: string
+          session_date: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          player_id: string
+          session_date: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          player_id?: string
+          session_date?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      demo_accounts: {
+        Row: {
+          email: string
+          full_name: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          email: string
+          full_name: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          email?: string
+          full_name?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
+      notices: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          target_category: string
+          title: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          target_category?: string
+          title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          target_category?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      nutrition_sessions: {
+        Row: {
+          id: string
+          player_id: string
+          scheduled_date: string | null
+          semester: number
+          status: string
+          year: number
+        }
+        Insert: {
+          id?: string
+          player_id: string
+          scheduled_date?: string | null
+          semester?: number
+          status?: string
+          year?: number
+        }
+        Update: {
+          id?: string
+          player_id?: string
+          scheduled_date?: string | null
+          semester?: number
+          status?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nutrition_sessions_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          concept: string
+          created_at: string
+          due_date: string
+          id: string
+          player_id: string
+          receipt_url: string | null
+          status: string
+        }
+        Insert: {
+          amount?: number
+          concept?: string
+          created_at?: string
+          due_date?: string
+          id?: string
+          player_id: string
+          receipt_url?: string | null
+          status?: string
+        }
+        Update: {
+          amount?: number
+          concept?: string
+          created_at?: string
+          due_date?: string
+          id?: string
+          player_id?: string
+          receipt_url?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      players: {
+        Row: {
+          category: string
+          coach: string
+          created_at: string
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          id: string
+          name: string
+          parent_email: string | null
+          parent_id: string | null
+          rut: string | null
+          schedule: string
+        }
+        Insert: {
+          category?: string
+          coach?: string
+          created_at?: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          id?: string
+          name: string
+          parent_email?: string | null
+          parent_id?: string | null
+          rut?: string | null
+          schedule?: string
+        }
+        Update: {
+          category?: string
+          coach?: string
+          created_at?: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          id?: string
+          name?: string
+          parent_email?: string | null
+          parent_id?: string | null
+          rut?: string | null
+          schedule?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "players_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          phone: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name?: string
+          id: string
+          phone?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "parent"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +397,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "parent"],
+    },
   },
 } as const
