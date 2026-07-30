@@ -1,0 +1,276 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Wallet, CalendarCheck, TriangleAlert, Megaphone, Apple, Check, X } from "lucide-react";
+import { toast } from "sonner";
+
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
+import { useSesion, saludo, pesos, proximoEntrenamiento, fechaCorta } from "@/lib/session";
+
+export const Route = createFileRoute("/_authenticated/inicio")({
+  head: () => ({
+    meta: [
+      { title: "Inicio — Escuela TIC TAC" },
+      { name: "description", content: "Resumen del día en la escuela de fútbol TIC TAC." },
+      { property: "og:title", content: "Inicio — Escuela TIC TAC" },
+      { property: "og:description", content: "Resumen del día en la escuela de fútbol TIC TAC." },
+    ],
+  }),
+  component: Inicio,
+});
+
+function Inicio() {
+  const { data: sesion } = useSesion();
+  if (!sesion) return null;
+  return sesion.rol === "admin" ? (
+    <Shell rol="admin" titulo={`${saludo()}, ${sesion.nombre}`} subtitulo="Escuela TIC TAC">
+      <InicioAdmin />
+    </Shell>
+  ) : (
+    <Shell rol="parent" titulo="Escuela TIC TAC" subtitulo={`${saludo()}, ${sesion.nombre}`}>
+      <InicioPadre userId={sesion.userId} />
+    </Shell>
+  );
+}
+
+function InicioAdmin() {
+  const proximo = proximoEntrenamiento();
+  const { data } = useQuery({
+    queryKey: ["resumen-admin", proximo.iso],
+    queryFn: async () => {
+      const [pagos, alumnos, asistencia] = await Promise.all([
+        supabase.from("payments").select("id, status, due_date"),
+        supabase.from("players").select("id"),
+        supabase.from("attendance").select("id, status").eq("session_date", proximo.iso),
+      ]);
+      const pendientes = (pagos.data ?? []).filter((p) => p.status === "pending");
+      const atrasados = pendientes.filter(
+        (p) => new Date(p.due_date).getTime() < Date.now() - 1000 * 60 * 60 * 24 * 60,
+      );
+      return {
+        pendientes: pendientes.length,
+        atrasados: atrasados.length,
+        total: alumnos.data?.length ?? 0,
+        confirmados: (asistencia.data ?? []).filter((a) => a.status === "confirmed").length,
+      };
+    },
+  });
+
+  return (
+    <>
+      <Tarjeta destacada>
+        <div className="flex items-center gap-3">
+          <Wallet className="size-7 text-gold-brand" />
+          <h2 className="text-xl font-bold">Pagos pendientes</h2>
+        </div>
+        <p className="mt-2 text-3xl font-extrabold text-gold-brand">{data?.pendientes ?? 0}</p>
+        <p className="text-base text-muted-foreground">comprobantes por revisar</p>
+        <Button asChild variant="accion" size="grande" className="mt-4">
+          <Link to="/pagos">Ver y Aprobar</Link>
+        </Button>
+      </Tarjeta>
+
+      <Tarjeta>
+        <div className="flex items-center gap-3">
+          <CalendarCheck className="size-7 text-cyan-brand" />
+          <h2 className="text-xl font-bold">Asistencia próxima clase</h2>
+        </div>
+        <p className="mt-2 text-2xl font-extrabold">
+          {data?.confirmados ?? 0} de {data?.total ?? 0} confirmados
+        </p>
+        <p className="text-base capitalize text-muted-foreground">{proximo.texto}</p>
+        <Button asChild variant="contorno" size="grande" className="mt-4">
+          <Link to="/alumnos">Ver Lista</Link>
+        </Button>
+      </Tarjeta>
+
+      <Tarjeta>
+        <div className="flex items-center gap-3">
+          <TriangleAlert className="size-7 text-danger" />
+          <h2 className="text-xl font-bold">Alertas</h2>
+        </div>
+        <p className="mt-2 text-base">
+          {data?.atrasados
+            ? `${data.atrasados} pagos atrasados (2 meses o más)`
+            : "Sin pagos muy atrasados. Todo tranquilo."}
+        </p>
+      </Tarjeta>
+    </>
+  );
+}
+
+function InicioPadre({ userId }: { userId: string }) {
+  const proximo = proximoEntrenamiento();
+  const queryClient = useQueryClient();
+
+  const { data } = useQuery({
+    queryKey: ["resumen-padre", userId, proximo.iso],
+    queryFn: async () => {
+      const { data: alumnos } = await supabase
+        .from("players")
+        .select("*")
+        .eq("parent_id", userId)
+        .order("name");
+      const ids = (alumnos ?? []).map((a) => a.id);
+      const [pagos, asistencia, avisos, nutricion] = await Promise.all([
+        ids.length
+          ? supabase.from("payments").select("*").in("player_id", ids).order("due_date")
+          : Promise.resolve({ data: [] as never[] }),
+        ids.length
+          ? supabase.from("attendance").select("*").in("player_id", ids).eq("session_date", proximo.iso)
+          : Promise.resolve({ data: [] as never[] }),
+        supabase.from("notices").select("*").order("created_at", { ascending: false }).limit(3),
+        ids.length
+          ? supabase.from("nutrition_sessions").select("*").in("player_id", ids)
+          : Promise.resolve({ data: [] as never[] }),
+      ]);
+      return {
+        alumnos: alumnos ?? [],
+        pagos: pagos.data ?? [],
+        asistencia: asistencia.data ?? [],
+        avisos: avisos.data ?? [],
+        nutricion: nutricion.data ?? [],
+      };
+    },
+  });
+
+  const responder = useMutation({
+    mutationFn: async ({ playerId, estado }: { playerId: string; estado: string }) => {
+      const { error } = await supabase
+        .from("attendance")
+        .upsert(
+          { player_id: playerId, session_date: proximo.iso, status: estado },
+          { onConflict: "player_id,session_date" },
+        );
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["resumen-padre"] });
+      toast.success(vars.estado === "confirmed" ? "¡Listo! Te esperamos" : "Gracias por avisar");
+    },
+    onError: () => toast.error("No pudimos guardar tu respuesta. Intenta otra vez."),
+  });
+
+  const alumno = data?.alumnos[0];
+  const pendiente = data?.pagos.find((p) => p.status === "pending");
+  const respuesta = data?.asistencia.find((a) => a.player_id === alumno?.id);
+
+  return (
+    <>
+      <Tarjeta destacada>
+        <h2 className="text-xl font-bold">⚽ Próximo entrenamiento</h2>
+        <p className="mt-1 text-lg capitalize">
+          {proximo.texto} — {alumno?.schedule ?? "Miércoles 15:00"}
+        </p>
+        {alumno ? (
+          <>
+            <p className="mt-4 text-lg font-semibold">¿Viene {alumno.name.split(" ")[0]}?</p>
+            {respuesta ? (
+              <div className="mt-3">
+                <Estado estado={respuesta.status} />
+                <Button
+                  variant="neutro"
+                  size="medio"
+                  className="mt-3 w-full"
+                  onClick={() =>
+                    responder.mutate({
+                      playerId: alumno.id,
+                      estado: respuesta.status === "confirmed" ? "absent" : "confirmed",
+                    })
+                  }
+                >
+                  Cambiar respuesta
+                </Button>
+              </div>
+            ) : (
+              <div className="mt-4 space-y-3">
+                <Button
+                  variant="exito"
+                  size="gigante"
+                  disabled={responder.isPending}
+                  onClick={() => responder.mutate({ playerId: alumno.id, estado: "confirmed" })}
+                >
+                  <Check /> SÍ VOY
+                </Button>
+                <Button
+                  variant="peligro"
+                  size="gigante"
+                  disabled={responder.isPending}
+                  onClick={() => responder.mutate({ playerId: alumno.id, estado: "absent" })}
+                >
+                  <X /> NO VOY
+                </Button>
+              </div>
+            )}
+          </>
+        ) : (
+          <p className="mt-3 text-base text-muted-foreground">
+            Aún no tienes alumnos asociados. Habla con la administradora.
+          </p>
+        )}
+      </Tarjeta>
+
+      <Tarjeta>
+        <div className="flex items-center gap-3">
+          <Wallet className="size-7 text-cyan-brand" />
+          <h2 className="text-xl font-bold">Pagos</h2>
+        </div>
+        {pendiente ? (
+          <p className="mt-2 text-base">
+            <Estado estado="pending" />
+            <span className="mt-2 block">
+              {pendiente.concept}: {pesos(pendiente.amount)} — vence {fechaCorta(pendiente.due_date)}
+            </span>
+          </p>
+        ) : (
+          <p className="mt-2 text-base">
+            <Estado estado="approved" />
+            <span className="mt-2 block">Todo al día. ¡Gracias!</span>
+          </p>
+        )}
+        <Button asChild variant="accion" size="grande" className="mt-4">
+          <Link to="/mi-hijo">Subir Comprobante</Link>
+        </Button>
+      </Tarjeta>
+
+      <Tarjeta>
+        <div className="flex items-center gap-3">
+          <Megaphone className="size-7 text-gold-brand" />
+          <h2 className="text-xl font-bold">Avisos</h2>
+        </div>
+        <ul className="mt-3 space-y-3">
+          {(data?.avisos ?? []).map((aviso) => (
+            <li key={aviso.id} className="rounded-xl bg-secondary p-4">
+              <p className="text-base font-bold">{aviso.title}</p>
+              <p className="text-base text-muted-foreground">{aviso.content}</p>
+            </li>
+          ))}
+          {!data?.avisos.length ? (
+            <li className="text-base text-muted-foreground">Sin avisos por ahora.</li>
+          ) : null}
+        </ul>
+      </Tarjeta>
+
+      <Tarjeta>
+        <div className="flex items-center gap-3">
+          <Apple className="size-7 text-success" />
+          <h2 className="text-xl font-bold">Nutricionista</h2>
+        </div>
+        <p className="mt-2 text-base">
+          Evaluación Semestre {data?.nutricion[0]?.semester ?? 1} — {" "}
+          {data?.nutricion[0]?.status === "booked" ? "hora agendada" : "por agendar"}
+        </p>
+        <Button asChild variant="alerta" size="grande" className="mt-4">
+          <a
+            href="https://wa.me/56912345678?text=Hola%2C%20quiero%20agendar%20la%20hora%20con%20la%20nutricionista"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Agendar Hora
+          </a>
+        </Button>
+      </Tarjeta>
+    </>
+  );
+}

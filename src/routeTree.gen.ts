@@ -10,33 +10,104 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthenticatedAlumnosRouteImport } from './routes/_authenticated/alumnos'
+import { Route as AuthenticatedAvisosRouteImport } from './routes/_authenticated/avisos'
+import { Route as AuthenticatedInfoRouteImport } from './routes/_authenticated/info'
+import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
+import { Route as AuthenticatedMiHijoRouteImport } from './routes/_authenticated/mi-hijo'
+import { Route as AuthenticatedPagosRouteImport } from './routes/_authenticated/pagos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAlumnosRoute = AuthenticatedAlumnosRouteImport.update({
+  id: '/alumnos',
+  path: '/alumnos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAvisosRoute = AuthenticatedAvisosRouteImport.update({
+  id: '/avisos',
+  path: '/avisos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInfoRoute = AuthenticatedInfoRouteImport.update({
+  id: '/info',
+  path: '/info',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInicioRoute = AuthenticatedInicioRouteImport.update({
+  id: '/inicio',
+  path: '/inicio',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMiHijoRoute = AuthenticatedMiHijoRouteImport.update({
+  id: '/mi-hijo',
+  path: '/mi-hijo',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPagosRoute = AuthenticatedPagosRouteImport.update({
+  id: '/pagos',
+  path: '/pagos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/alumnos': typeof AuthenticatedAlumnosRoute
+  '/avisos': typeof AuthenticatedAvisosRoute
+  '/info': typeof AuthenticatedInfoRoute
+  '/inicio': typeof AuthenticatedInicioRoute
+  '/mi-hijo': typeof AuthenticatedMiHijoRoute
+  '/pagos': typeof AuthenticatedPagosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/alumnos': typeof AuthenticatedAlumnosRoute
+  '/avisos': typeof AuthenticatedAvisosRoute
+  '/info': typeof AuthenticatedInfoRoute
+  '/inicio': typeof AuthenticatedInicioRoute
+  '/mi-hijo': typeof AuthenticatedMiHijoRoute
+  '/pagos': typeof AuthenticatedPagosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_authenticated/alumnos': typeof AuthenticatedAlumnosRoute
+  '/_authenticated/avisos': typeof AuthenticatedAvisosRoute
+  '/_authenticated/info': typeof AuthenticatedInfoRoute
+  '/_authenticated/inicio': typeof AuthenticatedInicioRoute
+  '/_authenticated/mi-hijo': typeof AuthenticatedMiHijoRoute
+  '/_authenticated/pagos': typeof AuthenticatedPagosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/alumnos' | '/avisos' | '/info' | '/inicio' | '/mi-hijo' | '/pagos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/alumnos' | '/avisos' | '/info' | '/inicio' | '/mi-hijo' | '/pagos'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/_authenticated/alumnos'
+    | '/_authenticated/avisos'
+    | '/_authenticated/info'
+    | '/_authenticated/inicio'
+    | '/_authenticated/mi-hijo'
+    | '/_authenticated/pagos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +119,83 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/alumnos': {
+      id: '/_authenticated/alumnos'
+      path: '/alumnos'
+      fullPath: '/alumnos'
+      preLoaderRoute: typeof AuthenticatedAlumnosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/avisos': {
+      id: '/_authenticated/avisos'
+      path: '/avisos'
+      fullPath: '/avisos'
+      preLoaderRoute: typeof AuthenticatedAvisosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/info': {
+      id: '/_authenticated/info'
+      path: '/info'
+      fullPath: '/info'
+      preLoaderRoute: typeof AuthenticatedInfoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/inicio': {
+      id: '/_authenticated/inicio'
+      path: '/inicio'
+      fullPath: '/inicio'
+      preLoaderRoute: typeof AuthenticatedInicioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mi-hijo': {
+      id: '/_authenticated/mi-hijo'
+      path: '/mi-hijo'
+      fullPath: '/mi-hijo'
+      preLoaderRoute: typeof AuthenticatedMiHijoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/pagos': {
+      id: '/_authenticated/pagos'
+      path: '/pagos'
+      fullPath: '/pagos'
+      preLoaderRoute: typeof AuthenticatedPagosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAlumnosRoute: typeof AuthenticatedAlumnosRoute
+  AuthenticatedAvisosRoute: typeof AuthenticatedAvisosRoute
+  AuthenticatedInfoRoute: typeof AuthenticatedInfoRoute
+  AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
+  AuthenticatedMiHijoRoute: typeof AuthenticatedMiHijoRoute
+  AuthenticatedPagosRoute: typeof AuthenticatedPagosRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAlumnosRoute: AuthenticatedAlumnosRoute,
+  AuthenticatedAvisosRoute: AuthenticatedAvisosRoute,
+  AuthenticatedInfoRoute: AuthenticatedInfoRoute,
+  AuthenticatedInicioRoute: AuthenticatedInicioRoute,
+  AuthenticatedMiHijoRoute: AuthenticatedMiHijoRoute,
+  AuthenticatedPagosRoute: AuthenticatedPagosRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

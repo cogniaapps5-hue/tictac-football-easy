@@ -1,24 +1,154 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { LogIn, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import logo from "@/assets/tictac-logo.png";
+
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Entrar — Escuela de Fútbol TIC TAC" },
+      {
+        name: "description",
+        content:
+          "Entra a la app de la escuela de fútbol TIC TAC para confirmar asistencia, pagar y ver avisos.",
+      },
+      { property: "og:title", content: "Entrar — Escuela de Fútbol TIC TAC" },
+      {
+        property: "og:description",
+        content: "Asistencia, pagos y avisos de la escuela de fútbol TIC TAC.",
+      },
+    ],
+  }),
+  ssr: false,
+  component: Entrar,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+const DEMO = ["admin@tictac.cl", "padre1@demo.cl", "padre2@demo.cl"];
+
+function Entrar() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [cargando, setCargando] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) navigate({ to: "/inicio", replace: true });
+    });
+  }, [navigate]);
+
+  async function entrar(correo: string, clave: string) {
+    if (!correo || !clave) {
+      toast.error("Escribe tu correo y tu contraseña");
+      return;
+    }
+    setCargando(true);
+    let { error } = await supabase.auth.signInWithPassword({
+      email: correo.trim(),
+      password: clave,
+    });
+
+    if (error && DEMO.includes(correo.trim().toLowerCase())) {
+      const alta = await supabase.auth.signUp({ email: correo.trim(), password: clave });
+      error = alta.error ?? null;
+      if (!error && !alta.data.session) {
+        const reintento = await supabase.auth.signInWithPassword({
+          email: correo.trim(),
+          password: clave,
+        });
+        error = reintento.error ?? null;
+      }
+    }
+
+    setCargando(false);
+    if (error) {
+      toast.error("No pudimos entrar. Revisa el correo y la contraseña.");
+      return;
+    }
+    toast.success("¡Bienvenido!");
+    navigate({ to: "/inicio", replace: true });
+  }
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-10">
       <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
+        src={logo}
+        alt="Escuela de fútbol TIC TAC"
+        width={160}
+        height={160}
+        className="h-40 w-40"
       />
+      <h1 className="mt-4 text-center text-3xl font-extrabold">TIC TAC</h1>
+      <p className="mt-1 text-center text-base text-muted-foreground">Siempre Feliz</p>
+
+      <form
+        className="mt-8 w-full max-w-sm space-y-5 rounded-2xl border-2 border-cyan-brand bg-card p-6 shadow-card"
+        onSubmit={(e) => {
+          e.preventDefault();
+          void entrar(email, password);
+        }}
+      >
+        <div className="space-y-2">
+          <Label htmlFor="email" className="text-base">
+            Tu correo
+          </Label>
+          <Input
+            id="email"
+            type="email"
+            autoComplete="email"
+            placeholder="correo@ejemplo.cl"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="h-14 rounded-xl text-lg"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="password" className="text-base">
+            Tu contraseña
+          </Label>
+          <Input
+            id="password"
+            type="password"
+            autoComplete="current-password"
+            placeholder="••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="h-14 rounded-xl text-lg"
+          />
+        </div>
+        <Button type="submit" variant="accion" size="grande" disabled={cargando}>
+          {cargando ? <Loader2 className="animate-spin" /> : <LogIn />}
+          ENTRAR
+        </Button>
+      </form>
+
+      <div className="mt-8 w-full max-w-sm space-y-3">
+        <p className="text-center text-sm text-muted-foreground">Cuentas de prueba</p>
+        <Button
+          variant="contorno"
+          size="medio"
+          className="w-full"
+          disabled={cargando}
+          onClick={() => void entrar("admin@tictac.cl", "demo123")}
+        >
+          Entrar como Administradora
+        </Button>
+        <Button
+          variant="contorno"
+          size="medio"
+          className="w-full"
+          disabled={cargando}
+          onClick={() => void entrar("padre1@demo.cl", "123456")}
+        >
+          Entrar como Apoderado
+        </Button>
+      </div>
     </div>
   );
 }

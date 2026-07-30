@@ -16,12 +16,27 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        accion:
+          "bg-cyan-brand text-cyan-brand-foreground font-bold shadow-glow active:scale-[0.98] hover:brightness-110",
+        contorno:
+          "border-2 border-cyan-brand bg-transparent text-cyan-brand font-semibold active:scale-[0.98] hover:bg-cyan-brand/10",
+        alerta:
+          "bg-gold-brand text-gold-brand-foreground font-bold active:scale-[0.98] hover:brightness-110",
+        exito:
+          "bg-success text-success-foreground font-bold active:scale-[0.98] hover:brightness-110",
+        peligro:
+          "bg-danger text-danger-foreground font-bold active:scale-[0.98] hover:brightness-110",
+        neutro:
+          "border-2 border-border bg-secondary text-foreground font-semibold active:scale-[0.98] hover:bg-secondary/70",
       },
       size: {
         default: "h-9 px-4 py-2",
         sm: "h-8 rounded-md px-3 text-xs",
         lg: "h-10 rounded-md px-8",
         icon: "h-9 w-9",
+        grande: "min-h-[60px] w-full rounded-xl px-6 text-lg [&_svg]:size-6",
+        gigante: "min-h-[80px] w-full rounded-xl px-6 text-xl [&_svg]:size-7",
+        medio: "min-h-[52px] rounded-xl px-5 text-base [&_svg]:size-5",
       },
     },
     defaultVariants: {
