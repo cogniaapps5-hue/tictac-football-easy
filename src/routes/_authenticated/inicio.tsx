@@ -100,6 +100,8 @@ function InicioAdmin() {
         <p className="mt-2 text-2xl font-extrabold">
           {data?.confirmados ?? 0} de {data?.total ?? 0} confirmados
         </p>
+        <p className="text-lg font-bold text-cyan-brand">{proximo.titulo}</p>
+        <p className="text-base font-semibold">📍 {proximo.sede}</p>
         <p className="text-base capitalize text-muted-foreground">{proximo.texto}</p>
         <Button asChild variant="contorno" size="grande" className="mt-4">
           <Link to="/alumnos">Ver Lista</Link>
