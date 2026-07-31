@@ -212,8 +212,38 @@ function InicioPadre({ userId }: { userId: string }) {
     (n) => n.player_id === alumno?.id && n.year === anioActual && n.semester === semestreActual,
   );
 
+  // Recordatorio amable de mensualidad según el día del mes.
+  const diaDelMes = hoy.getDate();
+  const inicioMes = new Date(anioActual, hoy.getMonth(), 1).toISOString().slice(0, 10);
+  const finMes = new Date(anioActual, hoy.getMonth() + 1, 1).toISOString().slice(0, 10);
+  const pagoDelMes = (data?.pagos ?? []).find(
+    (p) =>
+      p.due_date >= inicioMes &&
+      p.due_date < finMes &&
+      (p.status === "approved" || (p.status === "pending" && p.receipt_url)),
+  );
+  const recordatorio =
+    pagoDelMes || !alumno ? null : diaDelMes >= 6 ? "atrasado" : diaDelMes >= 1 ? "proximo" : null;
+
   return (
     <div className="space-y-6">
+      {recordatorio === "proximo" ? (
+        <div className="flex items-start gap-3 rounded-2xl border-2 border-gold-brand bg-gold-brand/20 p-5">
+          <span aria-hidden className="text-2xl">⏰</span>
+          <p className="text-lg font-bold text-foreground">
+            Tu mensualidad vence el día 6. ¡No olvides subir tu comprobante! 🌟
+          </p>
+        </div>
+      ) : null}
+      {recordatorio === "atrasado" ? (
+        <div className="flex items-start gap-3 rounded-2xl border-2 border-[oklch(0.75_0.18_60)] bg-[oklch(0.75_0.18_60)]/25 p-5">
+          <span aria-hidden className="text-2xl">⚠️</span>
+          <p className="text-lg font-bold text-foreground">
+            Tu pago está pendiente. Por favor regulariza tu situación para mantener tu acceso activo. 🙏
+          </p>
+        </div>
+      ) : null}
+
       {bloqueado ? (
         <div className="flex items-start gap-3 rounded-2xl border-[3px] border-danger bg-danger/20 p-5">
           <TriangleAlert className="mt-0.5 size-7 shrink-0 text-danger" />
