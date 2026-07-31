@@ -41,7 +41,7 @@ function InicioAdmin() {
     queryFn: async () => {
       const [pagos, alumnos, asistencia] = await Promise.all([
         supabase.from("payments").select("id, status, due_date"),
-        supabase.from("players").select("id"),
+        supabase.from("players").select("id, access_status"),
         supabase.from("attendance").select("id, status").eq("session_date", proximo.iso),
       ]);
       const pendientes = (pagos.data ?? []).filter((p) => p.status === "pending");
@@ -52,6 +52,7 @@ function InicioAdmin() {
         pendientes: pendientes.length,
         atrasados: atrasados.length,
         total: alumnos.data?.length ?? 0,
+        bloqueados: (alumnos.data ?? []).filter((a) => a.access_status === "blocked").length,
         confirmados: (asistencia.data ?? []).filter((a) => a.status === "confirmed").length,
       };
     },
@@ -82,6 +83,18 @@ function InicioAdmin() {
         <p className="text-base capitalize text-muted-foreground">{proximo.texto}</p>
         <Button asChild variant="contorno" size="grande" className="mt-4">
           <Link to="/alumnos">Ver Lista</Link>
+        </Button>
+      </Tarjeta>
+
+      <Tarjeta>
+        <div className="flex items-center gap-3">
+          <Lock className="size-7 text-danger" />
+          <h2 className="text-xl font-bold">Alumnos bloqueados hoy</h2>
+        </div>
+        <p className="mt-2 text-3xl font-extrabold text-danger">{data?.bloqueados ?? 0}</p>
+        <p className="text-base text-muted-foreground">por pago pendiente</p>
+        <Button asChild variant="contorno" size="grande" className="mt-4">
+          <Link to="/alumnos">Gestionar Bloqueos</Link>
         </Button>
       </Tarjeta>
 
