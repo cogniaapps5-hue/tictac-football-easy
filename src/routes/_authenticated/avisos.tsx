@@ -10,7 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Shell, Tarjeta } from "@/components/tictac/Shell";
-import { useSesion, fechaCorta, GRUPOS, grupoEtiqueta } from "@/lib/session";
+import { useSesion, fechaCorta, GRUPOS, grupoEtiqueta, SEDES, sedeDe } from "@/lib/session";
+
+function destinoEtiqueta(valor: string) {
+  if (valor === "all") return "todos";
+  if (SEDES.some((s) => s.valor === valor)) return `${sedeDe(valor).largo} · ${sedeDe(valor).sede}`;
+  return grupoEtiqueta(valor);
+}
 
 export const Route = createFileRoute("/_authenticated/avisos")({
   head: () => ({
@@ -98,7 +104,7 @@ function Avisos() {
           </div>
           <div className="space-y-2">
             <Label className="text-base">Para</Label>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               {[
                 ["all", "Todos"],
                 ...GRUPOS.map((g) => [g.valor, `${g.emoji} ${g.etiqueta}`]),
@@ -111,6 +117,20 @@ function Avisos() {
                   onClick={() => setDestino(valor)}
                 >
                   {texto}
+                </Button>
+              ))}
+            </div>
+            <p className="pt-2 text-base font-semibold">O solo una sede</p>
+            <div className="flex gap-4">
+              {SEDES.map((s) => (
+                <Button
+                  key={s.valor}
+                  variant={destino === s.valor ? "accion" : "neutro"}
+                  size="medio"
+                  className="h-auto min-h-[60px] flex-1 py-4 text-base"
+                  onClick={() => setDestino(s.valor)}
+                >
+                  📍 {s.sede}
                 </Button>
               ))}
             </div>
@@ -134,7 +154,7 @@ function Avisos() {
               <p className="text-base font-bold">{aviso.title}</p>
               <p className="text-base text-muted-foreground">{aviso.content}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Para {aviso.target_category === "all" ? "todos" : grupoEtiqueta(aviso.target_category)} ·{" "}
+                Para {destinoEtiqueta(aviso.target_category)} ·{" "}
                 {fechaCorta(aviso.created_at)}
               </p>
             </li>
