@@ -123,7 +123,7 @@ function Pagos() {
                 <Button
                   variant="contorno"
                   size="medio"
-                  className="w-full"
+                  className="h-auto min-h-[60px] w-full py-4 text-base"
                   onClick={() => void verFoto(pago.receipt_url!)}
                 >
                   <ImageIcon /> Ver Foto
@@ -137,7 +137,7 @@ function Pagos() {
                 <Button
                   variant="exito"
                   size="medio"
-                  className="flex-1"
+                  className="h-auto min-h-[60px] flex-1 py-4 text-base"
                   onClick={() => decidir.mutate({ id: pago.id, estado: "approved" })}
                 >
                   <Check /> Aprobar
@@ -145,7 +145,7 @@ function Pagos() {
                 <Button
                   variant="peligro"
                   size="medio"
-                  className="flex-1"
+                  className="h-auto min-h-[60px] flex-1 py-4 text-base"
                   onClick={() => decidir.mutate({ id: pago.id, estado: "rejected" })}
                 >
                   <X /> Rechazar
