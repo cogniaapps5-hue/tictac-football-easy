@@ -7,7 +7,12 @@ import * as XLSX from "xlsx";
 
 import { Button } from "@/components/ui/button";
 import { Tarjeta } from "@/components/tictac/Shell";
-import { cargaMasiva, type EntradaCarga, type ResultadoCarga } from "@/lib/carga-masiva.functions";
+import {
+  cargaMasiva,
+  CLAVE_TEMPORAL,
+  type EntradaCarga,
+  type ResultadoCarga,
+} from "@/lib/carga-masiva.functions";
 
 type Fila = Record<string, unknown>;
 
@@ -229,6 +234,13 @@ export function CargaMasiva() {
           <p className="rounded-xl border-2 border-green-500 bg-green-500/15 p-4 text-lg font-semibold">
             ✅ Guardado: {resultado.alumnos} alumnos y {resultado.apoderados} apoderados nuevos.
           </p>
+          {resultado.apoderados > 0 ? (
+            <p className="rounded-xl border-2 border-gold-brand bg-black/70 p-4 text-lg font-semibold text-foreground">
+              🔑 Usuarios creados. Contraseña temporal para todos los apoderados:{" "}
+              <strong>{CLAVE_TEMPORAL}</strong>. Se recomienda que cambien su contraseña al primer
+              inicio de sesión.
+            </p>
+          ) : null}
           {resultado.errores.length ? (
             <div className="rounded-xl border-2 border-red-500 bg-red-500/15 p-4">
               <p className="text-lg font-bold">⚠️ Filas con problemas ({resultado.errores.length})</p>

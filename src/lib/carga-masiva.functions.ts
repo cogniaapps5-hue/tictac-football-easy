@@ -27,6 +27,8 @@ export type ResultadoCarga = {
   errores: string[];
 };
 
+export const CLAVE_TEMPORAL = "TicTac2026*";
+
 export const cargaMasiva = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => entrada.parse(data))
@@ -66,7 +68,7 @@ export const cargaMasiva = createServerFn({ method: "POST" })
         } else {
           const { data: creado, error } = await supabaseAdmin.auth.admin.createUser({
             email,
-            password: `TicTac-${crypto.randomUUID().slice(0, 12)}`,
+            password: CLAVE_TEMPORAL,
             email_confirm: true,
             user_metadata: {
               full_name: f.nombre_apoderado,
@@ -78,6 +80,20 @@ export const cargaMasiva = createServerFn({ method: "POST" })
           else {
             parentId = creado.user?.id ?? null;
             creadosApoderados += 1;
+            if (parentId) {
+              await supabaseAdmin.from("profiles").upsert(
+                {
+                  id: parentId,
+                  email,
+                  full_name: f.nombre_apoderado || email.split("@")[0]!,
+                  phone: f.telefono || null,
+                },
+                { onConflict: "id" },
+              );
+              await supabaseAdmin
+                .from("user_roles")
+                .upsert({ user_id: parentId, role: "parent" }, { onConflict: "user_id,role" });
+            }
           }
         }
       }
