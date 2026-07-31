@@ -3,46 +3,27 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { parseFechaNacimiento, edadDesde, grupoPorEdad } from "@/lib/carga-masiva-utils";
 
-const filaApoderado = z.object({
-  nombre: z.string().trim().max(120).default(""),
-  rut: z.string().trim().max(20).default(""),
-  email: z.string().trim().email().max(255),
+const fila = z.object({
+  nombre_apoderado: z.string().trim().max(120).default(""),
+  rut_apoderado: z.string().trim().max(20).default(""),
+  email: z.string().trim().max(255).default(""),
   telefono: z.string().trim().max(40).default(""),
-});
-
-const filaAlumno = z.object({
-  nombre: z.string().trim().min(1).max(120),
-  rut: z.string().trim().max(20).default(""),
+  nombre_alumno: z.string().trim().min(1).max(120),
+  rut_alumno: z.string().trim().max(20).default(""),
   fecha_nacimiento: z.string().trim().max(20).default(""),
   talla_polera: z.string().trim().max(5).default(""),
   condiciones_medicas: z.string().trim().max(1000).default(""),
-  nombre_emergencia: z.string().trim().max(120).default(""),
-  telefono_emergencia: z.string().trim().max(40).default(""),
-  parentesco: z.string().trim().max(60).default(""),
-  apoderado_email: z.string().trim().max(255).default(""),
-  dia: z.enum(["martes", "jueves"]).default("martes"),
-  monto_inicial: z.number().int().min(0).max(10_000_000).nullable().default(null),
-  concepto_inicial: z.string().trim().max(120).default(""),
+  dia_entrenamiento: z.enum(["martes", "jueves"]).default("martes"),
 });
 
-const filaPago = z.object({
-  alumno_rut: z.string().trim().min(1).max(20),
-  monto: z.number().int().min(0).max(10_000_000).default(20000),
-  concepto: z.string().trim().max(120).default("Mensualidad"),
-});
+const entrada = z.object({ filas: z.array(fila).max(500).default([]) });
 
-const entrada = z.object({
-  apoderados: z.array(filaApoderado).max(500).default([]),
-  alumnos: z.array(filaAlumno).max(500).default([]),
-  pagos: z.array(filaPago).max(1000).default([]),
-});
-
+export type FilaCarga = z.input<typeof fila>;
 export type EntradaCarga = z.input<typeof entrada>;
 
 export type ResultadoCarga = {
   apoderados: number;
   alumnos: number;
-  pagos: number;
   errores: string[];
 };
 
@@ -61,58 +42,54 @@ export const cargaMasiva = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const errores: string[] = [];
     let creadosApoderados = 0;
-
-    for (const fila of data.apoderados) {
-      const email = fila.email.toLowerCase();
-      const { data: existente } = await supabaseAdmin
-        .from("profiles")
-        .select("id")
-        .eq("email", email)
-        .maybeSingle();
-      if (existente) {
-        await supabaseAdmin
-          .from("profiles")
-          .update({
-            full_name: fila.nombre || undefined,
-            phone: fila.telefono || undefined,
-          })
-          .eq("id", existente.id);
-        errores.push(`Apoderado ${email}: ya existía, se actualizaron sus datos`);
-        continue;
-      }
-      const { error } = await supabaseAdmin.auth.admin.createUser({
-        email,
-        password: `TicTac-${crypto.randomUUID().slice(0, 12)}`,
-        email_confirm: true,
-        user_metadata: { full_name: fila.nombre, phone: fila.telefono, rut: fila.rut },
-      });
-      if (error) {
-        errores.push(`Apoderado ${email}: ${error.message}`);
-        continue;
-      }
-      creadosApoderados += 1;
-    }
-
     let creadosAlumnos = 0;
-    let pagosIniciales = 0;
-    for (const fila of data.alumnos) {
-      const email = fila.apoderado_email.toLowerCase() || null;
+
+    for (const f of data.filas) {
+      const email = f.email.trim().toLowerCase();
       let parentId: string | null = null;
+
       if (email) {
         const { data: perfil } = await supabaseAdmin
           .from("profiles")
           .select("id")
           .eq("email", email)
           .maybeSingle();
-        parentId = perfil?.id ?? null;
+        if (perfil) {
+          parentId = perfil.id;
+          await supabaseAdmin
+            .from("profiles")
+            .update({
+              full_name: f.nombre_apoderado || undefined,
+              phone: f.telefono || undefined,
+            })
+            .eq("id", perfil.id);
+        } else {
+          const { data: creado, error } = await supabaseAdmin.auth.admin.createUser({
+            email,
+            password: `TicTac-${crypto.randomUUID().slice(0, 12)}`,
+            email_confirm: true,
+            user_metadata: {
+              full_name: f.nombre_apoderado,
+              phone: f.telefono,
+              rut: f.rut_apoderado,
+            },
+          });
+          if (error) errores.push(`Apoderado ${email}: ${error.message}`);
+          else {
+            parentId = creado.user?.id ?? null;
+            creadosApoderados += 1;
+          }
+        }
       }
-      const fechaNac = parseFechaNacimiento(fila.fecha_nacimiento);
-      if (fila.fecha_nacimiento && !fechaNac) {
-        errores.push(`Alumno ${fila.nombre}: fecha de nacimiento inválida (usa DD-MM-AAAA)`);
+
+      const fechaNac = parseFechaNacimiento(f.fecha_nacimiento);
+      if (f.fecha_nacimiento && !fechaNac) {
+        errores.push(`Alumno ${f.nombre_alumno}: fecha de nacimiento inválida (usa DD-MM-AAAA)`);
       }
       const edad = fechaNac ? edadDesde(fechaNac) : 8;
       const anio = fechaNac ? Number(fechaNac.slice(0, 4)) : new Date().getFullYear() - 8;
-      const rut = fila.rut || null;
+      const rut = f.rut_alumno || null;
+
       if (rut) {
         const { data: yaExiste } = await supabaseAdmin
           .from("players")
@@ -120,75 +97,29 @@ export const cargaMasiva = createServerFn({ method: "POST" })
           .eq("rut", rut)
           .maybeSingle();
         if (yaExiste) {
-          errores.push(`Alumno ${fila.nombre} (RUT ${rut}): ya estaba registrado`);
+          errores.push(`Alumno ${f.nombre_alumno} (RUT ${rut}): ya estaba registrado`);
           continue;
         }
       }
-      const { data: creado, error } = await supabaseAdmin
-        .from("players")
-        .insert({
-          name: fila.nombre,
-          rut,
-          birth_year: anio,
-          birth_date: fechaNac,
-          age_group: grupoPorEdad(edad),
-          jersey_size: fila.talla_polera.toUpperCase() || null,
-          medical_conditions: fila.condiciones_medicas || null,
-          emergency_contact_name: fila.nombre_emergencia || null,
-          emergency_contact_phone: fila.telefono_emergencia || null,
-          emergency_relationship: fila.parentesco || null,
-          training_day: fila.dia,
-          parent_email: email,
-          parent_id: parentId,
-        })
-        .select("id")
-        .single();
+
+      const { error } = await supabaseAdmin.from("players").insert({
+        name: f.nombre_alumno,
+        rut,
+        birth_year: anio,
+        birth_date: fechaNac,
+        age_group: grupoPorEdad(edad),
+        jersey_size: f.talla_polera.toUpperCase() || null,
+        medical_conditions: f.condiciones_medicas || null,
+        training_day: f.dia_entrenamiento,
+        parent_email: email || null,
+        parent_id: parentId,
+      });
       if (error) {
-        errores.push(`Alumno ${fila.nombre}: ${error.message}`);
+        errores.push(`Alumno ${f.nombre_alumno}: ${error.message}`);
         continue;
       }
       creadosAlumnos += 1;
-
-      if (creado && fila.monto_inicial != null) {
-        const { error: errorPago } = await supabaseAdmin.from("payments").insert({
-          player_id: creado.id,
-          amount: fila.monto_inicial,
-          concept: fila.concepto_inicial || "Mensualidad",
-          status: "pending",
-        });
-        if (errorPago) errores.push(`Pago inicial de ${fila.nombre}: ${errorPago.message}`);
-        else pagosIniciales += 1;
-      }
     }
 
-    let creadosPagos = 0;
-    for (const fila of data.pagos) {
-      const { data: alumno } = await supabaseAdmin
-        .from("players")
-        .select("id")
-        .eq("rut", fila.alumno_rut)
-        .maybeSingle();
-      if (!alumno) {
-        errores.push(`Pago RUT ${fila.alumno_rut}: no encontramos ese alumno`);
-        continue;
-      }
-      const { error } = await supabaseAdmin.from("payments").insert({
-        player_id: alumno.id,
-        amount: fila.monto,
-        concept: fila.concepto || "Mensualidad",
-        status: "pending",
-      });
-      if (error) {
-        errores.push(`Pago RUT ${fila.alumno_rut}: ${error.message}`);
-        continue;
-      }
-      creadosPagos += 1;
-    }
-
-    return {
-      apoderados: creadosApoderados,
-      alumnos: creadosAlumnos,
-      pagos: creadosPagos + pagosIniciales,
-      errores,
-    };
+    return { apoderados: creadosApoderados, alumnos: creadosAlumnos, errores };
   });
