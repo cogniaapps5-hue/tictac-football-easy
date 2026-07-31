@@ -152,7 +152,7 @@ function InicioPadre({ userId }: { userId: string }) {
         .eq("parent_id", userId)
         .order("name");
       const ids = (alumnos ?? []).map((a) => a.id);
-      const [pagos, asistencia, avisos, nutricion, alertas] = await Promise.all([
+      const [pagos, asistencia, avisos, nutricion, alertas, recordatorios] = await Promise.all([
         ids.length
           ? supabase.from("payments").select("*").in("player_id", ids).order("due_date")
           : Promise.resolve({ data: [] as never[] }),
