@@ -155,7 +155,7 @@ function InicioPadre({ userId }: { userId: string }) {
         .eq("parent_id", userId)
         .order("name");
       const ids = (alumnos ?? []).map((a) => a.id);
-      const [pagos, asistencia, avisos, nutricion, alertas, recordatorios] = await Promise.all([
+      const [pagos, asistencia, avisos, nutricion, alertas, recordatorios, perfil] = await Promise.all([
         ids.length
           ? supabase.from("payments").select("*").in("player_id", ids).order("due_date")
           : Promise.resolve({ data: [] as never[] }),
@@ -183,6 +183,7 @@ function InicioPadre({ userId }: { userId: string }) {
               .order("sent_at", { ascending: false })
               .limit(3)
           : Promise.resolve({ data: [] as never[] }),
+        supabase.from("profiles").select("contract_accepted_at").eq("id", userId).maybeSingle(),
       ]);
       return {
         alumnos: alumnos ?? [],
@@ -192,6 +193,7 @@ function InicioPadre({ userId }: { userId: string }) {
         nutricion: nutricion.data ?? [],
         alertas: alertas.data ?? [],
         recordatorios: recordatorios.data ?? [],
+        contrato: perfil.data?.contract_accepted_at ?? null,
       };
     },
   });
@@ -244,6 +246,17 @@ function InicioPadre({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-6">
+      {data && !data.contrato ? (
+        <Link
+          to="/info"
+          className="flex items-start gap-3 rounded-2xl border-2 border-gold-brand bg-gold-brand/20 p-5"
+        >
+          <span aria-hidden className="text-2xl">⚠️</span>
+          <p className="text-lg font-bold text-foreground">
+            Debes aceptar el reglamento para continuar usando la app. Toca aquí para firmarlo.
+          </p>
+        </Link>
+      ) : null}
       {recordatorio === "proximo" ? (
         <div className="flex items-start gap-3 rounded-2xl border-2 border-gold-brand bg-gold-brand/20 p-5">
           <span aria-hidden className="text-2xl">⏰</span>
