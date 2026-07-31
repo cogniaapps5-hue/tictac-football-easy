@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Wallet, CalendarCheck, TriangleAlert, Megaphone, Apple, Check, X } from "lucide-react";
+import { Wallet, CalendarCheck, TriangleAlert, Megaphone, Apple, Check, X, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -41,7 +41,7 @@ function InicioAdmin() {
     queryFn: async () => {
       const [pagos, alumnos, asistencia] = await Promise.all([
         supabase.from("payments").select("id, status, due_date"),
-        supabase.from("players").select("id"),
+        supabase.from("players").select("id, access_status"),
         supabase.from("attendance").select("id, status").eq("session_date", proximo.iso),
       ]);
       const pendientes = (pagos.data ?? []).filter((p) => p.status === "pending");
@@ -52,6 +52,7 @@ function InicioAdmin() {
         pendientes: pendientes.length,
         atrasados: atrasados.length,
         total: alumnos.data?.length ?? 0,
+        bloqueados: (alumnos.data ?? []).filter((a) => a.access_status === "blocked").length,
         confirmados: (asistencia.data ?? []).filter((a) => a.status === "confirmed").length,
       };
     },
@@ -87,6 +88,18 @@ function InicioAdmin() {
 
       <Tarjeta>
         <div className="flex items-center gap-3">
+          <Lock className="size-7 text-danger" />
+          <h2 className="text-xl font-bold">Alumnos bloqueados hoy</h2>
+        </div>
+        <p className="mt-2 text-3xl font-extrabold text-danger">{data?.bloqueados ?? 0}</p>
+        <p className="text-base text-muted-foreground">por pago pendiente</p>
+        <Button asChild variant="contorno" size="grande" className="mt-4">
+          <Link to="/alumnos">Gestionar Bloqueos</Link>
+        </Button>
+      </Tarjeta>
+
+      <Tarjeta>
+        <div className="flex items-center gap-3">
           <TriangleAlert className="size-7 text-danger" />
           <h2 className="text-xl font-bold">Alertas</h2>
         </div>
@@ -113,7 +126,7 @@ function InicioPadre({ userId }: { userId: string }) {
         .eq("parent_id", userId)
         .order("name");
       const ids = (alumnos ?? []).map((a) => a.id);
-      const [pagos, asistencia, avisos, nutricion] = await Promise.all([
+      const [pagos, asistencia, avisos, nutricion, alertas] = await Promise.all([
         ids.length
           ? supabase.from("payments").select("*").in("player_id", ids).order("due_date")
           : Promise.resolve({ data: [] as never[] }),
@@ -124,6 +137,14 @@ function InicioPadre({ userId }: { userId: string }) {
         ids.length
           ? supabase.from("nutrition_sessions").select("*").in("player_id", ids)
           : Promise.resolve({ data: [] as never[] }),
+        ids.length
+          ? supabase
+              .from("notifications")
+              .select("*")
+              .in("player_id", ids)
+              .order("created_at", { ascending: false })
+              .limit(3)
+          : Promise.resolve({ data: [] as never[] }),
       ]);
       return {
         alumnos: alumnos ?? [],
@@ -131,6 +152,7 @@ function InicioPadre({ userId }: { userId: string }) {
         asistencia: asistencia.data ?? [],
         avisos: avisos.data ?? [],
         nutricion: nutricion.data ?? [],
+        alertas: alertas.data ?? [],
       };
     },
   });
@@ -153,6 +175,7 @@ function InicioPadre({ userId }: { userId: string }) {
   });
 
   const alumno = data?.alumnos[0];
+  const bloqueado = alumno?.access_status === "blocked";
   const pendiente = data?.pagos.find((p) => p.status === "pending");
   const rechazado = data?.pagos.find((p) => p.status === "rejected");
   const respuesta = data?.asistencia.find((a) => a.player_id === alumno?.id);
@@ -165,12 +188,25 @@ function InicioPadre({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-6">
+      {bloqueado ? (
+        <div className="flex items-start gap-3 rounded-2xl border-[3px] border-danger bg-danger/20 p-5">
+          <TriangleAlert className="mt-0.5 size-7 shrink-0 text-danger" />
+          <p className="text-lg font-bold text-foreground">
+            ⚠️ ACCESO SUSPENDIDO — Pago pendiente desde el día 6. Regulariza tu situación.
+          </p>
+        </div>
+      ) : null}
+
       <Tarjeta destacada className="border-[3px] p-6">
         <h2 className="text-2xl font-bold">⚽ Próximo entrenamiento</h2>
         <p className="mt-1 text-lg capitalize">
           {proximo.texto} — {alumno?.schedule ?? "Miércoles 15:00"}
         </p>
-        {alumno ? (
+        {alumno && bloqueado ? (
+          <p className="mt-4 text-lg font-semibold text-muted-foreground">
+            Acceso suspendido hasta regularizar pago
+          </p>
+        ) : alumno ? (
           <>
             <p className="mt-4 text-lg font-semibold">¿Viene {alumno.name.split(" ")[0]}?</p>
             {respuesta ? (
@@ -287,6 +323,12 @@ function InicioPadre({ userId }: { userId: string }) {
           <h2 className="text-xl font-bold">Avisos</h2>
         </div>
         <ul className="mt-3 space-y-3">
+          {(data?.alertas ?? []).map((alerta) => (
+            <li key={alerta.id} className="rounded-xl border-2 border-danger bg-danger/15 p-4">
+              <p className="text-base font-bold">⚠️ {alerta.title}</p>
+              <p className="text-base">{alerta.body}</p>
+            </li>
+          ))}
           {(data?.avisos ?? []).map((aviso) => (
             <li key={aviso.id} className="rounded-xl bg-secondary p-4">
               <p className="text-base font-bold">{aviso.title}</p>

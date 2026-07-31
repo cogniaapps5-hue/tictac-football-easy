@@ -88,6 +88,38 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          player_id: string
+          title: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          player_id: string
+          title: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          player_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nutrition_sessions: {
         Row: {
           id: string
@@ -169,6 +201,7 @@ export type Database = {
       }
       players: {
         Row: {
+          access_status: Database["public"]["Enums"]["access_status"]
           category: string
           coach: string
           created_at: string
@@ -182,6 +215,7 @@ export type Database = {
           schedule: string
         }
         Insert: {
+          access_status?: Database["public"]["Enums"]["access_status"]
           category?: string
           coach?: string
           created_at?: string
@@ -195,6 +229,7 @@ export type Database = {
           schedule?: string
         }
         Update: {
+          access_status?: Database["public"]["Enums"]["access_status"]
           category?: string
           coach?: string
           created_at?: string
@@ -264,6 +299,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      aplicar_bloqueos_morosidad: { Args: never; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -273,6 +309,7 @@ export type Database = {
       }
     }
     Enums: {
+      access_status: "active" | "pending_review" | "blocked" | "exception"
       app_role: "admin" | "parent"
     }
     CompositeTypes: {
@@ -401,6 +438,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      access_status: ["active", "pending_review", "blocked", "exception"],
       app_role: ["admin", "parent"],
     },
   },
