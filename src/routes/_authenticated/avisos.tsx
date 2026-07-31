@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Shell, Tarjeta } from "@/components/tictac/Shell";
-import { useSesion, fechaCorta } from "@/lib/session";
+import { useSesion, fechaCorta, GRUPOS, grupoEtiqueta } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/avisos")({
   head: () => ({
@@ -101,14 +101,13 @@ function Avisos() {
             <div className="flex gap-2">
               {[
                 ["all", "Todos"],
-                ["SUB12", "SUB12"],
-                ["SUB15", "SUB15"],
+                ...GRUPOS.map((g) => [g.valor, `${g.emoji} ${g.etiqueta}`]),
               ].map(([valor, texto]) => (
                 <Button
                   key={valor}
                   variant={destino === valor ? "accion" : "neutro"}
                   size="medio"
-                  className="flex-1"
+                  className="h-auto min-h-[60px] flex-1 py-4 text-base"
                   onClick={() => setDestino(valor)}
                 >
                   {texto}
@@ -135,7 +134,7 @@ function Avisos() {
               <p className="text-base font-bold">{aviso.title}</p>
               <p className="text-base text-muted-foreground">{aviso.content}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Para {aviso.target_category === "all" ? "todos" : aviso.target_category} ·{" "}
+                Para {aviso.target_category === "all" ? "todos" : grupoEtiqueta(aviso.target_category)} ·{" "}
                 {fechaCorta(aviso.created_at)}
               </p>
             </li>
