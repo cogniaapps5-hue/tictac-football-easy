@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const filaApoderado = z.object({
   email: z.string().trim().email().max(255),
@@ -50,10 +51,10 @@ function grupo(anio: number) {
 }
 
 export const cargaMasiva = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => entrada.parse(data))
-  .handler(async ({ data }): Promise<ResultadoCarga> => {
-    const { requireSupabaseAuthContext } = await import("@/lib/carga-masiva.server");
-    const { supabase, userId } = await requireSupabaseAuthContext();
+  .handler(async ({ data, context }): Promise<ResultadoCarga> => {
+    const { supabase, userId } = context;
     const { data: roles } = await supabase
       .from("user_roles")
       .select("role")
