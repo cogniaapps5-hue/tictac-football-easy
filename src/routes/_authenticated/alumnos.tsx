@@ -15,6 +15,7 @@ import {
   GRUPOS,
   DIAS,
   grupoPorAnio,
+  sedeDe,
   type DiaEntrenamiento,
 } from "@/lib/session";
 
@@ -40,11 +41,12 @@ function semaforo(estado: string) {
 function Alumnos() {
   const { data: sesion } = useSesion();
   const queryClient = useQueryClient();
-  const proximo = proximoEntrenamiento();
   const [busqueda, setBusqueda] = useState("");
   const [agregando, setAgregando] = useState(false);
   const [grupoFiltro, setGrupoFiltro] = useState<string>("todos");
-  const [diaFiltro, setDiaFiltro] = useState<string>("todos");
+  const [diaFiltro, setDiaFiltro] = useState<DiaEntrenamiento>(proximoEntrenamiento().dia);
+  const proximo = proximoEntrenamiento(diaFiltro);
+  const sedeActual = sedeDe(diaFiltro);
   const [nuevo, setNuevo] = useState({
     name: "",
     rut: "",
