@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
-import { useSesion, pesos, fechaCorta } from "@/lib/session";
+import { useSesion, pesos, fechaCorta, GRUPOS, grupoEtiqueta } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/pagos")({
   head: () => ({
@@ -35,6 +35,7 @@ function Pagos() {
   const { data: sesion } = useSesion();
   const queryClient = useQueryClient();
   const [filtro, setFiltro] = useState<Filtro>("pending");
+  const [grupo, setGrupo] = useState<string>("todos");
   const [foto, setFoto] = useState<string | null>(null);
   const [rechazo, setRechazo] = useState<{ id: string; nombre: string } | null>(null);
   const [motivo, setMotivo] = useState("");
@@ -44,7 +45,7 @@ function Pagos() {
     queryFn: async () => {
       const { data } = await supabase
         .from("payments")
-        .select("*, players(name, category)")
+        .select("*, players(name, age_group)")
         .order("created_at", { ascending: false });
       return data ?? [];
     },
@@ -119,8 +120,11 @@ function Pagos() {
     );
   }
 
-  const lista = (pagos ?? []).filter((p) => p.status === filtro);
-  const pendientes = (pagos ?? []).filter((p) => p.status === "pending").length;
+  const porGrupo = (pagos ?? []).filter(
+    (p) => grupo === "todos" || p.players?.age_group === grupo,
+  );
+  const lista = porGrupo.filter((p) => p.status === filtro);
+  const pendientes = porGrupo.filter((p) => p.status === "pending").length;
 
   return (
     <Shell rol="admin" titulo="Pagos" subtitulo="Revisa los comprobantes">
@@ -146,11 +150,31 @@ function Pagos() {
         </div>
       </Tarjeta>
 
+      <Tarjeta>
+        <p className="text-base font-semibold">Grupo</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {[{ valor: "todos", etiqueta: "Todos", emoji: "" }, ...GRUPOS].map((g) => (
+            <Button
+              key={g.valor}
+              variant={grupo === g.valor ? "accion" : "neutro"}
+              size="medio"
+              className="h-auto min-h-[60px] flex-1 py-4 text-base"
+              onClick={() => setGrupo(g.valor)}
+            >
+              {g.emoji} {g.etiqueta}
+            </Button>
+          ))}
+        </div>
+      </Tarjeta>
+
       {filtro === "pending" ? (
         <Tarjeta destacada>
           <p className="text-3xl font-black text-primary">{pendientes}</p>
           <p className="text-lg font-semibold">
             {pendientes === 1 ? "pago pendiente por revisar" : "pagos pendientes por revisar"}
+          </p>
+          <p className="mt-1 text-base text-muted-foreground">
+            Pagos pendientes — {grupo === "todos" ? "Todos los grupos" : grupoEtiqueta(grupo)}
           </p>
         </Tarjeta>
       ) : null}
