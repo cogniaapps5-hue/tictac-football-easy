@@ -48,21 +48,52 @@ export function fechaCorta(iso: string) {
   return d.toLocaleDateString("es-CL", { day: "numeric", month: "short" });
 }
 
-export function proximoEntrenamiento() {
+export type GrupoEtario = "iniciados" | "intermedios" | "avanzados";
+export type DiaEntrenamiento = "martes" | "jueves";
+
+/** Horarios y sedes fijas de la escuela. */
+export const SEDES: {
+  valor: DiaEntrenamiento;
+  corto: string;
+  largo: string;
+  diaSemana: number;
+  hora: string;
+  sede: string;
+}[] = [
+  { valor: "martes", corto: "Mar", largo: "Martes", diaSemana: 2, hora: "19:00", sede: "Rancho Rossi Peñuelas" },
+  { valor: "jueves", corto: "Jue", largo: "Jueves", diaSemana: 4, hora: "19:00", sede: "Forza Club Simdempart" },
+];
+
+export function sedeDe(dia: string | null | undefined) {
+  return SEDES.find((s) => s.valor === dia) ?? SEDES[0];
+}
+
+/**
+ * Próxima sesión. Si se entrega un día (martes/jueves) calcula la próxima de
+ * ese día; si no, la más cercana de las dos.
+ */
+export function proximoEntrenamiento(dia?: string | null) {
   const hoy = new Date();
-  const dia = hoy.getDay();
-  const faltan = (3 - dia + 7) % 7 || 7;
-  const fecha = new Date(hoy);
-  fecha.setDate(hoy.getDate() + faltan);
+  const candidatos = (dia ? [sedeDe(dia)] : SEDES).map((slot) => {
+    const faltan = (slot.diaSemana - hoy.getDay() + 7) % 7;
+    const fecha = new Date(hoy);
+    fecha.setDate(hoy.getDate() + faltan);
+    return { slot, fecha, faltan };
+  });
+  candidatos.sort((a, b) => a.faltan - b.faltan);
+  const elegido = candidatos[0];
+  const { slot, fecha } = elegido;
   return {
     fecha,
-    iso: fecha.toISOString().slice(0, 10),
+    slot,
+    iso: `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}-${String(fecha.getDate()).padStart(2, "0")}`,
+    dia: slot.valor,
+    hora: slot.hora,
+    sede: slot.sede,
+    titulo: `${slot.largo} ${slot.hora} hrs`,
     texto: fecha.toLocaleDateString("es-CL", { weekday: "long", day: "numeric", month: "long" }),
   };
 }
-
-export type GrupoEtario = "iniciados" | "intermedios" | "avanzados";
-export type DiaEntrenamiento = "lunes" | "miercoles" | "viernes";
 
 export const GRUPOS: { valor: GrupoEtario; etiqueta: string; emoji: string; color: string }[] = [
   { valor: "iniciados", etiqueta: "Iniciados (7-8)", emoji: "🟢", color: "text-success" },
@@ -70,11 +101,7 @@ export const GRUPOS: { valor: GrupoEtario; etiqueta: string; emoji: string; colo
   { valor: "avanzados", etiqueta: "Avanzados (11-12)", emoji: "🔵", color: "text-cyan-brand" },
 ];
 
-export const DIAS: { valor: DiaEntrenamiento; corto: string; largo: string }[] = [
-  { valor: "lunes", corto: "Lun", largo: "Lunes" },
-  { valor: "miercoles", corto: "Mié", largo: "Miércoles" },
-  { valor: "viernes", corto: "Vie", largo: "Viernes" },
-];
+export const DIAS = SEDES;
 
 export function grupoEtiqueta(grupo: string) {
   return GRUPOS.find((g) => g.valor === grupo)?.etiqueta ?? grupo;
