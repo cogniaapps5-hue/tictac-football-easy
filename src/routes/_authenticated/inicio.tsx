@@ -140,11 +140,12 @@ function InicioAdmin() {
 }
 
 function InicioPadre({ userId }: { userId: string }) {
-  const proximo = proximoEntrenamiento();
+  const proximoGeneral = proximoEntrenamiento();
+  const fechasPosibles = SEDES.map((s) => proximoEntrenamiento(s.valor).iso);
   const queryClient = useQueryClient();
 
   const { data } = useQuery({
-    queryKey: ["resumen-padre", userId, proximo.iso],
+    queryKey: ["resumen-padre", userId, fechasPosibles.join(",")],
     queryFn: async () => {
       const { data: alumnos } = await supabase
         .from("players")
@@ -157,7 +158,7 @@ function InicioPadre({ userId }: { userId: string }) {
           ? supabase.from("payments").select("*").in("player_id", ids).order("due_date")
           : Promise.resolve({ data: [] as never[] }),
         ids.length
-          ? supabase.from("attendance").select("*").in("player_id", ids).eq("session_date", proximo.iso)
+          ? supabase.from("attendance").select("*").in("player_id", ids).in("session_date", fechasPosibles)
           : Promise.resolve({ data: [] as never[] }),
         supabase.from("notices").select("*").order("created_at", { ascending: false }).limit(3),
         ids.length
