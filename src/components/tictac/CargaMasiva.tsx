@@ -140,7 +140,7 @@ export function CargaMasiva() {
 
   if (!abierto) {
     return (
-      <Button variant="dorado" size="grande" onClick={() => setAbierto(true)}>
+      <Button variant="alerta" size="grande" onClick={() => setAbierto(true)}>
         <FileSpreadsheet /> Cargar Excel / CSV
       </Button>
     );
