@@ -202,7 +202,8 @@ export type Database = {
       players: {
         Row: {
           access_status: Database["public"]["Enums"]["access_status"]
-          category: string
+          age_group: Database["public"]["Enums"]["age_group"]
+          birth_year: number | null
           coach: string
           created_at: string
           emergency_contact_name: string | null
@@ -213,10 +214,12 @@ export type Database = {
           parent_id: string | null
           rut: string | null
           schedule: string
+          training_day: Database["public"]["Enums"]["training_day"]
         }
         Insert: {
           access_status?: Database["public"]["Enums"]["access_status"]
-          category?: string
+          age_group?: Database["public"]["Enums"]["age_group"]
+          birth_year?: number | null
           coach?: string
           created_at?: string
           emergency_contact_name?: string | null
@@ -227,10 +230,12 @@ export type Database = {
           parent_id?: string | null
           rut?: string | null
           schedule?: string
+          training_day?: Database["public"]["Enums"]["training_day"]
         }
         Update: {
           access_status?: Database["public"]["Enums"]["access_status"]
-          category?: string
+          age_group?: Database["public"]["Enums"]["age_group"]
+          birth_year?: number | null
           coach?: string
           created_at?: string
           emergency_contact_name?: string | null
@@ -241,6 +246,7 @@ export type Database = {
           parent_id?: string | null
           rut?: string | null
           schedule?: string
+          training_day?: Database["public"]["Enums"]["training_day"]
         }
         Relationships: [
           {
@@ -310,7 +316,9 @@ export type Database = {
     }
     Enums: {
       access_status: "active" | "pending_review" | "blocked" | "exception"
+      age_group: "iniciados" | "intermedios" | "avanzados"
       app_role: "admin" | "parent"
+      training_day: "lunes" | "miercoles" | "viernes"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -439,7 +447,9 @@ export const Constants = {
   public: {
     Enums: {
       access_status: ["active", "pending_review", "blocked", "exception"],
+      age_group: ["iniciados", "intermedios", "avanzados"],
       app_role: ["admin", "parent"],
+      training_day: ["lunes", "miercoles", "viernes"],
     },
   },
 } as const
