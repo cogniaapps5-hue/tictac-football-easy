@@ -15,7 +15,6 @@ import {
   GRUPOS,
   DIAS,
   grupoPorAnio,
-  type GrupoEtario,
   type DiaEntrenamiento,
 } from "@/lib/session";
 
