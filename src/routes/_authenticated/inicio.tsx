@@ -154,6 +154,7 @@ function InicioPadre({ userId }: { userId: string }) {
 
   const alumno = data?.alumnos[0];
   const pendiente = data?.pagos.find((p) => p.status === "pending");
+  const rechazado = data?.pagos.find((p) => p.status === "rejected");
   const respuesta = data?.asistencia.find((a) => a.player_id === alumno?.id);
   const hoy = new Date();
   const anioActual = hoy.getFullYear();
@@ -235,6 +236,11 @@ function InicioPadre({ userId }: { userId: string }) {
             <span className="mt-2 block">Todo al día. ¡Gracias!</span>
           </p>
         )}
+        {rechazado ? (
+          <p className="mt-3 text-base text-danger">
+            Pago rechazado{rechazado.rejection_reason ? `: ${rechazado.rejection_reason}` : ""}
+          </p>
+        ) : null}
         <Button asChild variant="accion" size="grande" className="mt-4">
           <Link to="/mi-hijo">Subir Comprobante</Link>
         </Button>

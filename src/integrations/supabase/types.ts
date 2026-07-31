@@ -132,6 +132,7 @@ export type Database = {
           id: string
           player_id: string
           receipt_url: string | null
+          rejection_reason: string | null
           status: string
         }
         Insert: {
@@ -142,6 +143,7 @@ export type Database = {
           id?: string
           player_id: string
           receipt_url?: string | null
+          rejection_reason?: string | null
           status?: string
         }
         Update: {
@@ -152,6 +154,7 @@ export type Database = {
           id?: string
           player_id?: string
           receipt_url?: string | null
+          rejection_reason?: string | null
           status?: string
         }
         Relationships: [

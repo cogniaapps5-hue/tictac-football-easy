@@ -199,11 +199,16 @@ function MiHijo() {
             <h2 className="text-xl font-bold">💳 Pagos</h2>
             <ul className="mt-3 space-y-2">
               {(data?.pagos ?? []).map((p) => (
-                <li key={p.id} className="flex items-center justify-between rounded-xl bg-secondary p-3">
-                  <span className="text-base">
-                    {p.concept} — {pesos(p.amount)}
-                  </span>
-                  <Estado estado={p.status} />
+                <li key={p.id} className="rounded-xl bg-secondary p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-base">
+                      {p.concept} — {pesos(p.amount)}
+                    </span>
+                    <Estado estado={p.status} />
+                  </div>
+                  {p.status === "rejected" && p.rejection_reason ? (
+                    <p className="mt-2 text-base text-danger">Motivo: {p.rejection_reason}</p>
+                  ) : null}
                 </li>
               ))}
             </ul>

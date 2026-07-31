@@ -6,6 +6,14 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { useSesion, pesos, fechaCorta } from "@/lib/session";
 
@@ -28,6 +36,8 @@ function Pagos() {
   const queryClient = useQueryClient();
   const [filtro, setFiltro] = useState<Filtro>("pending");
   const [foto, setFoto] = useState<string | null>(null);
+  const [rechazo, setRechazo] = useState<{ id: string; nombre: string } | null>(null);
+  const [motivo, setMotivo] = useState("");
 
   const { data: pagos } = useQuery({
     queryKey: ["pagos"],
@@ -41,13 +51,18 @@ function Pagos() {
   });
 
   const decidir = useMutation({
-    mutationFn: async ({ id, estado }: { id: string; estado: string }) => {
-      const { error } = await supabase.from("payments").update({ status: estado }).eq("id", id);
+    mutationFn: async ({ id, estado, motivo }: { id: string; estado: string; motivo?: string }) => {
+      const { error } = await supabase
+        .from("payments")
+        .update({ status: estado, rejection_reason: estado === "rejected" ? (motivo ?? null) : null })
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: (_d, vars) => {
       queryClient.invalidateQueries({ queryKey: ["pagos"] });
       queryClient.invalidateQueries({ queryKey: ["resumen-admin"] });
+      setRechazo(null);
+      setMotivo("");
       toast.success(vars.estado === "approved" ? "Pago aprobado" : "Pago rechazado");
     },
     onError: () => toast.error("No pudimos guardar el cambio"),
@@ -146,12 +161,18 @@ function Pagos() {
                   variant="peligro"
                   size="medio"
                   className="h-auto min-h-[60px] flex-1 py-4 text-base"
-                  onClick={() => decidir.mutate({ id: pago.id, estado: "rejected" })}
+                  onClick={() => {
+                    setMotivo("");
+                    setRechazo({ id: pago.id, nombre: pago.players?.name ?? "" });
+                  }}
                 >
                   <X /> Rechazar
                 </Button>
               </div>
             </div>
+          ) : null}
+          {pago.status === "rejected" && pago.rejection_reason ? (
+            <p className="mt-3 text-base text-danger">Motivo: {pago.rejection_reason}</p>
           ) : null}
         </Tarjeta>
       ))}
@@ -161,6 +182,37 @@ function Pagos() {
           <p className="text-base text-muted-foreground">No hay pagos en esta lista.</p>
         </Tarjeta>
       ) : null}
+
+      <Dialog open={!!rechazo} onOpenChange={(abierto) => !abierto && setRechazo(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rechazar pago</DialogTitle>
+            <DialogDescription className="text-base">
+              Indica el motivo del rechazo para que el apoderado pueda corregirlo
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={motivo}
+            maxLength={300}
+            rows={4}
+            placeholder="Ej: la foto no se ve o el monto no coincide"
+            className="text-base"
+            onChange={(e) => setMotivo(e.target.value)}
+          />
+          <Button
+            variant="peligro"
+            size="medio"
+            className="h-auto min-h-[60px] w-full py-4 text-base"
+            disabled={!motivo.trim() || decidir.isPending}
+            onClick={() =>
+              rechazo &&
+              decidir.mutate({ id: rechazo.id, estado: "rejected", motivo: motivo.trim() })
+            }
+          >
+            Confirmar Rechazo
+          </Button>
+        </DialogContent>
+      </Dialog>
     </Shell>
   );
 }
