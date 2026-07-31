@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { RecordatoriosAdmin } from "@/components/tictac/Recordatorios";
-import { useSesion, saludo, pesos, proximoEntrenamiento, fechaCorta } from "@/lib/session";
+import { useSesion, saludo, pesos, proximoEntrenamiento, fechaCorta, SEDES } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
   head: () => ({
@@ -100,6 +100,8 @@ function InicioAdmin() {
         <p className="mt-2 text-2xl font-extrabold">
           {data?.confirmados ?? 0} de {data?.total ?? 0} confirmados
         </p>
+        <p className="text-lg font-bold text-cyan-brand">{proximo.titulo}</p>
+        <p className="text-base font-semibold">📍 {proximo.sede}</p>
         <p className="text-base capitalize text-muted-foreground">{proximo.texto}</p>
         <Button asChild variant="contorno" size="grande" className="mt-4">
           <Link to="/alumnos">Ver Lista</Link>
@@ -140,11 +142,12 @@ function InicioAdmin() {
 }
 
 function InicioPadre({ userId }: { userId: string }) {
-  const proximo = proximoEntrenamiento();
+  const proximoGeneral = proximoEntrenamiento();
+  const fechasPosibles = SEDES.map((s) => proximoEntrenamiento(s.valor).iso);
   const queryClient = useQueryClient();
 
   const { data } = useQuery({
-    queryKey: ["resumen-padre", userId, proximo.iso],
+    queryKey: ["resumen-padre", userId, fechasPosibles.join(",")],
     queryFn: async () => {
       const { data: alumnos } = await supabase
         .from("players")
@@ -157,7 +160,7 @@ function InicioPadre({ userId }: { userId: string }) {
           ? supabase.from("payments").select("*").in("player_id", ids).order("due_date")
           : Promise.resolve({ data: [] as never[] }),
         ids.length
-          ? supabase.from("attendance").select("*").in("player_id", ids).eq("session_date", proximo.iso)
+          ? supabase.from("attendance").select("*").in("player_id", ids).in("session_date", fechasPosibles)
           : Promise.resolve({ data: [] as never[] }),
         supabase.from("notices").select("*").order("created_at", { ascending: false }).limit(3),
         ids.length
@@ -193,6 +196,9 @@ function InicioPadre({ userId }: { userId: string }) {
     },
   });
 
+  const alumno = data?.alumnos[0];
+  const proximo = proximoEntrenamiento(alumno?.training_day ?? proximoGeneral.dia);
+
   const responder = useMutation({
     mutationFn: async ({ playerId, estado }: { playerId: string; estado: string }) => {
       const { error } = await supabase
@@ -210,11 +216,12 @@ function InicioPadre({ userId }: { userId: string }) {
     onError: () => toast.error("No pudimos guardar tu respuesta. Intenta otra vez."),
   });
 
-  const alumno = data?.alumnos[0];
   const bloqueado = alumno?.access_status === "blocked";
   const pendiente = data?.pagos.find((p) => p.status === "pending");
   const rechazado = data?.pagos.find((p) => p.status === "rejected");
-  const respuesta = data?.asistencia.find((a) => a.player_id === alumno?.id);
+  const respuesta = data?.asistencia.find(
+    (a) => a.player_id === alumno?.id && a.session_date === proximo.iso,
+  );
   const hoy = new Date();
   const anioActual = hoy.getFullYear();
   const semestreActual = hoy.getMonth() < 6 ? 1 : 2;
@@ -265,10 +272,10 @@ function InicioPadre({ userId }: { userId: string }) {
       ) : null}
 
       <Tarjeta destacada className="border-[3px] p-6">
-        <h2 className="text-2xl font-bold">⚽ Próximo entrenamiento</h2>
-        <p className="mt-1 text-lg capitalize">
-          {proximo.texto} — {alumno?.schedule ?? "Miércoles 15:00"}
-        </p>
+        <h2 className="text-2xl font-black tracking-tight">⚽ PRÓXIMO ENTRENAMIENTO</h2>
+        <p className="mt-2 text-3xl font-extrabold text-cyan-brand">{proximo.titulo}</p>
+        <p className="mt-1 text-xl font-bold">📍 {proximo.sede}</p>
+        <p className="mt-1 text-base capitalize text-muted-foreground">{proximo.texto}</p>
         {alumno && bloqueado ? (
           <p className="mt-4 text-lg font-semibold text-muted-foreground">
             Podrás confirmar asistencia apenas subas tu comprobante. ¡Gracias!

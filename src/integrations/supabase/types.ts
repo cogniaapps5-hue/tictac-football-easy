@@ -329,6 +329,36 @@ export type Database = {
         }
         Relationships: []
       }
+      training_slots: {
+        Row: {
+          created_at: string
+          day: Database["public"]["Enums"]["training_day"]
+          end_time: string
+          id: string
+          start_time: string
+          updated_at: string
+          venue: string
+        }
+        Insert: {
+          created_at?: string
+          day: Database["public"]["Enums"]["training_day"]
+          end_time: string
+          id?: string
+          start_time: string
+          updated_at?: string
+          venue: string
+        }
+        Update: {
+          created_at?: string
+          day?: Database["public"]["Enums"]["training_day"]
+          end_time?: string
+          id?: string
+          start_time?: string
+          updated_at?: string
+          venue?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -366,7 +396,7 @@ export type Database = {
       access_status: "active" | "pending_review" | "blocked" | "exception"
       age_group: "iniciados" | "intermedios" | "avanzados"
       app_role: "admin" | "parent"
-      training_day: "lunes" | "miercoles" | "viernes"
+      training_day: "martes" | "jueves"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -497,7 +527,7 @@ export const Constants = {
       access_status: ["active", "pending_review", "blocked", "exception"],
       age_group: ["iniciados", "intermedios", "avanzados"],
       app_role: ["admin", "parent"],
-      training_day: ["lunes", "miercoles", "viernes"],
+      training_day: ["martes", "jueves"],
     },
   },
 } as const
