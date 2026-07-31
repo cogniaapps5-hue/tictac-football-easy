@@ -79,6 +79,19 @@ function Alumnos() {
     onError: () => toast.error("No pudimos agregar al alumno"),
   });
 
+  const cambiarAcceso = useMutation({
+    mutationFn: async ({ playerId, estado }: { playerId: string; estado: "exception" | "blocked" }) => {
+      const { error } = await supabase.from("players").update({ access_status: estado }).eq("id", playerId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["alumnos"] });
+      queryClient.invalidateQueries({ queryKey: ["resumen-admin"] });
+      toast.success("Acceso actualizado");
+    },
+    onError: () => toast.error("No pudimos cambiar el acceso"),
+  });
+
   if (!sesion) return null;
   if (sesion.rol !== "admin") {
     return (
@@ -125,9 +138,28 @@ function Alumnos() {
               {alumno.category} — {alumno.schedule}
             </p>
             {alumno.rut ? <p className="text-base text-muted-foreground">RUT {alumno.rut}</p> : null}
+            <p className="mt-2 text-base font-semibold">{semaforo(alumno.access_status)}</p>
             <div className="mt-3">
               <Estado estado={marca?.status ?? "no_response"} />
             </div>
+            {alumno.access_status === "blocked" || alumno.access_status === "exception" ? (
+              <Button
+                variant={alumno.access_status === "exception" ? "alerta" : "contorno"}
+                size="medio"
+                className="mt-3 h-auto min-h-[60px] w-full py-4 text-base"
+                disabled={cambiarAcceso.isPending}
+                onClick={() =>
+                  cambiarAcceso.mutate({
+                    playerId: alumno.id,
+                    estado: alumno.access_status === "exception" ? "blocked" : "exception",
+                  })
+                }
+              >
+                {alumno.access_status === "exception"
+                  ? "Quitar acceso excepcional"
+                  : "Autorizar acceso excepcional"}
+              </Button>
+            ) : null}
             <div className="mt-4 flex gap-3">
               <Button
                 variant="exito"
