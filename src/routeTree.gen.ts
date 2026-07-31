@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as CambiarClaveRouteImport } from './routes/cambiar-clave'
 import { Route as AuthenticatedAlumnosRouteImport } from './routes/_authenticated/alumnos'
 import { Route as AuthenticatedAvisosRouteImport } from './routes/_authenticated/avisos'
 import { Route as AuthenticatedCuerpoTecnicoRouteImport } from './routes/_authenticated/cuerpo-tecnico'
@@ -26,6 +27,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CambiarClaveRoute = CambiarClaveRouteImport.update({
+  id: '/cambiar-clave',
+  path: '/cambiar-clave',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAlumnosRoute = AuthenticatedAlumnosRouteImport.update({
@@ -67,6 +73,7 @@ const AuthenticatedPagosRoute = AuthenticatedPagosRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cambiar-clave': typeof CambiarClaveRoute
   '/alumnos': typeof AuthenticatedAlumnosRoute
   '/avisos': typeof AuthenticatedAvisosRoute
   '/cuerpo-tecnico': typeof AuthenticatedCuerpoTecnicoRoute
@@ -77,6 +84,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cambiar-clave': typeof CambiarClaveRoute
   '/alumnos': typeof AuthenticatedAlumnosRoute
   '/avisos': typeof AuthenticatedAvisosRoute
   '/cuerpo-tecnico': typeof AuthenticatedCuerpoTecnicoRoute
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/cambiar-clave': typeof CambiarClaveRoute
   '/_authenticated/alumnos': typeof AuthenticatedAlumnosRoute
   '/_authenticated/avisos': typeof AuthenticatedAvisosRoute
   '/_authenticated/cuerpo-tecnico': typeof AuthenticatedCuerpoTecnicoRoute
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/cambiar-clave'
     | '/alumnos'
     | '/avisos'
     | '/cuerpo-tecnico'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/cambiar-clave'
     | '/alumnos'
     | '/avisos'
     | '/cuerpo-tecnico'
@@ -122,6 +133,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/cambiar-clave'
     | '/_authenticated/alumnos'
     | '/_authenticated/avisos'
     | '/_authenticated/cuerpo-tecnico'
@@ -134,6 +146,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  CambiarClaveRoute: typeof CambiarClaveRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -150,6 +163,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cambiar-clave': {
+      id: '/cambiar-clave'
+      path: '/cambiar-clave'
+      fullPath: '/cambiar-clave'
+      preLoaderRoute: typeof CambiarClaveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/alumnos': {
@@ -230,6 +250,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  CambiarClaveRoute: CambiarClaveRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
