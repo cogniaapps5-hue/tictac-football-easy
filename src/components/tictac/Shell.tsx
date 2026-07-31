@@ -94,16 +94,19 @@ export function Shell({
 export function Tarjeta({
   children,
   destacada,
+  className,
 }: {
   children: ReactNode;
   destacada?: boolean;
+  className?: string;
 }) {
   return (
     <section
-      className={
-        "rounded-2xl bg-card p-5 shadow-card " +
-        (destacada ? "border-2 border-cyan-brand" : "border border-border")
-      }
+      className={cn(
+        "rounded-2xl bg-card p-5 shadow-card",
+        destacada ? "border-2 border-cyan-brand" : "border border-border",
+        className,
+      )}
     >
       {children}
     </section>
