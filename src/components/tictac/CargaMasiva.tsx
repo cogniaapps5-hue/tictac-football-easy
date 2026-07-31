@@ -26,6 +26,20 @@ function numero(fila: Fila, ...claves: string[]) {
   return valor ? Number(valor) : null;
 }
 
+function fecha(fila: Fila, ...claves: string[]) {
+  for (const clave of claves) {
+    const encontrada = Object.keys(fila).find(
+      (k) => k.trim().toLowerCase().replace(/\s+/g, "_") === clave,
+    );
+    const valor = encontrada ? fila[encontrada] : null;
+    if (valor instanceof Date) {
+      return `${String(valor.getDate()).padStart(2, "0")}-${String(valor.getMonth() + 1).padStart(2, "0")}-${valor.getFullYear()}`;
+    }
+    if (valor != null && String(valor).trim()) return String(valor).trim();
+  }
+  return "";
+}
+
 function leerLibro(libro: XLSX.WorkBook): EntradaCarga {
   const hoja = (nombre: string) => {
     const real = libro.SheetNames.find(
@@ -40,25 +54,35 @@ function leerLibro(libro: XLSX.WorkBook): EntradaCarga {
   return {
     apoderados: hoja("Apoderados")
       .map((f) => ({
+        nombre: texto(f, "nombre_apoderado", "nombre", "nombre_completo"),
+        rut: texto(f, "rut_apoderado", "rut"),
         email: texto(f, "email", "correo"),
-        nombre: texto(f, "nombre", "nombre_completo"),
         telefono: texto(f, "telefono", "teléfono", "fono"),
       }))
       .filter((f) => f.email),
     alumnos: hojaAlumnos
       .map((f) => ({
-        nombre: texto(f, "nombre", "alumno"),
-        rut: texto(f, "rut"),
-        edad: numero(f, "edad", "anio", "año", "birth_year"),
-        apoderado_email: texto(f, "apoderado_email", "email_apoderado", "apoderado"),
-        dia: (texto(f, "dia", "día").toLowerCase().startsWith("j") ? "jueves" : "martes") as
+        nombre: texto(f, "nombre_alumno", "nombre", "alumno"),
+        rut: texto(f, "rut_alumno", "rut"),
+        fecha_nacimiento: fecha(f, "fecha_nacimiento", "nacimiento"),
+        talla_polera: texto(f, "talla_polera", "talla"),
+        condiciones_medicas: texto(f, "condiciones_medicas", "condiciones_médicas", "medico"),
+        nombre_emergencia: texto(f, "nombre_emergencia", "contacto_emergencia"),
+        telefono_emergencia: texto(f, "telefono_emergencia", "teléfono_emergencia"),
+        parentesco: texto(f, "parentesco"),
+        apoderado_email: texto(f, "email", "apoderado_email", "email_apoderado", "apoderado"),
+        dia: (texto(f, "dia_entrenamiento", "dia", "día").toLowerCase().startsWith("j")
+          ? "jueves"
+          : "martes") as
           | "martes"
           | "jueves",
+        monto_inicial: numero(f, "monto_inicial", "monto"),
+        concepto_inicial: texto(f, "concepto_inicial", "concepto"),
       }))
       .filter((f) => f.nombre),
     pagos: hoja("Pagos")
       .map((f) => ({
-        alumno_rut: texto(f, "alumno_rut", "rut"),
+        alumno_rut: texto(f, "rut_alumno", "alumno_rut", "rut"),
         monto: numero(f, "monto", "amount") ?? 20000,
         concepto: texto(f, "concepto", "concept") || "Mensualidad",
       }))
@@ -71,7 +95,12 @@ function plantilla() {
   XLSX.utils.book_append_sheet(
     libro,
     XLSX.utils.json_to_sheet([
-      { email: "apoderado@correo.cl", nombre: "María Pérez", telefono: "+56912345678" },
+      {
+        nombre_apoderado: "María Pérez",
+        rut_apoderado: "10.111.222-3",
+        email: "apoderado@correo.cl",
+        telefono: "+56912345678",
+      },
     ]),
     "Apoderados",
   );
@@ -79,11 +108,18 @@ function plantilla() {
     libro,
     XLSX.utils.json_to_sheet([
       {
-        nombre: "Juan Pérez",
-        rut: "12.345.678-9",
-        edad: 8,
-        apoderado_email: "apoderado@correo.cl",
-        dia: "martes",
+        nombre_alumno: "Juan Pérez",
+        rut_alumno: "12.345.678-9",
+        fecha_nacimiento: "15-03-2018",
+        talla_polera: "M",
+        condiciones_medicas: "Asma leve, usa inhalador",
+        nombre_emergencia: "María Pérez",
+        telefono_emergencia: "+56912345678",
+        parentesco: "Madre",
+        email: "apoderado@correo.cl",
+        dia_entrenamiento: "Martes",
+        monto_inicial: 20000,
+        concepto_inicial: "Mensualidad",
       },
     ]),
     "Alumnos",
@@ -91,7 +127,7 @@ function plantilla() {
   XLSX.utils.book_append_sheet(
     libro,
     XLSX.utils.json_to_sheet([
-      { alumno_rut: "12.345.678-9", monto: 20000, concepto: "Mensualidad" },
+      { rut_alumno: "12.345.678-9", monto: 20000, concepto: "Mensualidad" },
     ]),
     "Pagos",
   );
@@ -124,7 +160,7 @@ export function CargaMasiva() {
   async function procesar(file: File) {
     try {
       const buffer = await file.arrayBuffer();
-      const libro = XLSX.read(buffer, { type: "array" });
+      const libro = XLSX.read(buffer, { type: "array", cellDates: true });
       const leidos = leerLibro(libro);
       if (!leidos.alumnos?.length && !leidos.apoderados?.length && !leidos.pagos?.length) {
         toast.error("El archivo no tiene datos que podamos leer");
@@ -150,7 +186,10 @@ export function CargaMasiva() {
     <Tarjeta destacada className="border-[3px]">
       <h2 className="text-2xl font-black">📄 Cargar Excel / CSV</h2>
       <p className="mt-2 text-base text-muted-foreground">
-        El archivo puede tener 3 pestañas: Apoderados, Alumnos y Pagos.
+        El archivo puede tener 3 pestañas: Apoderados, Alumnos y Pagos. En Alumnos usa las columnas:
+        nombre_alumno, rut_alumno, fecha_nacimiento (DD-MM-AAAA), talla_polera, condiciones_medicas,
+        nombre_emergencia, telefono_emergencia, parentesco, email, dia_entrenamiento, monto_inicial y
+        concepto_inicial.
       </p>
 
       <div
@@ -207,7 +246,8 @@ export function CargaMasiva() {
           <div className="space-y-2 rounded-xl bg-secondary p-4">
             {(datos.alumnos ?? []).slice(0, 5).map((a, i) => (
               <p key={i} className="text-base">
-                🧒 {a.nombre} — RUT {a.rut || "sin RUT"} — {a.apoderado_email || "sin apoderado"}
+                🧒 {a.nombre} — RUT {a.rut || "sin RUT"} — nace {a.fecha_nacimiento || "sin fecha"} —{" "}
+                {a.apoderado_email || "sin apoderado"}
               </p>
             ))}
             {(datos.apoderados ?? []).slice(0, 3).map((a, i) => (

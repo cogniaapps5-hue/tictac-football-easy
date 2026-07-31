@@ -226,6 +226,14 @@ function InicioPadre({ userId }: { userId: string }) {
   );
   const hoy = new Date();
   const anioActual = hoy.getFullYear();
+
+  // Cumpleaños: compara día y mes de la fecha de nacimiento con la fecha actual.
+  // Al depender de `hoy`, el saludo desaparece solo al cambiar el día.
+  const cumpleaneros = (data?.alumnos ?? []).filter((a) => {
+    if (!a.birth_date) return false;
+    const [, mes, dia] = String(a.birth_date).split("-").map(Number);
+    return mes === hoy.getMonth() + 1 && dia === hoy.getDate();
+  });
   const semestreActual = hoy.getMonth() < 6 ? 1 : 2;
   const nutricion = (data?.nutricion ?? []).find(
     (n) => n.player_id === alumno?.id && n.year === anioActual && n.semester === semestreActual,
@@ -246,6 +254,22 @@ function InicioPadre({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-6">
+      {cumpleaneros.map((c) => (
+        <div
+          key={c.id}
+          className="rounded-2xl border-[3px] border-gold-brand bg-gold-brand/25 p-5 text-center shadow-[0_0_24px_oklch(0.82_0.16_85/0.35)]"
+        >
+          <p className="animate-bounce text-3xl" aria-hidden>
+            🎉🎂🎈
+          </p>
+          <p className="mt-2 text-xl font-black text-foreground">
+            ¡Feliz Cumpleaños a {c.name}!
+          </p>
+          <p className="mt-1 text-lg font-semibold text-foreground">
+            El equipo TIC TAC te desea un gran día.
+          </p>
+        </div>
+      ))}
       {data && !data.contrato ? (
         <Link
           to="/info"

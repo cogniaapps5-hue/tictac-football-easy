@@ -157,6 +157,34 @@ function Alumnos() {
         <p className="text-xl font-bold">👤 {alumno.name}</p>
         <p className="text-base text-muted-foreground">{alumno.schedule}</p>
         {alumno.rut ? <p className="text-base text-muted-foreground">RUT {alumno.rut}</p> : null}
+        {alumno.birth_date ? (
+          <p className="text-base text-muted-foreground">
+            🎂 Nació el {new Date(`${alumno.birth_date}T12:00:00`).toLocaleDateString("es-CL")}
+          </p>
+        ) : null}
+        {alumno.jersey_size ? (
+          <p className="text-base text-muted-foreground">👕 Talla polera {alumno.jersey_size}</p>
+        ) : null}
+
+        <div
+          className={`mt-3 rounded-xl border-2 p-4 ${
+            alumno.medical_conditions
+              ? "border-danger bg-danger/20"
+              : "border-gold-brand bg-gold-brand/10"
+          }`}
+        >
+          <p className="text-lg font-black text-foreground">🚑 Ficha Médica</p>
+          <p className="mt-1 text-base font-semibold text-foreground">
+            {alumno.medical_conditions || "Sin condiciones médicas informadas."}
+          </p>
+          {alumno.emergency_contact_name || alumno.emergency_contact_phone ? (
+            <p className="mt-2 text-base text-foreground">
+              📞 Emergencia: {alumno.emergency_contact_name ?? "sin nombre"}
+              {alumno.emergency_relationship ? ` (${alumno.emergency_relationship})` : ""}
+              {alumno.emergency_contact_phone ? ` — ${alumno.emergency_contact_phone}` : ""}
+            </p>
+          ) : null}
+        </div>
         <p className="mt-2 text-base font-semibold">{semaforo(alumno.access_status)}</p>
         <div className="mt-3">
           <Estado estado={marca?.status ?? "no_response"} />
