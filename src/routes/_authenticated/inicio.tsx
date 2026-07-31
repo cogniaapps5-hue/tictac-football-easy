@@ -166,6 +166,7 @@ function InicioPadre({ userId }: { userId: string }) {
   });
 
   const alumno = data?.alumnos[0];
+  const bloqueado = alumno?.access_status === "blocked";
   const pendiente = data?.pagos.find((p) => p.status === "pending");
   const rechazado = data?.pagos.find((p) => p.status === "rejected");
   const respuesta = data?.asistencia.find((a) => a.player_id === alumno?.id);
@@ -178,12 +179,25 @@ function InicioPadre({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-6">
+      {bloqueado ? (
+        <div className="flex items-start gap-3 rounded-2xl border-[3px] border-danger bg-danger/20 p-5">
+          <TriangleAlert className="mt-0.5 size-7 shrink-0 text-danger" />
+          <p className="text-lg font-bold text-foreground">
+            ⚠️ ACCESO SUSPENDIDO — Pago pendiente desde el día 6. Regulariza tu situación.
+          </p>
+        </div>
+      ) : null}
+
       <Tarjeta destacada className="border-[3px] p-6">
         <h2 className="text-2xl font-bold">⚽ Próximo entrenamiento</h2>
         <p className="mt-1 text-lg capitalize">
           {proximo.texto} — {alumno?.schedule ?? "Miércoles 15:00"}
         </p>
-        {alumno ? (
+        {alumno && bloqueado ? (
+          <p className="mt-4 text-lg font-semibold text-muted-foreground">
+            Acceso suspendido hasta regularizar pago
+          </p>
+        ) : alumno ? (
           <>
             <p className="mt-4 text-lg font-semibold">¿Viene {alumno.name.split(" ")[0]}?</p>
             {respuesta ? (
