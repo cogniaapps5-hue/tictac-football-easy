@@ -258,7 +258,8 @@ function InicioPadre({ userId }: { userId: string }) {
         <div className="flex items-start gap-3 rounded-2xl border-[3px] border-danger bg-danger/20 p-5">
           <TriangleAlert className="mt-0.5 size-7 shrink-0 text-danger" />
           <p className="text-lg font-bold text-foreground">
-            ⛔ ACCESO SUSPENDIDO — Pago pendiente desde el día 6. Sube tu comprobante.
+            Tu pago del mes aún está pendiente. Por favor sube tu comprobante para mantener tu acceso
+            activo. 🙏
           </p>
         </div>
       ) : null}
@@ -270,7 +271,7 @@ function InicioPadre({ userId }: { userId: string }) {
         </p>
         {alumno && bloqueado ? (
           <p className="mt-4 text-lg font-semibold text-muted-foreground">
-            Acceso suspendido hasta regularizar pago
+            Podrás confirmar asistencia apenas subas tu comprobante. ¡Gracias!
           </p>
         ) : alumno ? (
           <>
