@@ -270,10 +270,10 @@ function InicioPadre({ userId }: { userId: string }) {
       ) : null}
 
       <Tarjeta destacada className="border-[3px] p-6">
-        <h2 className="text-2xl font-bold">⚽ Próximo entrenamiento</h2>
-        <p className="mt-1 text-lg capitalize">
-          {proximo.texto} — {alumno?.schedule ?? "Miércoles 15:00"}
-        </p>
+        <h2 className="text-2xl font-black tracking-tight">⚽ PRÓXIMO ENTRENAMIENTO</h2>
+        <p className="mt-2 text-3xl font-extrabold text-cyan-brand">{proximo.titulo}</p>
+        <p className="mt-1 text-xl font-bold">📍 {proximo.sede}</p>
+        <p className="mt-1 text-base capitalize text-muted-foreground">{proximo.texto}</p>
         {alumno && bloqueado ? (
           <p className="mt-4 text-lg font-semibold text-muted-foreground">
             Podrás confirmar asistencia apenas subas tu comprobante. ¡Gracias!
