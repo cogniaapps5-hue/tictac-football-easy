@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
+import { CargaMasiva } from "@/components/tictac/CargaMasiva";
 import {
   useSesion,
   proximoEntrenamiento,
@@ -210,6 +211,8 @@ function Alumnos() {
         <p className="text-lg font-semibold">📍 {sedeActual.sede}</p>
         <p className="mt-1 text-base capitalize text-muted-foreground">{proximo.texto}</p>
       </Tarjeta>
+
+      <CargaMasiva />
 
       <Tarjeta>
         <Label htmlFor="buscar" className="text-base">
