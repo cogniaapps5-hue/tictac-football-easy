@@ -280,12 +280,16 @@ export type Database = {
         Row: {
           access_status: Database["public"]["Enums"]["access_status"]
           age_group: Database["public"]["Enums"]["age_group"]
+          birth_date: string | null
           birth_year: number | null
           coach: string
           created_at: string
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
+          emergency_relationship: string | null
           id: string
+          jersey_size: string | null
+          medical_conditions: string | null
           name: string
           parent_email: string | null
           parent_id: string | null
@@ -296,12 +300,16 @@ export type Database = {
         Insert: {
           access_status?: Database["public"]["Enums"]["access_status"]
           age_group?: Database["public"]["Enums"]["age_group"]
+          birth_date?: string | null
           birth_year?: number | null
           coach?: string
           created_at?: string
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
+          emergency_relationship?: string | null
           id?: string
+          jersey_size?: string | null
+          medical_conditions?: string | null
           name: string
           parent_email?: string | null
           parent_id?: string | null
@@ -312,12 +320,16 @@ export type Database = {
         Update: {
           access_status?: Database["public"]["Enums"]["access_status"]
           age_group?: Database["public"]["Enums"]["age_group"]
+          birth_date?: string | null
           birth_year?: number | null
           coach?: string
           created_at?: string
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
+          emergency_relationship?: string | null
           id?: string
+          jersey_size?: string | null
+          medical_conditions?: string | null
           name?: string
           parent_email?: string | null
           parent_id?: string | null
