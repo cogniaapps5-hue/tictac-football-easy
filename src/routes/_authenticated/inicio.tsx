@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { RecordatoriosAdmin } from "@/components/tictac/Recordatorios";
-import { useSesion, saludo, pesos, proximoEntrenamiento, fechaCorta } from "@/lib/session";
+import { useSesion, saludo, pesos, proximoEntrenamiento, fechaCorta, SEDES } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
   head: () => ({
