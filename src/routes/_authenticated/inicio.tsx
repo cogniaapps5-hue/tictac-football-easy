@@ -194,6 +194,9 @@ function InicioPadre({ userId }: { userId: string }) {
     },
   });
 
+  const alumno = data?.alumnos[0];
+  const proximo = proximoEntrenamiento(alumno?.training_day ?? proximoGeneral.dia);
+
   const responder = useMutation({
     mutationFn: async ({ playerId, estado }: { playerId: string; estado: string }) => {
       const { error } = await supabase
@@ -211,11 +214,12 @@ function InicioPadre({ userId }: { userId: string }) {
     onError: () => toast.error("No pudimos guardar tu respuesta. Intenta otra vez."),
   });
 
-  const alumno = data?.alumnos[0];
   const bloqueado = alumno?.access_status === "blocked";
   const pendiente = data?.pagos.find((p) => p.status === "pending");
   const rechazado = data?.pagos.find((p) => p.status === "rejected");
-  const respuesta = data?.asistencia.find((a) => a.player_id === alumno?.id);
+  const respuesta = data?.asistencia.find(
+    (a) => a.player_id === alumno?.id && a.session_date === proximo.iso,
+  );
   const hoy = new Date();
   const anioActual = hoy.getFullYear();
   const semestreActual = hoy.getMonth() < 6 ? 1 : 2;
