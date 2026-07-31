@@ -171,6 +171,15 @@ function InicioPadre({ userId }: { userId: string }) {
               .order("created_at", { ascending: false })
               .limit(3)
           : Promise.resolve({ data: [] as never[] }),
+        ids.length
+          ? supabase
+              .from("payment_reminders")
+              .select("id, message, sent_at")
+              .in("player_id", ids)
+              .eq("status", "sent")
+              .order("sent_at", { ascending: false })
+              .limit(3)
+          : Promise.resolve({ data: [] as never[] }),
       ]);
       return {
         alumnos: alumnos ?? [],
@@ -179,6 +188,7 @@ function InicioPadre({ userId }: { userId: string }) {
         avisos: avisos.data ?? [],
         nutricion: nutricion.data ?? [],
         alertas: alertas.data ?? [],
+        recordatorios: recordatorios.data ?? [],
       };
     },
   });
