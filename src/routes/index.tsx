@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import logo from "@/assets/tictac-logo.png";
+import logoAsset from "@/assets/tictac-logo.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -78,7 +78,7 @@ function Entrar() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-10">
       <img
-        src={logo}
+        src={logoAsset.url}
         alt="Escuela de fútbol TIC TAC"
         width={160}
         height={160}
