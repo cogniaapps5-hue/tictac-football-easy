@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Wallet, CalendarCheck, TriangleAlert, Megaphone, Apple, Check, X } from "lucide-react";
+import { Wallet, CalendarCheck, TriangleAlert, Megaphone, Apple, Check, X, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
