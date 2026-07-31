@@ -26,7 +26,7 @@ export const Route = createFileRoute("/_authenticated/alumnos")({
 function semaforo(estado: string) {
   if (estado === "blocked") return "🔴 Bloqueado";
   if (estado === "pending_review") return "🟡 En revisión";
-  if (estado === "exception") return "🟠 Acceso excepcional";
+  if (estado === "exception") return "⚪ Excepción";
   return "🟢 Activo";
 }
 
