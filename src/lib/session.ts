@@ -85,16 +85,3 @@ export function grupoPorAnio(anio: number): GrupoEtario {
   if (anio >= 2016) return "intermedios";
   return "avanzados";
 }
-
-function _proximoEntrenamientoLegacy() {
-  const hoy = new Date();
-  const dia = hoy.getDay();
-  const faltan = (3 - dia + 7) % 7 || 7;
-  const fecha = new Date(hoy);
-  fecha.setDate(hoy.getDate() + faltan);
-  return {
-    fecha,
-    iso: fecha.toISOString().slice(0, 10),
-    texto: fecha.toLocaleDateString("es-CL", { weekday: "long", day: "numeric", month: "long" }),
-  };
-}
