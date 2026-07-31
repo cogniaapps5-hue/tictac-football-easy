@@ -25,7 +25,6 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
-  ssr: false,
   component: Entrar,
 });
 
@@ -85,7 +84,7 @@ function Entrar() {
         className="h-40 w-40"
       />
       <h1 className="mt-4 text-center text-3xl font-extrabold">TIC TAC</h1>
-      <p className="mt-1 text-center text-base text-muted-foreground">Siempre Feliz</p>
+      <p className="mt-1 text-center text-lg text-muted-foreground">Siempre Feliz</p>
 
       <form
         className="mt-8 w-full max-w-sm space-y-5 rounded-2xl border-2 border-cyan-brand bg-card p-6 shadow-card"
@@ -129,7 +128,7 @@ function Entrar() {
       </form>
 
       <div className="mt-8 w-full max-w-sm space-y-3">
-        <p className="text-center text-sm text-muted-foreground">Cuentas de prueba</p>
+        <p className="text-center text-base text-muted-foreground">Cuentas de prueba</p>
         <Button
           variant="contorno"
           size="medio"
