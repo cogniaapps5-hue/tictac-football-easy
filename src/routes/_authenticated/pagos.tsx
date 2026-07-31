@@ -74,6 +74,18 @@ function Pagos() {
         .eq("id", id);
       if (error) throw error;
     },
+    onMutate: async (vars) => {
+      await queryClient.cancelQueries({ queryKey: ["pagos"] });
+      const previo = queryClient.getQueryData<any[]>(["pagos"]);
+      queryClient.setQueryData<any[]>(["pagos"], (actual) =>
+        (actual ?? []).map((p) =>
+          p.id === vars.id
+            ? { ...p, status: vars.estado, rejection_reason: vars.motivo ?? null }
+            : p,
+        ),
+      );
+      return { previo };
+    },
     onSuccess: (_d, vars) => {
       queryClient.invalidateQueries({ queryKey: ["pagos"] });
       queryClient.invalidateQueries({ queryKey: ["resumen-admin"] });
@@ -81,7 +93,10 @@ function Pagos() {
       setMotivo("");
       toast.success(vars.estado === "approved" ? "Pago aprobado" : "Pago rechazado");
     },
-    onError: () => toast.error("No pudimos guardar el cambio"),
+    onError: (_e, _v, ctx) => {
+      if (ctx?.previo) queryClient.setQueryData(["pagos"], ctx.previo);
+      toast.error("No pudimos guardar el cambio");
+    },
   });
 
   async function verFoto(ruta: string) {
