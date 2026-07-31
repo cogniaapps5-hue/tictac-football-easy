@@ -9,7 +9,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
-import { useSesion, proximoEntrenamiento } from "@/lib/session";
+import {
+  useSesion,
+  proximoEntrenamiento,
+  GRUPOS,
+  DIAS,
+  grupoPorAnio,
+  type GrupoEtario,
+  type DiaEntrenamiento,
+} from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/alumnos")({
   head: () => ({
@@ -36,7 +44,15 @@ function Alumnos() {
   const proximo = proximoEntrenamiento();
   const [busqueda, setBusqueda] = useState("");
   const [agregando, setAgregando] = useState(false);
-  const [nuevo, setNuevo] = useState({ name: "", rut: "", category: "SUB12", parent_email: "" });
+  const [grupoFiltro, setGrupoFiltro] = useState<string>("todos");
+  const [diaFiltro, setDiaFiltro] = useState<string>("todos");
+  const [nuevo, setNuevo] = useState({
+    name: "",
+    rut: "",
+    birth_year: "2018",
+    training_day: "miercoles" as DiaEntrenamiento,
+    parent_email: "",
+  });
 
   const { data } = useQuery({
     queryKey: ["alumnos", proximo.iso],
@@ -72,14 +88,22 @@ function Alumnos() {
       const { error } = await supabase.from("players").insert({
         name: nuevo.name.trim(),
         rut: nuevo.rut.trim() || null,
-        category: nuevo.category,
+        birth_year: Number(nuevo.birth_year),
+        age_group: grupoPorAnio(Number(nuevo.birth_year)),
+        training_day: nuevo.training_day,
         parent_email: nuevo.parent_email.trim() || null,
       });
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["alumnos"] });
-      setNuevo({ name: "", rut: "", category: "SUB12", parent_email: "" });
+      setNuevo({
+        name: "",
+        rut: "",
+        birth_year: "2018",
+        training_day: "miercoles",
+        parent_email: "",
+      });
       setAgregando(false);
       toast.success("Alumno agregado");
     },
