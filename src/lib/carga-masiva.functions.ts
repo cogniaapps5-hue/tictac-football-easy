@@ -77,8 +77,7 @@ export const cargaMasiva = createServerFn({ method: "POST" })
             errores.push(
               `Apoderado ${email}: el RUT del alumno (${f.rut_alumno || "vacío"}) no sirve como clave temporal (mínimo 6 dígitos)`,
             );
-            continue;
-          }
+          } else {
           const { data: creado, error } = await supabaseAdmin.auth.admin.createUser({
             email,
             password: clave,
@@ -108,6 +107,7 @@ export const cargaMasiva = createServerFn({ method: "POST" })
                 .from("user_roles")
                 .upsert({ user_id: parentId, role: "parent" }, { onConflict: "user_id,role" });
             }
+          }
           }
         }
       }
