@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedAlumnosRouteImport } from './routes/_authenticated/alumnos'
 import { Route as AuthenticatedAvisosRouteImport } from './routes/_authenticated/avisos'
+import { Route as AuthenticatedCuerpoTecnicoRouteImport } from './routes/_authenticated/cuerpo-tecnico'
 import { Route as AuthenticatedInfoRouteImport } from './routes/_authenticated/info'
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
 import { Route as AuthenticatedMiHijoRouteImport } from './routes/_authenticated/mi-hijo'
@@ -37,6 +38,12 @@ const AuthenticatedAvisosRoute = AuthenticatedAvisosRouteImport.update({
   path: '/avisos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCuerpoTecnicoRoute =
+  AuthenticatedCuerpoTecnicoRouteImport.update({
+    id: '/cuerpo-tecnico',
+    path: '/cuerpo-tecnico',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedInfoRoute = AuthenticatedInfoRouteImport.update({
   id: '/info',
   path: '/info',
@@ -62,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/alumnos': typeof AuthenticatedAlumnosRoute
   '/avisos': typeof AuthenticatedAvisosRoute
+  '/cuerpo-tecnico': typeof AuthenticatedCuerpoTecnicoRoute
   '/info': typeof AuthenticatedInfoRoute
   '/inicio': typeof AuthenticatedInicioRoute
   '/mi-hijo': typeof AuthenticatedMiHijoRoute
@@ -71,6 +79,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/alumnos': typeof AuthenticatedAlumnosRoute
   '/avisos': typeof AuthenticatedAvisosRoute
+  '/cuerpo-tecnico': typeof AuthenticatedCuerpoTecnicoRoute
   '/info': typeof AuthenticatedInfoRoute
   '/inicio': typeof AuthenticatedInicioRoute
   '/mi-hijo': typeof AuthenticatedMiHijoRoute
@@ -82,6 +91,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_authenticated/alumnos': typeof AuthenticatedAlumnosRoute
   '/_authenticated/avisos': typeof AuthenticatedAvisosRoute
+  '/_authenticated/cuerpo-tecnico': typeof AuthenticatedCuerpoTecnicoRoute
   '/_authenticated/info': typeof AuthenticatedInfoRoute
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
   '/_authenticated/mi-hijo': typeof AuthenticatedMiHijoRoute
@@ -90,15 +100,31 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/alumnos' | '/avisos' | '/info' | '/inicio' | '/mi-hijo' | '/pagos'
+    | '/'
+    | '/alumnos'
+    | '/avisos'
+    | '/cuerpo-tecnico'
+    | '/info'
+    | '/inicio'
+    | '/mi-hijo'
+    | '/pagos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/alumnos' | '/avisos' | '/info' | '/inicio' | '/mi-hijo' | '/pagos'
+  to:
+    | '/'
+    | '/alumnos'
+    | '/avisos'
+    | '/cuerpo-tecnico'
+    | '/info'
+    | '/inicio'
+    | '/mi-hijo'
+    | '/pagos'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/_authenticated/alumnos'
     | '/_authenticated/avisos'
+    | '/_authenticated/cuerpo-tecnico'
     | '/_authenticated/info'
     | '/_authenticated/inicio'
     | '/_authenticated/mi-hijo'
@@ -140,6 +166,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAvisosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/cuerpo-tecnico': {
+      id: '/_authenticated/cuerpo-tecnico'
+      path: '/cuerpo-tecnico'
+      fullPath: '/cuerpo-tecnico'
+      preLoaderRoute: typeof AuthenticatedCuerpoTecnicoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/info': {
       id: '/_authenticated/info'
       path: '/info'
@@ -174,6 +207,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAlumnosRoute: typeof AuthenticatedAlumnosRoute
   AuthenticatedAvisosRoute: typeof AuthenticatedAvisosRoute
+  AuthenticatedCuerpoTecnicoRoute: typeof AuthenticatedCuerpoTecnicoRoute
   AuthenticatedInfoRoute: typeof AuthenticatedInfoRoute
   AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
   AuthenticatedMiHijoRoute: typeof AuthenticatedMiHijoRoute
@@ -183,6 +217,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAlumnosRoute: AuthenticatedAlumnosRoute,
   AuthenticatedAvisosRoute: AuthenticatedAvisosRoute,
+  AuthenticatedCuerpoTecnicoRoute: AuthenticatedCuerpoTecnicoRoute,
   AuthenticatedInfoRoute: AuthenticatedInfoRoute,
   AuthenticatedInicioRoute: AuthenticatedInicioRoute,
   AuthenticatedMiHijoRoute: AuthenticatedMiHijoRoute,

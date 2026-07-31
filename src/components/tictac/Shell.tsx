@@ -7,6 +7,7 @@ import {
   Megaphone,
   User,
   BookOpen,
+  ClipboardList,
   LogOut,
   type LucideIcon,
 } from "lucide-react";
@@ -24,6 +25,7 @@ const NAV_ADMIN: Item[] = [
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/pagos", label: "Pagos", icon: Wallet },
   { to: "/avisos", label: "Avisos", icon: Megaphone },
+  { to: "/cuerpo-tecnico", label: "Equipo", icon: ClipboardList },
 ];
 
 const NAV_PADRE: Item[] = [
@@ -81,12 +83,12 @@ export function Shell({
       <main className="mx-auto max-w-lg space-y-6 p-4">{children}</main>
 
       <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-card">
-        <div className="mx-auto flex max-w-lg gap-4 px-4 py-2">
+        <div className="mx-auto flex max-w-lg gap-2 px-3 py-2">
           {items.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}
               to={to}
-              className="flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2 text-base font-semibold text-muted-foreground"
+              className="flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-sm font-semibold text-muted-foreground"
               activeProps={{ className: "text-cyan-brand" }}
             >
               <Icon className="size-6" />

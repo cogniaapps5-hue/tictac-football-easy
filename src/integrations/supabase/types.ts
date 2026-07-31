@@ -46,6 +46,36 @@ export type Database = {
           },
         ]
       }
+      coaches: {
+        Row: {
+          bio: string
+          created_at: string
+          id: string
+          name: string
+          photo_url: string | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          bio?: string
+          created_at?: string
+          id?: string
+          name: string
+          photo_url?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          bio?: string
+          created_at?: string
+          id?: string
+          name?: string
+          photo_url?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       demo_accounts: {
         Row: {
           email: string
@@ -307,6 +337,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          contract_accepted_at: string | null
           created_at: string
           email: string
           full_name: string
@@ -314,6 +345,7 @@ export type Database = {
           phone: string | null
         }
         Insert: {
+          contract_accepted_at?: string | null
           created_at?: string
           email: string
           full_name?: string
@@ -321,6 +353,7 @@ export type Database = {
           phone?: string | null
         }
         Update: {
+          contract_accepted_at?: string | null
           created_at?: string
           email?: string
           full_name?: string
