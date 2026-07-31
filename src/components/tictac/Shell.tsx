@@ -7,7 +7,7 @@ import {
   Megaphone,
   User,
   BookOpen,
-  Whistle,
+  ClipboardList,
   LogOut,
   type LucideIcon,
 } from "lucide-react";
@@ -25,6 +25,7 @@ const NAV_ADMIN: Item[] = [
   { to: "/alumnos", label: "Alumnos", icon: Users },
   { to: "/pagos", label: "Pagos", icon: Wallet },
   { to: "/avisos", label: "Avisos", icon: Megaphone },
+  { to: "/cuerpo-tecnico", label: "Equipo", icon: ClipboardList },
 ];
 
 const NAV_PADRE: Item[] = [
