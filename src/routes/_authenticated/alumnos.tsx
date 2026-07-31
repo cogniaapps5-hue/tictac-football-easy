@@ -202,6 +202,15 @@ function Alumnos() {
 
   return (
     <Shell rol="admin" titulo="Alumnos" subtitulo={`${data?.alumnos.length ?? 0} inscritos`}>
+      <Tarjeta destacada className="border-[3px]">
+        <h2 className="text-2xl font-black">📋 Lista de Asistencia</h2>
+        <p className="mt-2 text-xl font-bold text-cyan-brand">
+          {sedeActual.largo} {sedeActual.hora} hrs
+        </p>
+        <p className="text-lg font-semibold">📍 {sedeActual.sede}</p>
+        <p className="mt-1 text-base capitalize text-muted-foreground">{proximo.texto}</p>
+      </Tarjeta>
+
       <Tarjeta>
         <Label htmlFor="buscar" className="text-base">
           Buscar alumno (nombre o RUT)
