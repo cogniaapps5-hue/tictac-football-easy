@@ -98,7 +98,7 @@ function Avisos() {
           </div>
           <div className="space-y-2">
             <Label className="text-base">Para</Label>
-            <div className="flex gap-2">
+            <div className="flex gap-4">
               {[
                 ["all", "Todos"],
                 ...GRUPOS.map((g) => [g.valor, `${g.emoji} ${g.etiqueta}`]),
@@ -128,7 +128,7 @@ function Avisos() {
 
       <Tarjeta>
         <h2 className="text-xl font-bold">Avisos enviados</h2>
-        <ul className="mt-3 space-y-3">
+        <ul className="mt-3 space-y-4">
           {(avisos ?? []).map((aviso) => (
             <li key={aviso.id} className="rounded-xl bg-secondary p-4">
               <p className="text-base font-bold">{aviso.title}</p>

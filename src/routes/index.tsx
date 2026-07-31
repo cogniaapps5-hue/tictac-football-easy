@@ -127,7 +127,7 @@ function Entrar() {
         </Button>
       </form>
 
-      <div className="mt-8 w-full max-w-sm space-y-3">
+      <div className="mt-8 w-full max-w-sm space-y-4">
         <p className="text-center text-base text-muted-foreground">Cuentas de prueba</p>
         <Button
           variant="contorno"
