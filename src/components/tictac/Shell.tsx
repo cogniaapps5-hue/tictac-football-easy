@@ -13,7 +13,7 @@ import {
 import type { ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/tictac-logo.png";
+import logoAsset from "@/assets/tictac-logo.jpg.asset.json";
 import type { Rol } from "@/lib/session";
 
 type Item = { to: string; label: string; icon: LucideIcon };
@@ -57,7 +57,7 @@ export function Shell({
     <div className="min-h-screen bg-background pb-28">
       <header className="sticky top-0 z-20 border-b border-border bg-background/95 px-5 py-4 backdrop-blur">
         <div className="mx-auto flex max-w-lg items-center gap-3">
-          <img src={logo} alt="Escuela de fútbol TIC TAC" width={56} height={56} className="h-14 w-14" />
+          <img src={logoAsset.url} alt="Escuela de fútbol TIC TAC" width={56} height={56} className="h-14 w-14" />
           <div className="min-w-0 flex-1">
             <h1 className="truncate text-xl font-bold leading-tight">{titulo}</h1>
             {subtitulo ? (
