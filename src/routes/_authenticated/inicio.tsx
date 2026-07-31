@@ -155,6 +155,12 @@ function InicioPadre({ userId }: { userId: string }) {
   const alumno = data?.alumnos[0];
   const pendiente = data?.pagos.find((p) => p.status === "pending");
   const respuesta = data?.asistencia.find((a) => a.player_id === alumno?.id);
+  const hoy = new Date();
+  const anioActual = hoy.getFullYear();
+  const semestreActual = hoy.getMonth() < 6 ? 1 : 2;
+  const nutricion = (data?.nutricion ?? []).find(
+    (n) => n.player_id === alumno?.id && n.year === anioActual && n.semester === semestreActual,
+  );
 
   return (
     <>
@@ -236,6 +242,37 @@ function InicioPadre({ userId }: { userId: string }) {
 
       <Tarjeta>
         <div className="flex items-center gap-3">
+          <Apple className="size-7 text-success" />
+          <h2 className="text-xl font-bold">Evaluación Nutricional</h2>
+        </div>
+        {!nutricion ? (
+          <p className="mt-3 text-base text-muted-foreground">Evaluación no habilitada aún.</p>
+        ) : nutricion.status === "booked" ? (
+          <p className="mt-3 text-lg font-bold text-gold-brand">
+            Hora agendada: {nutricion.scheduled_date ? fechaCorta(nutricion.scheduled_date) : "por confirmar"}
+          </p>
+        ) : (
+          <>
+            <p className="mt-2 text-base">
+              Semestre {nutricion.semester} — aún sin hora agendada.
+            </p>
+            <Button asChild variant="accion" size="grande" className="mt-4 min-h-[60px]">
+              <a
+                href={`https://wa.me/56912345678?text=${encodeURIComponent(
+                  `Hola, quiero agendar la hora del nutricionista para ${alumno?.name ?? "mi hijo/a"}`,
+                )}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Agendar Hora
+              </a>
+            </Button>
+          </>
+        )}
+      </Tarjeta>
+
+      <Tarjeta>
+        <div className="flex items-center gap-3">
           <Megaphone className="size-7 text-gold-brand" />
           <h2 className="text-xl font-bold">Avisos</h2>
         </div>
@@ -252,25 +289,6 @@ function InicioPadre({ userId }: { userId: string }) {
         </ul>
       </Tarjeta>
 
-      <Tarjeta>
-        <div className="flex items-center gap-3">
-          <Apple className="size-7 text-success" />
-          <h2 className="text-xl font-bold">Nutricionista</h2>
-        </div>
-        <p className="mt-2 text-base">
-          Evaluación Semestre {data?.nutricion[0]?.semester ?? 1} — {" "}
-          {data?.nutricion[0]?.status === "booked" ? "hora agendada" : "por agendar"}
-        </p>
-        <Button asChild variant="alerta" size="grande" className="mt-4">
-          <a
-            href="https://wa.me/56912345678?text=Hola%2C%20quiero%20agendar%20la%20hora%20con%20la%20nutricionista"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Agendar Hora
-          </a>
-        </Button>
-      </Tarjeta>
     </>
   );
 }
