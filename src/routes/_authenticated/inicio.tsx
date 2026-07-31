@@ -164,9 +164,9 @@ function InicioPadre({ userId }: { userId: string }) {
   );
 
   return (
-    <>
-      <Tarjeta destacada>
-        <h2 className="text-xl font-bold">⚽ Próximo entrenamiento</h2>
+    <div className="space-y-6">
+      <Tarjeta destacada className="border-[3px] p-6">
+        <h2 className="text-2xl font-bold">⚽ Próximo entrenamiento</h2>
         <p className="mt-1 text-lg capitalize">
           {proximo.texto} — {alumno?.schedule ?? "Miércoles 15:00"}
         </p>
@@ -191,7 +191,7 @@ function InicioPadre({ userId }: { userId: string }) {
                 </Button>
               </div>
             ) : (
-              <div className="mt-4 space-y-3">
+              <div className="mt-4 space-y-4">
                 <Button
                   variant="exito"
                   size="gigante"
@@ -237,9 +237,13 @@ function InicioPadre({ userId }: { userId: string }) {
           </p>
         )}
         {rechazado ? (
-          <p className="mt-3 text-base text-danger">
-            Pago rechazado{rechazado.rejection_reason ? `: ${rechazado.rejection_reason}` : ""}
-          </p>
+          <div className="mt-3 flex items-start gap-3 rounded-xl bg-black/70 p-4 text-lg font-semibold text-white">
+            <TriangleAlert className="mt-0.5 size-6 shrink-0 text-danger" />
+            <span>
+              Pago rechazado
+              {rechazado.rejection_reason ? `: ${rechazado.rejection_reason}` : ""}
+            </span>
+          </div>
         ) : null}
         <Button asChild variant="accion" size="grande" className="mt-4">
           <Link to="/mi-hijo">Subir Comprobante</Link>
@@ -262,7 +266,7 @@ function InicioPadre({ userId }: { userId: string }) {
             <p className="mt-2 text-base">
               Semestre {nutricion.semester} — aún sin hora agendada.
             </p>
-            <Button asChild variant="accion" size="grande" className="mt-4 min-h-[60px]">
+            <Button asChild variant="alerta" size="grande" className="mt-4 min-h-[60px]">
               <a
                 href={`https://wa.me/56912345678?text=${encodeURIComponent(
                   `Hola, quiero agendar la hora del nutricionista para ${alumno?.name ?? "mi hijo/a"}`,
@@ -294,7 +298,6 @@ function InicioPadre({ userId }: { userId: string }) {
           ) : null}
         </ul>
       </Tarjeta>
-
-    </>
+    </div>
   );
 }
