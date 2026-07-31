@@ -215,7 +215,7 @@ function InicioPadre({ userId }: { userId: string }) {
         <div className="flex items-start gap-3 rounded-2xl border-[3px] border-danger bg-danger/20 p-5">
           <TriangleAlert className="mt-0.5 size-7 shrink-0 text-danger" />
           <p className="text-lg font-bold text-foreground">
-            ⚠️ ACCESO SUSPENDIDO — Pago pendiente desde el día 6. Regulariza tu situación.
+            ⛔ ACCESO SUSPENDIDO — Pago pendiente desde el día 6. Sube tu comprobante.
           </p>
         </div>
       ) : null}
