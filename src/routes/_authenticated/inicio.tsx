@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
+import { RecordatoriosAdmin } from "@/components/tictac/Recordatorios";
 import { useSesion, saludo, pesos, proximoEntrenamiento, fechaCorta } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
@@ -88,6 +89,8 @@ function InicioAdmin() {
           <Link to="/pagos">Ver y Aprobar</Link>
         </Button>
       </Tarjeta>
+
+      <RecordatoriosAdmin />
 
       <Tarjeta>
         <div className="flex items-center gap-3">
