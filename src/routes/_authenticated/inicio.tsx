@@ -36,6 +36,23 @@ function Inicio() {
 
 function InicioAdmin() {
   const proximo = proximoEntrenamiento();
+  const queryClientAdmin = useQueryClient();
+
+  // Validación diaria en frontend (reemplaza el cron): al abrir la app, la
+  // administradora dispara la revisión de morosidad del mes en curso.
+  const { data: revision } = useQuery({
+    queryKey: ["revision-morosidad", new Date().toISOString().slice(0, 10)],
+    staleTime: Infinity,
+    retry: false,
+    queryFn: async () => {
+      const { data: bloqueadosHoy, error } = await supabase.rpc("aplicar_bloqueos_morosidad");
+      if (error) throw error;
+      await queryClientAdmin.invalidateQueries({ queryKey: ["resumen-admin"] });
+      await queryClientAdmin.invalidateQueries({ queryKey: ["alumnos"] });
+      return bloqueadosHoy ?? 0;
+    },
+  });
+
   const { data } = useQuery({
     queryKey: ["resumen-admin", proximo.iso],
     queryFn: async () => {
@@ -93,6 +110,12 @@ function InicioAdmin() {
         </div>
         <p className="mt-2 text-3xl font-extrabold text-danger">{data?.bloqueados ?? 0}</p>
         <p className="text-base text-muted-foreground">por pago pendiente</p>
+        {revision ? (
+          <p className="mt-3 rounded-xl bg-black/70 p-3 text-base font-semibold text-white">
+            ⚠️ {revision} {revision === 1 ? "alumno fue bloqueado" : "alumnos fueron bloqueados"} hoy. Envía aviso
+            manual por WhatsApp si es necesario.
+          </p>
+        ) : null}
         <Button asChild variant="contorno" size="grande" className="mt-4">
           <Link to="/alumnos">Gestionar Bloqueos</Link>
         </Button>
