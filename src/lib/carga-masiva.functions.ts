@@ -1,7 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { parseFechaNacimiento, edadDesde, grupoPorEdad } from "@/lib/carga-masiva-utils";
+import {
+  parseFechaNacimiento,
+  edadDesde,
+  grupoPorEdad,
+  rutClaveTemporal,
+} from "@/lib/carga-masiva-utils";
 
 const fila = z.object({
   nombre_apoderado: z.string().trim().max(120).default(""),
@@ -27,7 +32,8 @@ export type ResultadoCarga = {
   errores: string[];
 };
 
-export const CLAVE_TEMPORAL = "TicTac2026*";
+export const MENSAJE_WHATSAPP =
+  "Hola apoderados . Sus cuentas en la App TIC TAC están listas. Usuario: su correo registrado. Contraseña temporal: El RUT de su hijo (sin puntos ni guión). Al entrar, el sistema les pedirá crear su propia clave personal.";
 
 export const cargaMasiva = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -66,9 +72,15 @@ export const cargaMasiva = createServerFn({ method: "POST" })
             })
             .eq("id", perfil.id);
         } else {
+          const clave = rutClaveTemporal(f.rut_alumno);
+          if (clave.length < 6) {
+            errores.push(
+              `Apoderado ${email}: el RUT del alumno (${f.rut_alumno || "vacío"}) no sirve como clave temporal (mínimo 6 dígitos)`,
+            );
+          } else {
           const { data: creado, error } = await supabaseAdmin.auth.admin.createUser({
             email,
-            password: CLAVE_TEMPORAL,
+            password: clave,
             email_confirm: true,
             user_metadata: {
               full_name: f.nombre_apoderado,
@@ -87,6 +99,7 @@ export const cargaMasiva = createServerFn({ method: "POST" })
                   email,
                   full_name: f.nombre_apoderado || email.split("@")[0]!,
                   phone: f.telefono || null,
+                  must_change_password: true,
                 },
                 { onConflict: "id" },
               );
@@ -94,6 +107,7 @@ export const cargaMasiva = createServerFn({ method: "POST" })
                 .from("user_roles")
                 .upsert({ user_id: parentId, role: "parent" }, { onConflict: "user_id,role" });
             }
+          }
           }
         }
       }

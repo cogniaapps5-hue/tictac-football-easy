@@ -1,3 +1,8 @@
+// RUT como clave temporal: solo números (sin puntos, guión, espacios ni dígito K).
+export function rutClaveTemporal(rut: string): string {
+  return rut.replace(/\D/g, "");
+}
+
 // Acepta DD-MM-AAAA (también DD/MM/AAAA) y AAAA-MM-DD.
 export function parseFechaNacimiento(valor: string): string | null {
   const limpio = valor.trim();

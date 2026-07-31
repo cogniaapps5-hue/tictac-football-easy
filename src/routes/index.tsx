@@ -37,10 +37,20 @@ function Entrar() {
   const [cargando, setCargando] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/inicio", replace: true });
+    void supabase.auth.getSession().then(({ data }) => {
+      if (data.session) void irADestino(data.session.user.id);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
+
+  async function irADestino(userId: string) {
+    const { data: perfil } = await supabase
+      .from("profiles")
+      .select("must_change_password")
+      .eq("id", userId)
+      .maybeSingle();
+    navigate({ to: perfil?.must_change_password ? "/cambiar-clave" : "/inicio", replace: true });
+  }
 
   async function entrar(correo: string, clave: string) {
     if (!correo || !clave) {
@@ -71,7 +81,9 @@ function Entrar() {
       return;
     }
     toast.success("¡Bienvenido!");
-    navigate({ to: "/inicio", replace: true });
+    const { data: sesion } = await supabase.auth.getUser();
+    if (sesion.user) await irADestino(sesion.user.id);
+    else navigate({ to: "/inicio", replace: true });
   }
 
   return (

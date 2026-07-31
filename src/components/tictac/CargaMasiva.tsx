@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Download, FileSpreadsheet, Loader2, Upload, X } from "lucide-react";
+import { Copy, Download, FileSpreadsheet, Loader2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Tarjeta } from "@/components/tictac/Shell";
 import {
   cargaMasiva,
-  CLAVE_TEMPORAL,
+  MENSAJE_WHATSAPP,
   type EntradaCarga,
   type ResultadoCarga,
 } from "@/lib/carga-masiva.functions";
@@ -235,11 +235,22 @@ export function CargaMasiva() {
             ✅ Guardado: {resultado.alumnos} alumnos y {resultado.apoderados} apoderados nuevos.
           </p>
           {resultado.apoderados > 0 ? (
-            <p className="rounded-xl border-2 border-gold-brand bg-black/70 p-4 text-lg font-semibold text-foreground">
-              🔑 Usuarios creados. Contraseña temporal para todos los apoderados:{" "}
-              <strong>{CLAVE_TEMPORAL}</strong>. Se recomienda que cambien su contraseña al primer
-              inicio de sesión.
-            </p>
+            <div className="rounded-xl border-2 border-gold-brand bg-black/70 p-4">
+              <p className="text-lg font-semibold text-foreground">🔑 {MENSAJE_WHATSAPP}</p>
+              <Button
+                variant="accion"
+                size="grande"
+                className="mt-4 w-full"
+                onClick={() => {
+                  void navigator.clipboard
+                    .writeText(MENSAJE_WHATSAPP)
+                    .then(() => toast.success("Mensaje copiado para WhatsApp"))
+                    .catch(() => toast.error("No pudimos copiar el mensaje"));
+                }}
+              >
+                <Copy /> Copiar mensaje para WhatsApp
+              </Button>
+            </div>
           ) : null}
           {resultado.errores.length ? (
             <div className="rounded-xl border-2 border-red-500 bg-red-500/15 p-4">
