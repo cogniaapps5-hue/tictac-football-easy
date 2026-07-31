@@ -218,7 +218,7 @@ function Alumnos() {
 
       <Tarjeta>
         <p className="text-base font-semibold">Grupo etario</p>
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="mt-2 flex flex-wrap gap-4">
           {[{ valor: "todos", etiqueta: "Todos", emoji: "" }, ...GRUPOS].map((g) => (
             <Button
               key={g.valor}

@@ -345,7 +345,7 @@ function InicioPadre({ userId }: { userId: string }) {
           <Megaphone className="size-7 text-gold-brand" />
           <h2 className="text-xl font-bold">Avisos</h2>
         </div>
-        <ul className="mt-3 space-y-3">
+        <ul className="mt-3 space-y-4">
           {(data?.alertas ?? []).map((alerta) => (
             <li key={alerta.id} className="rounded-xl border-2 border-danger bg-danger/15 p-4">
               <p className="text-base font-bold">⚠️ {alerta.title}</p>

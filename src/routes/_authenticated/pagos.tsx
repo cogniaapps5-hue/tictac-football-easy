@@ -129,7 +129,7 @@ function Pagos() {
   return (
     <Shell rol="admin" titulo="Pagos" subtitulo="Revisa los comprobantes">
       <Tarjeta>
-        <div className="flex gap-2">
+        <div className="flex gap-4">
           {(
             [
               ["pending", `Pendientes (${pendientes})`],
@@ -152,7 +152,7 @@ function Pagos() {
 
       <Tarjeta>
         <p className="text-base font-semibold">Grupo</p>
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="mt-2 flex flex-wrap gap-4">
           {[{ valor: "todos", etiqueta: "Todos", emoji: "" }, ...GRUPOS].map((g) => (
             <Button
               key={g.valor}
@@ -221,7 +221,7 @@ function Pagos() {
             </div>
           </div>
           {pago.status === "pending" ? (
-            <div className="mt-4 space-y-3">
+            <div className="mt-4 space-y-4">
               {pago.receipt_url ? null : (
                 <p className="text-base text-muted-foreground">
                   El apoderado todavía no sube la foto del comprobante.

@@ -55,31 +55,38 @@ export function Shell({
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="min-h-dvh bg-background pb-40">
       <header className="sticky top-0 z-20 border-b border-border bg-background/95 px-5 py-4 backdrop-blur">
-        <div className="mx-auto flex max-w-lg items-center gap-3">
+        <div className="mx-auto flex max-w-lg items-center gap-4">
           <img src={logoAsset.url} alt="Escuela de fútbol TIC TAC" width={56} height={56} className="h-14 w-14" />
           <div className="min-w-0 flex-1">
-            <h1 className="truncate text-xl font-bold leading-tight">{titulo}</h1>
+            <h1 className="truncate text-2xl font-bold leading-tight">{titulo}</h1>
             {subtitulo ? (
-              <p className="truncate text-sm text-muted-foreground">{subtitulo}</p>
+              <p className="truncate text-base text-muted-foreground">{subtitulo}</p>
             ) : null}
           </div>
-          <Button variant="ghost" size="icon" onClick={salir} aria-label="Cerrar sesión">
-            <LogOut className="text-muted-foreground" />
+        </div>
+        <div className="mx-auto mt-4 flex max-w-lg gap-4">
+          <Button asChild variant="neutro" size="medio" className="flex-1">
+            <Link to="/inicio">
+              <Home /> Inicio
+            </Link>
+          </Button>
+          <Button variant="neutro" size="medio" className="flex-1" onClick={salir}>
+            <LogOut /> Salir
           </Button>
         </div>
       </header>
 
-      <main className="mx-auto max-w-lg space-y-4 p-4">{children}</main>
+      <main className="mx-auto max-w-lg space-y-6 p-4">{children}</main>
 
       <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-card">
-        <div className="mx-auto flex max-w-lg">
+        <div className="mx-auto flex max-w-lg gap-4 px-4 py-2">
           {items.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}
               to={to}
-              className="flex flex-1 flex-col items-center gap-1 py-3 text-xs font-semibold text-muted-foreground"
+              className="flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2 text-base font-semibold text-muted-foreground"
               activeProps={{ className: "text-cyan-brand" }}
             >
               <Icon className="size-6" />
@@ -125,7 +132,7 @@ export function Estado({ estado }: { estado: string }) {
   };
   const item = mapa[estado] ?? mapa.no_response;
   return (
-    <span className={"inline-block rounded-full px-3 py-1 text-sm font-bold " + item.clase}>
+    <span className={"inline-block rounded-full px-4 py-1.5 text-base font-bold " + item.clase}>
       {item.texto}
     </span>
   );

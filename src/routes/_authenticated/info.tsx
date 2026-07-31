@@ -77,7 +77,7 @@ function Info() {
           <Users className="size-6 text-cyan-brand" />
           <h2 className="text-xl font-bold">Profesores</h2>
         </div>
-        <ul className="mt-3 space-y-3">
+        <ul className="mt-3 space-y-4">
           <li className="rounded-xl bg-secondary p-4">
             <p className="text-base font-bold">Carlos Martínez</p>
             <p className="text-base text-muted-foreground">SUB12 — Miércoles 15:00</p>

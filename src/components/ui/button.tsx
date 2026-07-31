@@ -30,13 +30,13 @@ const buttonVariants = cva(
           "border-2 border-border bg-secondary text-foreground font-semibold active:scale-[0.98] hover:bg-secondary/70",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
-        icon: "h-9 w-9",
+        default: "min-h-[60px] px-5 py-3 text-base [&_svg]:size-5",
+        sm: "min-h-[48px] rounded-md px-4 text-base [&_svg]:size-5",
+        lg: "min-h-[60px] rounded-md px-8 text-lg [&_svg]:size-6",
+        icon: "size-[60px] [&_svg]:size-6",
         grande: "min-h-[60px] w-full rounded-xl px-6 text-lg [&_svg]:size-6",
         gigante: "min-h-[80px] w-full rounded-xl px-6 text-xl [&_svg]:size-7",
-        medio: "min-h-[52px] rounded-xl px-5 text-base [&_svg]:size-5",
+        medio: "min-h-[60px] rounded-xl px-5 text-base [&_svg]:size-5",
       },
     },
     defaultVariants: {
