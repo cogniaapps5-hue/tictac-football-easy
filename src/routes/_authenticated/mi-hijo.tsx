@@ -121,7 +121,7 @@ function MiHijo() {
           <Tarjeta destacada>
             <p className="text-xl font-bold">👤 {alumno.name}</p>
             <p className="text-base text-muted-foreground">
-              {alumno.category} — {alumno.schedule}
+              {alumno.schedule}
             </p>
             <p className="text-base text-muted-foreground">Profesor: {alumno.coach}</p>
           </Tarjeta>
