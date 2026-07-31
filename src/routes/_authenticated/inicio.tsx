@@ -126,7 +126,7 @@ function InicioPadre({ userId }: { userId: string }) {
         .eq("parent_id", userId)
         .order("name");
       const ids = (alumnos ?? []).map((a) => a.id);
-      const [pagos, asistencia, avisos, nutricion] = await Promise.all([
+      const [pagos, asistencia, avisos, nutricion, alertas] = await Promise.all([
         ids.length
           ? supabase.from("payments").select("*").in("player_id", ids).order("due_date")
           : Promise.resolve({ data: [] as never[] }),
@@ -137,6 +137,14 @@ function InicioPadre({ userId }: { userId: string }) {
         ids.length
           ? supabase.from("nutrition_sessions").select("*").in("player_id", ids)
           : Promise.resolve({ data: [] as never[] }),
+        ids.length
+          ? supabase
+              .from("notifications")
+              .select("*")
+              .in("player_id", ids)
+              .order("created_at", { ascending: false })
+              .limit(3)
+          : Promise.resolve({ data: [] as never[] }),
       ]);
       return {
         alumnos: alumnos ?? [],
@@ -144,6 +152,7 @@ function InicioPadre({ userId }: { userId: string }) {
         asistencia: asistencia.data ?? [],
         avisos: avisos.data ?? [],
         nutricion: nutricion.data ?? [],
+        alertas: alertas.data ?? [],
       };
     },
   });
@@ -314,6 +323,12 @@ function InicioPadre({ userId }: { userId: string }) {
           <h2 className="text-xl font-bold">Avisos</h2>
         </div>
         <ul className="mt-3 space-y-3">
+          {(data?.alertas ?? []).map((alerta) => (
+            <li key={alerta.id} className="rounded-xl border-2 border-danger bg-danger/15 p-4">
+              <p className="text-base font-bold">⚠️ {alerta.title}</p>
+              <p className="text-base">{alerta.body}</p>
+            </li>
+          ))}
           {(data?.avisos ?? []).map((aviso) => (
             <li key={aviso.id} className="rounded-xl bg-secondary p-4">
               <p className="text-base font-bold">{aviso.title}</p>
