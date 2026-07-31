@@ -49,7 +49,7 @@ function Alumnos() {
     name: "",
     rut: "",
     birth_year: "2018",
-    training_day: "miercoles" as DiaEntrenamiento,
+    training_day: "martes" as DiaEntrenamiento,
     parent_email: "",
   });
 
@@ -100,7 +100,7 @@ function Alumnos() {
         name: "",
         rut: "",
         birth_year: "2018",
-        training_day: "miercoles",
+        training_day: "martes",
         parent_email: "",
       });
       setAgregando(false);
