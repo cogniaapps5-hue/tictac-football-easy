@@ -14,6 +14,7 @@ import type { ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import logoAsset from "@/assets/tictac-logo.jpg.asset.json";
+import { cn } from "@/lib/utils";
 import type { Rol } from "@/lib/session";
 
 type Item = { to: string; label: string; icon: LucideIcon };
