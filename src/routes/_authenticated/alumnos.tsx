@@ -23,6 +23,13 @@ export const Route = createFileRoute("/_authenticated/alumnos")({
   component: Alumnos,
 });
 
+function semaforo(estado: string) {
+  if (estado === "blocked") return "🔴 Bloqueado";
+  if (estado === "pending_review") return "🟡 En revisión";
+  if (estado === "exception") return "🟠 Acceso excepcional";
+  return "🟢 Activo";
+}
+
 function Alumnos() {
   const { data: sesion } = useSesion();
   const queryClient = useQueryClient();
