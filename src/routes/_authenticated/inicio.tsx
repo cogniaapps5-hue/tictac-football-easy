@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
+import { RecordatoriosAdmin } from "@/components/tictac/Recordatorios";
 import { useSesion, saludo, pesos, proximoEntrenamiento, fechaCorta } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
@@ -89,6 +90,8 @@ function InicioAdmin() {
         </Button>
       </Tarjeta>
 
+      <RecordatoriosAdmin />
+
       <Tarjeta>
         <div className="flex items-center gap-3">
           <CalendarCheck className="size-7 text-cyan-brand" />
@@ -149,7 +152,7 @@ function InicioPadre({ userId }: { userId: string }) {
         .eq("parent_id", userId)
         .order("name");
       const ids = (alumnos ?? []).map((a) => a.id);
-      const [pagos, asistencia, avisos, nutricion, alertas] = await Promise.all([
+      const [pagos, asistencia, avisos, nutricion, alertas, recordatorios] = await Promise.all([
         ids.length
           ? supabase.from("payments").select("*").in("player_id", ids).order("due_date")
           : Promise.resolve({ data: [] as never[] }),
@@ -168,6 +171,15 @@ function InicioPadre({ userId }: { userId: string }) {
               .order("created_at", { ascending: false })
               .limit(3)
           : Promise.resolve({ data: [] as never[] }),
+        ids.length
+          ? supabase
+              .from("payment_reminders")
+              .select("id, message, sent_at")
+              .in("player_id", ids)
+              .eq("status", "sent")
+              .order("sent_at", { ascending: false })
+              .limit(3)
+          : Promise.resolve({ data: [] as never[] }),
       ]);
       return {
         alumnos: alumnos ?? [],
@@ -176,6 +188,7 @@ function InicioPadre({ userId }: { userId: string }) {
         avisos: avisos.data ?? [],
         nutricion: nutricion.data ?? [],
         alertas: alertas.data ?? [],
+        recordatorios: recordatorios.data ?? [],
       };
     },
   });
@@ -209,13 +222,44 @@ function InicioPadre({ userId }: { userId: string }) {
     (n) => n.player_id === alumno?.id && n.year === anioActual && n.semester === semestreActual,
   );
 
+  // Recordatorio amable de mensualidad según el día del mes.
+  const diaDelMes = hoy.getDate();
+  const inicioMes = new Date(anioActual, hoy.getMonth(), 1).toISOString().slice(0, 10);
+  const finMes = new Date(anioActual, hoy.getMonth() + 1, 1).toISOString().slice(0, 10);
+  const pagoDelMes = (data?.pagos ?? []).find(
+    (p) =>
+      p.due_date >= inicioMes &&
+      p.due_date < finMes &&
+      (p.status === "approved" || (p.status === "pending" && p.receipt_url)),
+  );
+  const recordatorio =
+    pagoDelMes || !alumno ? null : diaDelMes >= 6 ? "atrasado" : diaDelMes >= 1 ? "proximo" : null;
+
   return (
     <div className="space-y-6">
+      {recordatorio === "proximo" ? (
+        <div className="flex items-start gap-3 rounded-2xl border-2 border-gold-brand bg-gold-brand/20 p-5">
+          <span aria-hidden className="text-2xl">⏰</span>
+          <p className="text-lg font-bold text-foreground">
+            Tu mensualidad vence el día 6. ¡No olvides subir tu comprobante! 🌟
+          </p>
+        </div>
+      ) : null}
+      {recordatorio === "atrasado" ? (
+        <div className="flex items-start gap-3 rounded-2xl border-2 border-[oklch(0.75_0.18_60)] bg-[oklch(0.75_0.18_60)]/25 p-5">
+          <span aria-hidden className="text-2xl">⚠️</span>
+          <p className="text-lg font-bold text-foreground">
+            Tu pago está pendiente. Por favor regulariza tu situación para mantener tu acceso activo. 🙏
+          </p>
+        </div>
+      ) : null}
+
       {bloqueado ? (
         <div className="flex items-start gap-3 rounded-2xl border-[3px] border-danger bg-danger/20 p-5">
           <TriangleAlert className="mt-0.5 size-7 shrink-0 text-danger" />
           <p className="text-lg font-bold text-foreground">
-            ⛔ ACCESO SUSPENDIDO — Pago pendiente desde el día 6. Sube tu comprobante.
+            Tu pago del mes aún está pendiente. Por favor sube tu comprobante para mantener tu acceso
+            activo. 🙏
           </p>
         </div>
       ) : null}
@@ -227,7 +271,7 @@ function InicioPadre({ userId }: { userId: string }) {
         </p>
         {alumno && bloqueado ? (
           <p className="mt-4 text-lg font-semibold text-muted-foreground">
-            Acceso suspendido hasta regularizar pago
+            Podrás confirmar asistencia apenas subas tu comprobante. ¡Gracias!
           </p>
         ) : alumno ? (
           <>
@@ -346,6 +390,12 @@ function InicioPadre({ userId }: { userId: string }) {
           <h2 className="text-xl font-bold">Avisos</h2>
         </div>
         <ul className="mt-3 space-y-4">
+          {(data?.recordatorios ?? []).map((r) => (
+            <li key={r.id} className="rounded-xl border-2 border-gold-brand bg-gold-brand/15 p-4">
+              <p className="text-base font-bold">🌟 Recordatorio de mensualidad</p>
+              <p className="whitespace-pre-line text-base">{r.message}</p>
+            </li>
+          ))}
           {(data?.alertas ?? []).map((alerta) => (
             <li key={alerta.id} className="rounded-xl border-2 border-danger bg-danger/15 p-4">
               <p className="text-base font-bold">⚠️ {alerta.title}</p>
