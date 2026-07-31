@@ -80,11 +80,15 @@ function Info() {
         <ul className="mt-3 space-y-4">
           <li className="rounded-xl bg-secondary p-4">
             <p className="text-base font-bold">Carlos Martínez</p>
-            <p className="text-base text-muted-foreground">SUB12 — Miércoles 15:00</p>
+            <p className="text-base text-muted-foreground">
+              Martes 19:00 a 20:00 hrs — 📍 Rancho Rossi Peñuelas
+            </p>
           </li>
           <li className="rounded-xl bg-secondary p-4">
             <p className="text-base font-bold">Luis Fuentes</p>
-            <p className="text-base text-muted-foreground">SUB15 — Viernes 17:00</p>
+            <p className="text-base text-muted-foreground">
+              Jueves 19:00 a 20:00 hrs — 📍 Forza Club Simdempart
+            </p>
           </li>
         </ul>
       </Tarjeta>
