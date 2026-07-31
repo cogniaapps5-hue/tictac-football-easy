@@ -29,7 +29,7 @@ export const Route = createFileRoute("/_authenticated/pagos")({
   component: Pagos,
 });
 
-type Filtro = "all" | "pending" | "approved";
+type Filtro = "pending" | "approved" | "rejected";
 
 function Pagos() {
   const { data: sesion } = useSesion();
@@ -47,6 +47,22 @@ function Pagos() {
         .select("*, players(name, category)")
         .order("created_at", { ascending: false });
       return data ?? [];
+    },
+  });
+
+  const rutas = (pagos ?? []).map((p) => p.receipt_url).filter(Boolean) as string[];
+
+  const { data: miniaturas } = useQuery({
+    queryKey: ["comprobantes-urls", rutas.join(",")],
+    enabled: rutas.length > 0,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase.storage.from("comprobantes").createSignedUrls(rutas, 600);
+      const mapa: Record<string, string> = {};
+      for (const item of data ?? []) {
+        if (item.path && item.signedUrl) mapa[item.path] = item.signedUrl;
+      }
+      return mapa;
     },
   });
 
@@ -88,7 +104,8 @@ function Pagos() {
     );
   }
 
-  const lista = (pagos ?? []).filter((p) => filtro === "all" || p.status === filtro);
+  const lista = (pagos ?? []).filter((p) => p.status === filtro);
+  const pendientes = (pagos ?? []).filter((p) => p.status === "pending").length;
 
   return (
     <Shell rol="admin" titulo="Pagos" subtitulo="Revisa los comprobantes">
@@ -96,9 +113,9 @@ function Pagos() {
         <div className="flex gap-2">
           {(
             [
-              ["pending", "Pendientes"],
+              ["pending", `Pendientes (${pendientes})`],
               ["approved", "Aprobados"],
-              ["all", "Todos"],
+              ["rejected", "Rechazados"],
             ] as [Filtro, string][]
           ).map(([valor, texto]) => (
             <Button
@@ -114,6 +131,15 @@ function Pagos() {
         </div>
       </Tarjeta>
 
+      {filtro === "pending" ? (
+        <Tarjeta destacada>
+          <p className="text-3xl font-black text-primary">{pendientes}</p>
+          <p className="text-lg font-semibold">
+            {pendientes === 1 ? "pago pendiente por revisar" : "pagos pendientes por revisar"}
+          </p>
+        </Tarjeta>
+      ) : null}
+
       {foto ? (
         <Tarjeta destacada>
           <img src={foto} alt="Comprobante de pago" className="w-full rounded-xl" />
@@ -125,25 +151,39 @@ function Pagos() {
 
       {lista.map((pago) => (
         <Tarjeta key={pago.id} destacada={pago.status === "pending"}>
-          <Estado estado={pago.status} />
-          <p className="mt-2 text-xl font-bold">
-            {pago.players?.name} — {pesos(pago.amount)}
-          </p>
-          <p className="text-base text-muted-foreground">
-            {pago.concept} — vence {fechaCorta(pago.due_date)}
-          </p>
+          <div className="flex items-start gap-3">
+            {pago.receipt_url && miniaturas?.[pago.receipt_url] ? (
+              <button
+                type="button"
+                onClick={() => void verFoto(pago.receipt_url!)}
+                className="shrink-0 overflow-hidden rounded-xl border-2 border-primary/50"
+                aria-label={`Ver comprobante de ${pago.players?.name ?? "alumno"}`}
+              >
+                <img
+                  src={miniaturas[pago.receipt_url]}
+                  alt={`Comprobante de ${pago.players?.name ?? "alumno"}`}
+                  className="h-[60px] w-[60px] object-cover"
+                  loading="lazy"
+                />
+              </button>
+            ) : (
+              <div className="flex h-[60px] w-[60px] shrink-0 items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/40 text-muted-foreground">
+                <ImageIcon />
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <Estado estado={pago.status} />
+              <p className="mt-2 text-xl font-bold">
+                {pago.players?.name} — {pesos(pago.amount)}
+              </p>
+              <p className="text-base text-muted-foreground">
+                {pago.concept} — vence {fechaCorta(pago.due_date)}
+              </p>
+            </div>
+          </div>
           {pago.status === "pending" ? (
             <div className="mt-4 space-y-3">
-              {pago.receipt_url ? (
-                <Button
-                  variant="contorno"
-                  size="medio"
-                  className="h-auto min-h-[60px] w-full py-4 text-base"
-                  onClick={() => void verFoto(pago.receipt_url!)}
-                >
-                  <ImageIcon /> Ver Foto
-                </Button>
-              ) : (
+              {pago.receipt_url ? null : (
                 <p className="text-base text-muted-foreground">
                   El apoderado todavía no sube la foto del comprobante.
                 </p>
