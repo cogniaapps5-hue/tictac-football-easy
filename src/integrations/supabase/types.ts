@@ -155,6 +155,53 @@ export type Database = {
           },
         ]
       }
+      payment_reminders: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          message: string
+          parent_id: string | null
+          period: string
+          player_id: string
+          sent_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind?: string
+          message: string
+          parent_id?: string | null
+          period: string
+          player_id: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          message?: string
+          parent_id?: string | null
+          period?: string
+          player_id?: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_reminders_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -306,6 +353,7 @@ export type Database = {
     }
     Functions: {
       aplicar_bloqueos_morosidad: { Args: never; Returns: number }
+      generar_recordatorios_pago: { Args: never; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
