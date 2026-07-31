@@ -142,7 +142,7 @@ function Alumnos() {
         a.name.toLowerCase().includes(texto) ||
         (a.rut ?? "").toLowerCase().includes(texto)) &&
       (grupoFiltro === "todos" || a.age_group === grupoFiltro) &&
-      (diaFiltro === "todos" || a.training_day === diaFiltro),
+      a.training_day === diaFiltro,
   );
 
   const gruposVisibles = GRUPOS.filter(
@@ -233,9 +233,9 @@ function Alumnos() {
             </Button>
           ))}
         </div>
-        <p className="mt-4 text-base font-semibold">Día</p>
-        <div className="mt-2 flex gap-2">
-          {[{ valor: "todos", corto: "Todos" }, ...DIAS].map((d) => (
+        <p className="mt-4 text-base font-semibold">Día y sede</p>
+        <div className="mt-2 flex gap-4">
+          {DIAS.map((d) => (
             <Button
               key={d.valor}
               variant={diaFiltro === d.valor ? "accion" : "neutro"}
@@ -243,7 +243,7 @@ function Alumnos() {
               className="h-auto min-h-[60px] flex-1 py-4 text-base"
               onClick={() => setDiaFiltro(d.valor)}
             >
-              {d.corto}
+              {d.largo} {d.hora}
             </Button>
           ))}
         </div>
