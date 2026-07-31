@@ -257,9 +257,9 @@ function InicioPadre({ userId }: { userId: string }) {
       {cumpleaneros.map((c) => (
         <div
           key={c.id}
-          className="animate-pulse rounded-2xl border-[3px] border-gold-brand bg-gold-brand/25 p-5 text-center"
+          className="rounded-2xl border-[3px] border-gold-brand bg-gold-brand/25 p-5 text-center shadow-[0_0_24px_oklch(0.82_0.16_85/0.35)]"
         >
-          <p className="text-3xl" aria-hidden>
+          <p className="animate-bounce text-3xl" aria-hidden>
             🎉🎂🎈
           </p>
           <p className="mt-2 text-xl font-black text-foreground">
