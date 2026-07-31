@@ -37,7 +37,7 @@ function Info() {
             <li>Llegar 15 minutos antes del entrenamiento.</li>
             <li>Traer bidón de agua, canilleras y zapatos de fútbol.</li>
             <li>Avisar la asistencia por la app antes de cada clase.</li>
-            <li>El pago de la mensualidad vence el día 15 de cada mes.</li>
+            <li>La mensualidad es de $20.000 mensuales y vence el día 15 de cada mes.</li>
             <li>Respeto y buen trato con compañeros, profesores y árbitros.</li>
           </ul>
         ) : null}

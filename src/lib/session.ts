@@ -33,8 +33,14 @@ export function saludo() {
   return "Buenas noches";
 }
 
+const formatoCLP = new Intl.NumberFormat("es-CL", {
+  style: "currency",
+  currency: "CLP",
+  maximumFractionDigits: 0,
+});
+
 export function pesos(valor: number) {
-  return "$" + valor.toLocaleString("es-CL");
+  return formatoCLP.format(valor).replace(/\s/g, "");
 }
 
 export function fechaCorta(iso: string) {
