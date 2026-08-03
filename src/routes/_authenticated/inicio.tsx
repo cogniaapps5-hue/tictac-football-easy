@@ -466,35 +466,26 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
         ) : null}
       </Tarjeta>
 
-      <Tarjeta>
+      <Tarjeta className="relative opacity-75">
+        <span className="absolute right-4 top-4 rounded-full bg-gold-brand/25 px-3 py-1 text-xs font-bold tracking-wide text-gold-brand">
+          PRÓXIMAMENTE 2027
+        </span>
         <div className="flex items-center gap-3">
           <Apple className="size-7 text-success" />
           <h2 className="text-xl font-bold">Evaluación Nutricional</h2>
         </div>
-        {!nutricion ? (
-          <p className="mt-3 text-base text-muted-foreground">Evaluación no habilitada aún.</p>
-        ) : nutricion.status === "booked" ? (
-          <p className="mt-3 text-lg font-bold text-gold-brand">
-            Hora agendada: {nutricion.scheduled_date ? fechaCorta(nutricion.scheduled_date) : "por confirmar"}
-          </p>
-        ) : (
-          <>
-            <p className="mt-2 text-base">
-              Semestre {nutricion.semester} — aún sin hora agendada.
-            </p>
-            <Button asChild variant="alerta" size="grande" className="mt-4 min-h-[60px]">
-              <a
-                href={`https://wa.me/56912345678?text=${encodeURIComponent(
-                  `Hola, quiero agendar la hora del nutricionista para ${alumno?.name ?? "mi hijo/a"}`,
-                )}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Agendar Hora
-              </a>
-            </Button>
-          </>
-        )}
+        <button
+          type="button"
+          title="Disponible en 2027"
+          aria-disabled="true"
+          onClick={() => toast("Próximamente en 2027")}
+          className="mt-4 flex min-h-[60px] w-full cursor-not-allowed items-center justify-center rounded-xl bg-[#6B7280] px-4 py-4 text-lg font-bold text-white"
+        >
+          Próximamente
+        </button>
+        <p className="mt-3 text-sm text-muted-foreground">
+          🌟 La evaluación nutricional estará disponible a partir de 2027. ¡Mantente atento!
+        </p>
       </Tarjeta>
 
       <Tarjeta>
