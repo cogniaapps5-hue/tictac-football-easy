@@ -17,7 +17,16 @@ import {
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { RecordatoriosAdmin } from "@/components/tictac/Recordatorios";
 import { ReportesAdmin } from "@/components/tictac/Reportes";
-import { useSesion, useSaludo, pesos, proximoEntrenamiento, fechaCorta, SEDES } from "@/lib/session";
+import { SubirComprobante } from "@/components/tictac/SubirComprobante";
+import {
+  useSesion,
+  useSaludo,
+  pesos,
+  proximoEntrenamiento,
+  fechaCorta,
+  SEDES,
+  categoriaAviso,
+} from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
   head: () => ({
@@ -225,11 +234,40 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
         );
       if (error) throw error;
     },
+    // Respuesta instantánea: pintamos el estado antes de que responda el servidor.
+    onMutate: async (vars) => {
+      await queryClient.cancelQueries({ queryKey: ["resumen-padre"] });
+      const clave = ["resumen-padre", userId, fechasPosibles.join(",")];
+      const previo = queryClient.getQueryData<typeof data>(clave);
+      queryClient.setQueryData(clave, (actual: typeof data) => {
+        if (!actual) return actual;
+        const otras = actual.asistencia.filter(
+          (a) => !(a.player_id === vars.playerId && a.session_date === proximo.iso),
+        );
+        return {
+          ...actual,
+          asistencia: [
+            ...otras,
+            {
+              id: `optimista-${vars.playerId}`,
+              player_id: vars.playerId,
+              session_date: proximo.iso,
+              status: vars.estado,
+              created_at: new Date().toISOString(),
+            },
+          ],
+        };
+      });
+      return { clave, previo };
+    },
     onSuccess: (_d, vars) => {
       queryClient.invalidateQueries({ queryKey: ["resumen-padre"] });
       toast.success(vars.estado === "confirmed" ? "¡Listo! Te esperamos" : "Gracias por avisar");
     },
-    onError: () => toast.error("No pudimos guardar tu respuesta. Intenta otra vez."),
+    onError: (_e, _v, ctx) => {
+      if (ctx?.previo) queryClient.setQueryData(ctx.clave, ctx.previo);
+      toast.error("No pudimos guardar tu respuesta. Intenta otra vez.");
+    },
   });
 
   const bloqueado = alumno?.access_status === "blocked";
