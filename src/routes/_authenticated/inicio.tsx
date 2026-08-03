@@ -446,20 +446,34 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
             </span>
           </div>
         ) : null}
-        {!pagoAprobado ? (
-          <div className="mt-4 space-y-4">
-            <Button asChild variant="alerta" size="grande">
+        <div className="mt-4 space-y-4">
+          {puedeSubirComprobante ? (
+            <Button
+              asChild
+              variant="alerta"
+              size="grande"
+              className="h-auto min-h-[60px] w-full py-4 text-base"
+            >
               <Link to="/mi-hijo">Subir Comprobante</Link>
             </Button>
-            {!pagoEnRevision ? (
-              <Button asChild variant="contorno" size="grande">
-                <a href={whatsapp} target="_blank" rel="noreferrer">
-                  Contactar por WhatsApp
-                </a>
-              </Button>
-            ) : null}
-          </div>
-        ) : null}
+          ) : (
+            <Button
+              disabled
+              size="grande"
+              className="h-auto min-h-[60px] w-full cursor-not-allowed bg-muted py-4 text-base text-muted-foreground opacity-100 hover:bg-muted"
+              title={pagoAprobado ? "Pago confirmado" : "Comprobante ya enviado"}
+            >
+              {pagoAprobado ? "Pago confirmado" : "Comprobante ya enviado"}
+            </Button>
+          )}
+          {!pagoAprobado && !pagoEnRevision ? (
+            <Button asChild variant="contorno" size="grande">
+              <a href={whatsapp} target="_blank" rel="noreferrer">
+                Contactar por WhatsApp
+              </a>
+            </Button>
+          ) : null}
+        </div>
       </Tarjeta>
 
       <Tarjeta className="relative opacity-75">
