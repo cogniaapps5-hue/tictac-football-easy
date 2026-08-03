@@ -33,7 +33,7 @@ export type ResultadoCarga = {
 };
 
 export const MENSAJE_WHATSAPP =
-  "Hola apoderados . Sus cuentas en la App TIC TAC están listas. Usuario: su correo registrado. Contraseña temporal: El RUT de su hijo (sin puntos ni guión). Al entrar, el sistema les pedirá crear su propia clave personal.";
+  "Hola apoderados 🌟. Sus cuentas en la App TIC TAC están listas. Usuario: su correo. Contraseña temporal: El RUT de su hijo (sin puntos ni guión). Al entrar, deberán crear su propia clave.";
 
 export const cargaMasiva = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
