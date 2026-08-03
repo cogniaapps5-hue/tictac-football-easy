@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { Check, X, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
@@ -33,6 +33,103 @@ export const Route = createFileRoute("/_authenticated/pagos")({
 
 type Filtro = "pending" | "approved" | "rejected";
 
+type Pago = {
+  id: string;
+  status: string;
+  amount: number;
+  concept: string;
+  due_date: string;
+  receipt_url: string | null;
+  rejection_reason: string | null;
+  players: { name: string; age_group: string } | null;
+};
+
+/**
+ * Fila de pago memoizada: al aprobar un pago solo se vuelve a dibujar la fila
+ * afectada, así la lista responde al instante aunque haya muchos alumnos.
+ */
+const FilaPago = memo(function FilaPago({
+  pago,
+  miniatura,
+  onVerFoto,
+  onAprobar,
+  onRechazar,
+}: {
+  pago: Pago;
+  miniatura?: string;
+  onVerFoto: (ruta: string) => void;
+  onAprobar: (id: string) => void;
+  onRechazar: (id: string, nombre: string) => void;
+}) {
+  return (
+    <Tarjeta destacada={pago.status === "pending"}>
+      <div className="flex items-start gap-3">
+        {pago.receipt_url && miniatura ? (
+          <button
+            type="button"
+            onClick={() => onVerFoto(pago.receipt_url!)}
+            className="shrink-0 overflow-hidden rounded-xl border-2 border-primary/50"
+            aria-label={`Ver comprobante de ${pago.players?.name ?? "alumno"}`}
+          >
+            <img
+              src={miniatura}
+              alt={`Comprobante de ${pago.players?.name ?? "alumno"}`}
+              width={60}
+              height={60}
+              decoding="async"
+              className="h-[60px] w-[60px] object-cover"
+              loading="lazy"
+            />
+          </button>
+        ) : (
+          <div className="flex h-[60px] w-[60px] shrink-0 items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/40 text-muted-foreground">
+            <ImageIcon />
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <Estado estado={pago.status} />
+          <p className="mt-2 text-xl font-bold">
+            {pago.players?.name} — {pesos(pago.amount)}
+          </p>
+          <p className="text-base text-muted-foreground">
+            {pago.concept} — vence {fechaCorta(pago.due_date)}
+          </p>
+        </div>
+      </div>
+      {pago.status === "pending" ? (
+        <div className="mt-4 space-y-4">
+          {pago.receipt_url ? null : (
+            <p className="text-base text-muted-foreground">
+              El apoderado todavía no sube la foto del comprobante.
+            </p>
+          )}
+          <div className="flex gap-3">
+            <Button
+              variant="exito"
+              size="medio"
+              className="h-auto min-h-[60px] flex-1 py-4 text-base"
+              onClick={() => onAprobar(pago.id)}
+            >
+              <Check /> Aprobar
+            </Button>
+            <Button
+              variant="peligro"
+              size="medio"
+              className="h-auto min-h-[60px] flex-1 py-4 text-base"
+              onClick={() => onRechazar(pago.id, pago.players?.name ?? "")}
+            >
+              <X /> Rechazar
+            </Button>
+          </div>
+        </div>
+      ) : null}
+      {pago.status === "rejected" && pago.rejection_reason ? (
+        <p className="mt-3 text-base text-danger">Motivo: {pago.rejection_reason}</p>
+      ) : null}
+    </Tarjeta>
+  );
+});
+
 function Pagos() {
   const { data: sesion } = useSesion();
   const queryClient = useQueryClient();
@@ -47,9 +144,11 @@ function Pagos() {
     queryFn: async () => {
       const { data } = await supabase
         .from("payments")
-        .select("*, players(name, age_group)")
+        .select(
+          "id, status, amount, concept, due_date, receipt_url, rejection_reason, players(name, age_group)",
+        )
         .order("created_at", { ascending: false });
-      return data ?? [];
+      return (data ?? []) as unknown as Pago[];
     },
   });
 
@@ -102,14 +201,25 @@ function Pagos() {
     },
   });
 
-  async function verFoto(ruta: string) {
+  const verFoto = useCallback(async (ruta: string) => {
     const { data, error } = await supabase.storage.from("comprobantes").createSignedUrl(ruta, 600);
     if (error || !data) {
       toast.error("No pudimos abrir la foto");
       return;
     }
     setFoto(data.signedUrl);
-  }
+  }, []);
+
+  const aprobar = useCallback(
+    (id: string) => decidir.mutate({ id, estado: "approved" }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+  const pedirRechazo = useCallback((id: string, nombre: string) => {
+    setMotivo("");
+    setRechazo({ id, nombre });
+  }, []);
+  const abrirFoto = useCallback((ruta: string) => void verFoto(ruta), [verFoto]);
 
   if (!sesion) return null;
   if (sesion.rol !== "admin") {
@@ -191,71 +301,14 @@ function Pagos() {
       ) : null}
 
       {lista.map((pago) => (
-        <Tarjeta key={pago.id} destacada={pago.status === "pending"}>
-          <div className="flex items-start gap-3">
-            {pago.receipt_url && miniaturas?.[pago.receipt_url] ? (
-              <button
-                type="button"
-                onClick={() => void verFoto(pago.receipt_url!)}
-                className="shrink-0 overflow-hidden rounded-xl border-2 border-primary/50"
-                aria-label={`Ver comprobante de ${pago.players?.name ?? "alumno"}`}
-              >
-                <img
-                  src={miniaturas[pago.receipt_url]}
-                  alt={`Comprobante de ${pago.players?.name ?? "alumno"}`}
-                  className="h-[60px] w-[60px] object-cover"
-                  loading="lazy"
-                />
-              </button>
-            ) : (
-              <div className="flex h-[60px] w-[60px] shrink-0 items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/40 text-muted-foreground">
-                <ImageIcon />
-              </div>
-            )}
-            <div className="min-w-0 flex-1">
-              <Estado estado={pago.status} />
-              <p className="mt-2 text-xl font-bold">
-                {pago.players?.name} — {pesos(pago.amount)}
-              </p>
-              <p className="text-base text-muted-foreground">
-                {pago.concept} — vence {fechaCorta(pago.due_date)}
-              </p>
-            </div>
-          </div>
-          {pago.status === "pending" ? (
-            <div className="mt-4 space-y-4">
-              {pago.receipt_url ? null : (
-                <p className="text-base text-muted-foreground">
-                  El apoderado todavía no sube la foto del comprobante.
-                </p>
-              )}
-              <div className="flex gap-3">
-                <Button
-                  variant="exito"
-                  size="medio"
-                  className="h-auto min-h-[60px] flex-1 py-4 text-base"
-                  onClick={() => decidir.mutate({ id: pago.id, estado: "approved" })}
-                >
-                  <Check /> Aprobar
-                </Button>
-                <Button
-                  variant="peligro"
-                  size="medio"
-                  className="h-auto min-h-[60px] flex-1 py-4 text-base"
-                  onClick={() => {
-                    setMotivo("");
-                    setRechazo({ id: pago.id, nombre: pago.players?.name ?? "" });
-                  }}
-                >
-                  <X /> Rechazar
-                </Button>
-              </div>
-            </div>
-          ) : null}
-          {pago.status === "rejected" && pago.rejection_reason ? (
-            <p className="mt-3 text-base text-danger">Motivo: {pago.rejection_reason}</p>
-          ) : null}
-        </Tarjeta>
+        <FilaPago
+          key={pago.id}
+          pago={pago}
+          miniatura={pago.receipt_url ? miniaturas?.[pago.receipt_url] : undefined}
+          onVerFoto={abrirFoto}
+          onAprobar={aprobar}
+          onRechazar={pedirRechazo}
+        />
       ))}
 
       {!lista.length ? (
