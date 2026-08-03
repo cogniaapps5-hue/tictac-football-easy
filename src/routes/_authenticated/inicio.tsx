@@ -1,10 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { Wallet, CalendarCheck, TriangleAlert, Megaphone, Apple, Check, X, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { RecordatoriosAdmin } from "@/components/tictac/Recordatorios";
 import { useSesion, useSaludo, pesos, proximoEntrenamiento, fechaCorta, SEDES } from "@/lib/session";
@@ -31,7 +40,7 @@ function Inicio() {
     </Shell>
   ) : (
     <Shell rol="parent" titulo="Escuela TIC TAC" subtitulo={`${saludoActual}, ${sesion.nombre}`}>
-      <InicioPadre userId={sesion.userId} />
+      <InicioPadre userId={sesion.userId} nombreApoderado={sesion.nombre} />
     </Shell>
   );
 }
@@ -142,10 +151,11 @@ function InicioAdmin() {
   );
 }
 
-function InicioPadre({ userId }: { userId: string }) {
+function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoderado: string }) {
   const proximoGeneral = proximoEntrenamiento();
   const fechasPosibles = SEDES.map((s) => proximoEntrenamiento(s.valor).iso);
   const queryClient = useQueryClient();
+  const [avisoBloqueo, setAvisoBloqueo] = useState(false);
 
   const { data } = useQuery({
     queryKey: ["resumen-padre", userId, fechasPosibles.join(",")],
@@ -253,8 +263,26 @@ function InicioPadre({ userId }: { userId: string }) {
   const recordatorio =
     pagoDelMes || !alumno ? null : diaDelMes >= 6 ? "atrasado" : diaDelMes >= 1 ? "proximo" : null;
 
+  const pagosMes = (data?.pagos ?? []).filter((p) => p.due_date >= inicioMes && p.due_date < finMes);
+  const pagoAprobado = pagosMes.find((p) => p.status === "approved");
+  const pagoEnRevision = pagosMes.find((p) => p.status === "pending" && p.receipt_url);
+  const whatsapp = `https://wa.me/56912345678?text=${encodeURIComponent(
+    `Hola, necesito ayuda con el pago de la mensualidad de ${alumno?.name ?? "mi hijo/a"}`,
+  )}`;
+
   return (
     <div className="space-y-6">
+      {bloqueado && alumno ? (
+        <div className="rounded-2xl border-2 border-gold-brand bg-gold-brand/20 p-5">
+          <p className="text-lg font-bold text-foreground">
+            🌟 Hola {nombreApoderado}, para que {alumno.name.split(" ")[0]} pueda entrenar con
+            nosotros, necesitamos regularizar el pago de la mensualidad. ¡Te esperamos! 💙
+          </p>
+          <Button asChild variant="alerta" size="gigante" className="mt-4">
+            <Link to="/mi-hijo">Subir Comprobante Ahora</Link>
+          </Button>
+        </div>
+      ) : null}
       {cumpleaneros.map((c) => (
         <div
           key={c.id}
@@ -301,25 +329,27 @@ function InicioPadre({ userId }: { userId: string }) {
         </div>
       ) : null}
 
-      {bloqueado ? (
-        <div className="flex items-start gap-3 rounded-2xl border-[3px] border-danger bg-danger/20 p-5">
-          <TriangleAlert className="mt-0.5 size-7 shrink-0 text-danger" />
-          <p className="text-lg font-bold text-foreground">
-            Tu pago del mes aún está pendiente. Por favor sube tu comprobante para mantener tu acceso
-            activo. 🙏
-          </p>
-        </div>
-      ) : null}
-
       <Tarjeta destacada className="border-[3px] p-6">
         <h2 className="text-2xl font-black tracking-tight">⚽ PRÓXIMO ENTRENAMIENTO</h2>
         <p className="mt-2 text-3xl font-extrabold text-cyan-brand">{proximo.titulo}</p>
         <p className="mt-1 text-xl font-bold">📍 {proximo.sede}</p>
         <p className="mt-1 text-base capitalize text-muted-foreground">{proximo.texto}</p>
         {alumno && bloqueado ? (
-          <p className="mt-4 text-lg font-semibold text-muted-foreground">
-            Podrás confirmar asistencia apenas subas tu comprobante. ¡Gracias!
-          </p>
+          <div className="mt-4 space-y-3">
+            <Button
+              variant="neutro"
+              size="gigante"
+              disabled
+              aria-disabled
+              className="cursor-not-allowed bg-muted text-muted-foreground opacity-70"
+              onClick={() => setAvisoBloqueo(true)}
+            >
+              Regulariza tu pago para confirmar asistencia
+            </Button>
+            <p className="text-base text-muted-foreground">
+              Apenas revisemos tu comprobante podrás confirmar asistencia. ¡Gracias! 🙏
+            </p>
+          </div>
         ) : alumno ? (
           <>
             <p className="mt-4 text-lg font-semibold">¿Viene {alumno.name.split(" ")[0]}?</p>
@@ -373,31 +403,67 @@ function InicioPadre({ userId }: { userId: string }) {
           <Wallet className="size-7 text-cyan-brand" />
           <h2 className="text-xl font-bold">Pagos</h2>
         </div>
-        {pendiente ? (
-          <p className="mt-2 text-base">
-            <Estado estado="pending" />
-            <span className="mt-2 block">
-              {pendiente.concept}: {pesos(pendiente.amount)} — vence {fechaCorta(pendiente.due_date)}
-            </span>
-          </p>
-        ) : (
-          <p className="mt-2 text-base">
+        {pagoAprobado ? (
+          <div className="mt-3 space-y-2">
             <Estado estado="approved" />
-            <span className="mt-2 block">Todo al día. ¡Gracias!</span>
-          </p>
+            <p className="text-lg font-bold">✅ ¡Todo en orden!</p>
+            <p className="text-base">
+              Tu pago de este mes está confirmado. {alumno?.name ?? "Tu hijo/a"} puede entrenar sin
+              problemas.
+            </p>
+            <p className="text-base">¡Nos vemos en la cancha! ⚽💙</p>
+          </div>
+        ) : pagoEnRevision ? (
+          <div className="mt-3 space-y-2">
+            <Estado estado="pending" />
+            <p className="text-lg font-bold">✅ ¡Comprobante recibido!</p>
+            <p className="text-base">
+              Estamos revisando tu pago. En cuanto lo confirmemos, te avisaremos.
+            </p>
+            <p className="text-base">
+              Mientras tanto, tu hijo puede entrenar normalmente. ¡Gracias por tu paciencia! 🙏
+            </p>
+          </div>
+        ) : (
+          <div className="mt-3 space-y-2">
+            <p className="text-lg font-bold">📋 Tu pago está pendiente</p>
+            <p className="text-base">
+              Sabemos que a veces se nos olvida subir el comprobante. Si ya pagaste, por favor súbelo
+              aquí para que podamos confirmarlo.
+            </p>
+            <p className="text-base">
+              Si necesitas ayuda, escríbenos por WhatsApp y te orientamos. 💬
+            </p>
+            {pendiente ? (
+              <p className="text-base text-muted-foreground">
+                {pendiente.concept}: {pesos(pendiente.amount)} — vence {fechaCorta(pendiente.due_date)}
+              </p>
+            ) : null}
+          </div>
         )}
         {rechazado ? (
           <div className="mt-3 flex items-start gap-3 rounded-xl bg-black/70 p-4 text-lg font-semibold text-white">
             <TriangleAlert className="mt-0.5 size-6 shrink-0 text-danger" />
             <span>
-              Pago rechazado
+              No pudimos confirmar tu último comprobante
               {rechazado.rejection_reason ? `: ${rechazado.rejection_reason}` : ""}
             </span>
           </div>
         ) : null}
-        <Button asChild variant="accion" size="grande" className="mt-4">
-          <Link to="/mi-hijo">Subir Comprobante</Link>
-        </Button>
+        {!pagoAprobado ? (
+          <div className="mt-4 space-y-4">
+            <Button asChild variant="alerta" size="grande">
+              <Link to="/mi-hijo">Subir Comprobante</Link>
+            </Button>
+            {!pagoEnRevision ? (
+              <Button asChild variant="contorno" size="grande">
+                <a href={whatsapp} target="_blank" rel="noreferrer">
+                  Contactar por WhatsApp
+                </a>
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
       </Tarjeta>
 
       <Tarjeta>
@@ -460,6 +526,33 @@ function InicioPadre({ userId }: { userId: string }) {
           ) : null}
         </ul>
       </Tarjeta>
+
+      <Dialog open={avisoBloqueo} onOpenChange={setAvisoBloqueo}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">¡Hola! 👋</DialogTitle>
+            <DialogDescription className="space-y-3 text-left text-base text-foreground">
+              <span className="block">
+                Notamos que tu pago de este mes está pendiente. Para confirmar la asistencia de{" "}
+                {alumno?.name ?? "tu hijo/a"}, primero necesitamos regularizar tu situación.
+              </span>
+              <span className="block">
+                No te preocupes, puedes subir tu comprobante ahora mismo y en cuanto lo revisemos, tu
+                acceso quedará habilitado.
+              </span>
+              <span className="block font-semibold">¿Quieres subir tu comprobante ahora?</span>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-col gap-4 sm:flex-col">
+            <Button asChild variant="alerta" size="grande">
+              <Link to="/mi-hijo">Subir Comprobante</Link>
+            </Button>
+            <Button variant="neutro" size="grande" onClick={() => setAvisoBloqueo(false)}>
+              Después
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

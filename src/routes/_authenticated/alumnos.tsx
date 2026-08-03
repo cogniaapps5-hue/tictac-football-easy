@@ -45,6 +45,7 @@ function Alumnos() {
   const [busqueda, setBusqueda] = useState("");
   const [agregando, setAgregando] = useState(false);
   const [grupoFiltro, setGrupoFiltro] = useState<string>("todos");
+  const [soloAlDia, setSoloAlDia] = useState(false);
   const [diaFiltro, setDiaFiltro] = useState<DiaEntrenamiento>(proximoEntrenamiento().dia);
   const proximo = proximoEntrenamiento(diaFiltro);
   const sedeActual = sedeDe(diaFiltro);
@@ -143,7 +144,8 @@ function Alumnos() {
         a.name.toLowerCase().includes(texto) ||
         (a.rut ?? "").toLowerCase().includes(texto)) &&
       (grupoFiltro === "todos" || a.age_group === grupoFiltro) &&
-      a.training_day === diaFiltro,
+      a.training_day === diaFiltro &&
+      (!soloAlDia || a.access_status === "active" || a.access_status === "exception"),
   );
 
   const gruposVisibles = GRUPOS.filter(
@@ -287,6 +289,16 @@ function Alumnos() {
             </Button>
           ))}
         </div>
+        <p className="mt-4 text-base font-semibold">Pagos</p>
+        <Button
+          variant={soloAlDia ? "accion" : "neutro"}
+          size="medio"
+          className="mt-2 h-auto min-h-[60px] w-full py-4 text-base"
+          aria-pressed={soloAlDia}
+          onClick={() => setSoloAlDia((v) => !v)}
+        >
+          {soloAlDia ? "✅" : "⬜"} Mostrar solo alumnos con pago al día
+        </Button>
       </Tarjeta>
 
       {gruposVisibles.map((g) => {
