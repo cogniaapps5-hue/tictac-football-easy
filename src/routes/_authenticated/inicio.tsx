@@ -262,6 +262,9 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
   const pagosMes = (data?.pagos ?? []).filter((p) => p.due_date >= inicioMes && p.due_date < finMes);
   const pagoAprobado = pagosMes.find((p) => p.status === "approved");
   const pagoEnRevision = pagosMes.find((p) => p.status === "pending" && p.receipt_url);
+  // El botón se habilita siempre que el padre necesite subir un comprobante:
+  // pago rechazado, pendiente sin comprobante, o alumno bloqueado por morosidad.
+  const puedeSubirComprobante = Boolean(rechazado) || bloqueado || !(pagoAprobado || pagoEnRevision);
   const whatsapp = `https://wa.me/56912345678?text=${encodeURIComponent(
     `Hola, necesito ayuda con el pago de la mensualidad de ${alumno?.name ?? "mi hijo/a"}`,
   )}`;
