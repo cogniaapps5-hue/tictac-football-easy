@@ -245,10 +245,6 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
     const [, mes, dia] = String(a.birth_date).split("-").map(Number);
     return mes === hoy.getMonth() + 1 && dia === hoy.getDate();
   });
-  const semestreActual = hoy.getMonth() < 6 ? 1 : 2;
-  const nutricion = (data?.nutricion ?? []).find(
-    (n) => n.player_id === alumno?.id && n.year === anioActual && n.semester === semestreActual,
-  );
 
   // Recordatorio amable de mensualidad según el día del mes.
   const diaDelMes = hoy.getDate();
