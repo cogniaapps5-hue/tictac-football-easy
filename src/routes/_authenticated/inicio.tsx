@@ -329,25 +329,27 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
         </div>
       ) : null}
 
-      {bloqueado ? (
-        <div className="flex items-start gap-3 rounded-2xl border-[3px] border-danger bg-danger/20 p-5">
-          <TriangleAlert className="mt-0.5 size-7 shrink-0 text-danger" />
-          <p className="text-lg font-bold text-foreground">
-            Tu pago del mes aún está pendiente. Por favor sube tu comprobante para mantener tu acceso
-            activo. 🙏
-          </p>
-        </div>
-      ) : null}
-
       <Tarjeta destacada className="border-[3px] p-6">
         <h2 className="text-2xl font-black tracking-tight">⚽ PRÓXIMO ENTRENAMIENTO</h2>
         <p className="mt-2 text-3xl font-extrabold text-cyan-brand">{proximo.titulo}</p>
         <p className="mt-1 text-xl font-bold">📍 {proximo.sede}</p>
         <p className="mt-1 text-base capitalize text-muted-foreground">{proximo.texto}</p>
         {alumno && bloqueado ? (
-          <p className="mt-4 text-lg font-semibold text-muted-foreground">
-            Podrás confirmar asistencia apenas subas tu comprobante. ¡Gracias!
-          </p>
+          <div className="mt-4 space-y-3">
+            <Button
+              variant="neutro"
+              size="gigante"
+              disabled
+              aria-disabled
+              className="cursor-not-allowed bg-muted text-muted-foreground opacity-70"
+              onClick={() => setAvisoBloqueo(true)}
+            >
+              Regulariza tu pago para confirmar asistencia
+            </Button>
+            <p className="text-base text-muted-foreground">
+              Apenas revisemos tu comprobante podrás confirmar asistencia. ¡Gracias! 🙏
+            </p>
+          </div>
         ) : alumno ? (
           <>
             <p className="mt-4 text-lg font-semibold">¿Viene {alumno.name.split(" ")[0]}?</p>
