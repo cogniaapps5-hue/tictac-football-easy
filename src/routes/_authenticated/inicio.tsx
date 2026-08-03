@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { RecordatoriosAdmin } from "@/components/tictac/Recordatorios";
-import { useSesion, saludo, pesos, proximoEntrenamiento, fechaCorta, SEDES } from "@/lib/session";
+import { useSesion, useSaludo, pesos, proximoEntrenamiento, fechaCorta, SEDES } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
   head: () => ({
@@ -23,13 +23,14 @@ export const Route = createFileRoute("/_authenticated/inicio")({
 
 function Inicio() {
   const { data: sesion } = useSesion();
+  const saludoActual = useSaludo();
   if (!sesion) return null;
   return sesion.rol === "admin" ? (
-    <Shell rol="admin" titulo={`${saludo()}, ${sesion.nombre}`} subtitulo="Escuela TIC TAC">
+    <Shell rol="admin" titulo={`${saludoActual}, ${sesion.nombre}`} subtitulo="Escuela TIC TAC">
       <InicioAdmin />
     </Shell>
   ) : (
-    <Shell rol="parent" titulo="Escuela TIC TAC" subtitulo={`${saludo()}, ${sesion.nombre}`}>
+    <Shell rol="parent" titulo="Escuela TIC TAC" subtitulo={`${saludoActual}, ${sesion.nombre}`}>
       <InicioPadre userId={sesion.userId} />
     </Shell>
   );
