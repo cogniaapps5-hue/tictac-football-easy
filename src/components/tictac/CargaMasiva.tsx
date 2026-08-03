@@ -7,7 +7,14 @@ import * as XLSX from "xlsx";
 
 import { Button } from "@/components/ui/button";
 import { Tarjeta } from "@/components/tictac/Shell";
-import { parseFechaNacimiento, edadDesde, grupoPorEdad } from "@/lib/carga-masiva-utils";
+import {
+  parseFechaNacimiento,
+  edadDesde,
+  grupoPorEdad,
+  parseHorario,
+  textoHorario,
+  normalizarCondicion,
+} from "@/lib/carga-masiva-utils";
 import {
   cargaMasiva,
   MENSAJE_WHATSAPP,
@@ -15,15 +22,13 @@ import {
   type ResultadoCarga,
 } from "@/lib/carga-masiva.functions";
 
-type Fila = Record<string, unknown>;
-
 const GRUPOS = { iniciados: "Iniciados", intermedios: "Intermedios", avanzados: "Avanzados" };
 
-function resumenEdad(fechaTexto: string) {
+function edadYGrupo(fechaTexto: string) {
   const iso = parseFechaNacimiento(fechaTexto);
-  if (!iso) return "sin fecha válida";
+  if (!iso) return { edad: "—", grupo: "—" };
   const edad = edadDesde(iso);
-  return `${edad} años · ${GRUPOS[grupoPorEdad(edad)]}`;
+  return { edad: `${edad} años`, grupo: GRUPOS[grupoPorEdad(edad)] };
 }
 
 const COLUMNAS = [
@@ -45,50 +50,81 @@ function normalizar(clave: string) {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s+/g, "_");
+    .replace(/\s+/g, " ");
 }
 
-function bruto(fila: Fila, clave: string) {
-  const encontrada = Object.keys(fila).find((k) => normalizar(k) === clave);
-  return encontrada ? fila[encontrada] : null;
-}
+// Palabras clave por campo; se busca la primera fila de encabezados que las contenga.
+const CLAVES = {
+  nombre_apoderado: ["nombre apoderado", "nombre_apoderado", "apoderado"],
+  rut_apoderado: ["rut apoderado", "rut_apoderado"],
+  email: ["e-mail", "email", "correo", "mail"],
+  telefono: ["telefono", "fono", "celular"],
+  nombre_alumno: ["nombre alumno", "nombre_alumno", "alumno"],
+  rut_alumno: ["rut alumno", "rut_alumno"],
+  fecha_nacimiento: ["fecha nacimiento", "fecha_nacimiento", "nacimiento", "fecha de nacimiento"],
+  talla_polera: ["talla"],
+  condiciones_medicas: ["condicion", "condiciones", "medica", "salud"],
+  horario: ["horario", "dia", "dia_entrenamiento"],
+} as const;
 
-function texto(fila: Fila, clave: string) {
-  const valor = bruto(fila, clave);
-  return valor == null ? "" : String(valor).trim();
-}
+type Campo = keyof typeof CLAVES;
 
-function fecha(fila: Fila, clave: string) {
-  const valor = bruto(fila, clave);
+function celda(valor: unknown) {
   if (valor instanceof Date) {
-    return `${String(valor.getDate()).padStart(2, "0")}-${String(valor.getMonth() + 1).padStart(2, "0")}-${valor.getFullYear()}`;
+    return `${valor.getMonth() + 1}/${valor.getDate()}/${valor.getFullYear()}`;
   }
   return valor == null ? "" : String(valor).trim();
 }
 
-function leerLibro(libro: XLSX.WorkBook): EntradaCarga {
+// Busca la fila de encabezados en cualquier posición y mapea cada campo a su columna.
+function detectarEncabezados(filas: unknown[][]) {
+  for (let i = 0; i < Math.min(filas.length, 30); i++) {
+    const fila = (filas[i] ?? []).map((c) => normalizar(celda(c)));
+    const mapa = {} as Partial<Record<Campo, number>>;
+    (Object.keys(CLAVES) as Campo[]).forEach((campo) => {
+      const idx = fila.findIndex((h) => h && CLAVES[campo].some((k) => h.includes(k)));
+      if (idx >= 0 && !Object.values(mapa).includes(idx)) mapa[campo] = idx;
+    });
+    if (mapa.nombre_apoderado != null && mapa.nombre_alumno != null) {
+      return { inicio: i + 1, mapa };
+    }
+  }
+  return null;
+}
+
+function leerLibro(libro: XLSX.WorkBook): EntradaCarga | null {
   const nombreHoja = libro.SheetNames[0] ?? "";
   const hoja = libro.Sheets[nombreHoja];
-  const filas = hoja ? XLSX.utils.sheet_to_json<Fila>(hoja, { defval: "" }) : [];
+  const filas = hoja
+    ? XLSX.utils.sheet_to_json<unknown[]>(hoja, { header: 1, defval: "", blankrows: true, raw: false })
+    : [];
+  const encabezado = detectarEncabezados(filas);
+  if (!encabezado) return null;
+  const { inicio, mapa } = encabezado;
+  const val = (fila: unknown[], campo: Campo) =>
+    mapa[campo] == null ? "" : celda(fila[mapa[campo]!]);
 
-  return {
-    filas: filas
-      .map((f) => ({
-        nombre_apoderado: texto(f, "nombre_apoderado"),
-        rut_apoderado: texto(f, "rut_apoderado"),
-        email: texto(f, "email").toLowerCase(),
-        telefono: texto(f, "telefono"),
-        nombre_alumno: texto(f, "nombre_alumno"),
-        rut_alumno: texto(f, "rut_alumno"),
-        fecha_nacimiento: fecha(f, "fecha_nacimiento"),
-        talla_polera: texto(f, "talla_polera").toUpperCase(),
-        condiciones_medicas: texto(f, "condiciones_medicas"),
-        dia_entrenamiento: (texto(f, "dia_entrenamiento").toLowerCase().startsWith("j")
-          ? "jueves"
-          : "martes") as "martes" | "jueves",
-      }))
-      .filter((f) => f.nombre_alumno),
-  };
+  const datos = filas.slice(inicio).map((f) => {
+    const fila = f ?? [];
+    const dias = parseHorario(val(fila, "horario"));
+    return {
+      nombre_apoderado: val(fila, "nombre_apoderado"),
+      rut_apoderado: val(fila, "rut_apoderado"),
+      email: val(fila, "email").toLowerCase(),
+      telefono: val(fila, "telefono"),
+      nombre_alumno: val(fila, "nombre_alumno"),
+      rut_alumno: val(fila, "rut_alumno"),
+      fecha_nacimiento: val(fila, "fecha_nacimiento"),
+      talla_polera: val(fila, "talla_polera"),
+      condiciones_medicas: normalizarCondicion(val(fila, "condiciones_medicas")),
+      dia_entrenamiento: (dias.martes ? "martes" : "jueves") as "martes" | "jueves",
+      training_tuesday: dias.martes,
+      training_thursday: dias.jueves,
+    };
+  });
+
+  // Se ignoran las filas sin apoderado o sin alumno.
+  return { filas: datos.filter((f) => f.nombre_apoderado && f.nombre_alumno) };
 }
 
 function plantilla() {
@@ -141,7 +177,7 @@ export function CargaMasiva() {
       const buffer = await file.arrayBuffer();
       const libro = XLSX.read(buffer, { type: "array", cellDates: true });
       const leidos = leerLibro(libro);
-      if (!leidos.filas?.length) {
+      if (!leidos?.filas?.length) {
         toast.error("El archivo no tiene alumnos que podamos leer");
         return;
       }
