@@ -272,15 +272,17 @@ function InicioPadre({ userId }: { userId: string }) {
         </div>
       ))}
       {data && !data.contrato ? (
-        <Link
-          to="/info"
-          className="flex items-start gap-3 rounded-2xl border-2 border-gold-brand bg-gold-brand/20 p-5"
-        >
-          <span aria-hidden className="text-2xl">⚠️</span>
-          <p className="text-lg font-bold text-foreground">
-            Debes aceptar el reglamento para continuar usando la app. Toca aquí para firmarlo.
-          </p>
-        </Link>
+        <div className="rounded-2xl border-2 border-gold-brand bg-gold-brand/20 p-5">
+          <div className="flex items-start gap-3">
+            <span aria-hidden className="text-2xl">⚠️</span>
+            <p className="text-lg font-bold text-foreground">
+              Debes aceptar el reglamento para continuar usando la app
+            </p>
+          </div>
+          <Button asChild variant="alerta" size="gigante" className="mt-4">
+            <Link to="/contrato">Aceptar ahora</Link>
+          </Button>
+        </div>
       ) : null}
       {recordatorio === "proximo" ? (
         <div className="flex items-start gap-3 rounded-2xl border-2 border-gold-brand bg-gold-brand/20 p-5">
