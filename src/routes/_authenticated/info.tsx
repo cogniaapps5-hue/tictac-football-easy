@@ -1,15 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { FileText, Target, Users, Images, ScrollText, CheckCircle2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { FileText, Target, Users, Images, ScrollText } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Shell, Tarjeta } from "@/components/tictac/Shell";
 import { supabase } from "@/integrations/supabase/client";
 import { useSesion } from "@/lib/session";
-import { REGLAMENTO } from "@/lib/reglamento";
 
 export const Route = createFileRoute("/_authenticated/info")({
   head: () => ({
@@ -32,7 +29,18 @@ function Info() {
 
   return (
     <Shell rol={sesion.rol} titulo="Información" subtitulo="Todo sobre la escuela">
-      <Contrato userId={sesion.userId} />
+      <Tarjeta>
+        <div className="flex items-center gap-3">
+          <ScrollText className="size-6 text-gold-brand" />
+          <h2 className="text-xl font-bold">Contrato y Reglamento</h2>
+        </div>
+        <p className="mt-3 text-base text-muted-foreground">
+          Revisa y firma el reglamento interno de la escuela.
+        </p>
+        <Button asChild variant="alerta" size="grande" className="mt-4">
+          <Link to="/contrato">Ver Contrato</Link>
+        </Button>
+      </Tarjeta>
 
       <Tarjeta>
         <div className="flex items-center gap-3">
