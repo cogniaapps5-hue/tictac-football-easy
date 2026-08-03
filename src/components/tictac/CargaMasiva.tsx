@@ -7,6 +7,7 @@ import * as XLSX from "xlsx";
 
 import { Button } from "@/components/ui/button";
 import { Tarjeta } from "@/components/tictac/Shell";
+import { parseFechaNacimiento, edadDesde, grupoPorEdad } from "@/lib/carga-masiva-utils";
 import {
   cargaMasiva,
   MENSAJE_WHATSAPP,
@@ -15,6 +16,15 @@ import {
 } from "@/lib/carga-masiva.functions";
 
 type Fila = Record<string, unknown>;
+
+const GRUPOS = { iniciados: "Iniciados", intermedios: "Intermedios", avanzados: "Avanzados" };
+
+function resumenEdad(fechaTexto: string) {
+  const iso = parseFechaNacimiento(fechaTexto);
+  if (!iso) return "sin fecha válida";
+  const edad = edadDesde(iso);
+  return `${edad} años · ${GRUPOS[grupoPorEdad(edad)]}`;
+}
 
 const COLUMNAS = [
   "nombre_apoderado",
@@ -145,7 +155,7 @@ export function CargaMasiva() {
 
   if (!abierto) {
     return (
-      <Button variant="alerta" size="grande" onClick={() => setAbierto(true)}>
+      <Button variant="alerta" size="grande" className="py-4" onClick={() => setAbierto(true)}>
         <FileSpreadsheet /> Cargar Excel / CSV
       </Button>
     );
@@ -213,6 +223,7 @@ export function CargaMasiva() {
             {(datos.filas ?? []).slice(0, 6).map((a, i) => (
               <p key={i} className="text-base">
                 🧒 {a.nombre_alumno} — nace {a.fecha_nacimiento || "sin fecha"} —{" "}
+                {resumenEdad(a.fecha_nacimiento ?? "")} —{" "}
                 {a.dia_entrenamiento === "jueves" ? "Jueves" : "Martes"} —{" "}
                 {a.email || "sin apoderado"}
               </p>
