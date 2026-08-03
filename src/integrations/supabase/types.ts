@@ -296,6 +296,8 @@ export type Database = {
           rut: string | null
           schedule: string
           training_day: Database["public"]["Enums"]["training_day"]
+          training_thursday: boolean
+          training_tuesday: boolean
         }
         Insert: {
           access_status?: Database["public"]["Enums"]["access_status"]
@@ -316,6 +318,8 @@ export type Database = {
           rut?: string | null
           schedule?: string
           training_day?: Database["public"]["Enums"]["training_day"]
+          training_thursday?: boolean
+          training_tuesday?: boolean
         }
         Update: {
           access_status?: Database["public"]["Enums"]["access_status"]
@@ -336,6 +340,8 @@ export type Database = {
           rut?: string | null
           schedule?: string
           training_day?: Database["public"]["Enums"]["training_day"]
+          training_thursday?: boolean
+          training_tuesday?: boolean
         }
         Relationships: [
           {

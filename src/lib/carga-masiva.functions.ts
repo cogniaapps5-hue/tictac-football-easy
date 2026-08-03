@@ -6,6 +6,7 @@ import {
   edadDesde,
   grupoPorEdad,
   rutClaveTemporal,
+  normalizarCondicion,
 } from "@/lib/carga-masiva-utils";
 
 const fila = z.object({
@@ -16,9 +17,11 @@ const fila = z.object({
   nombre_alumno: z.string().trim().min(1).max(120),
   rut_alumno: z.string().trim().max(20).default(""),
   fecha_nacimiento: z.string().trim().max(20).default(""),
-  talla_polera: z.string().trim().max(5).default(""),
+  talla_polera: z.string().trim().max(40).default(""),
   condiciones_medicas: z.string().trim().max(1000).default(""),
   dia_entrenamiento: z.enum(["martes", "jueves"]).default("martes"),
+  training_tuesday: z.boolean().default(true),
+  training_thursday: z.boolean().default(false),
 });
 
 const entrada = z.object({ filas: z.array(fila).max(500).default([]) });
@@ -139,8 +142,10 @@ export const cargaMasiva = createServerFn({ method: "POST" })
         birth_date: fechaNac,
         age_group: grupoPorEdad(edad),
         jersey_size: f.talla_polera.toUpperCase() || null,
-        medical_conditions: f.condiciones_medicas || null,
-        training_day: f.dia_entrenamiento,
+        medical_conditions: normalizarCondicion(f.condiciones_medicas),
+        training_day: f.training_tuesday ? "martes" : "jueves",
+        training_tuesday: f.training_tuesday,
+        training_thursday: f.training_thursday,
         parent_email: email || null,
         parent_id: parentId,
       });
