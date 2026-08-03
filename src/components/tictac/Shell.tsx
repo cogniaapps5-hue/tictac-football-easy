@@ -8,6 +8,7 @@ import {
   User,
   BookOpen,
   ClipboardList,
+  FileText,
   LogOut,
   type LucideIcon,
 } from "lucide-react";
@@ -31,6 +32,7 @@ const NAV_ADMIN: Item[] = [
 const NAV_PADRE: Item[] = [
   { to: "/inicio", label: "Inicio", icon: Home },
   { to: "/mi-hijo", label: "Mi Hijo", icon: User },
+  { to: "/contrato", label: "Contrato", icon: FileText },
   { to: "/info", label: "Info", icon: BookOpen },
 ];
 

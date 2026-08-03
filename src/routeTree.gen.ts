@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as CambiarClaveRouteImport } from './routes/cambiar-clave'
 import { Route as AuthenticatedAlumnosRouteImport } from './routes/_authenticated/alumnos'
 import { Route as AuthenticatedAvisosRouteImport } from './routes/_authenticated/avisos'
+import { Route as AuthenticatedContratoRouteImport } from './routes/_authenticated/contrato'
 import { Route as AuthenticatedCuerpoTecnicoRouteImport } from './routes/_authenticated/cuerpo-tecnico'
 import { Route as AuthenticatedInfoRouteImport } from './routes/_authenticated/info'
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
@@ -42,6 +43,11 @@ const AuthenticatedAlumnosRoute = AuthenticatedAlumnosRouteImport.update({
 const AuthenticatedAvisosRoute = AuthenticatedAvisosRouteImport.update({
   id: '/avisos',
   path: '/avisos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedContratoRoute = AuthenticatedContratoRouteImport.update({
+  id: '/contrato',
+  path: '/contrato',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCuerpoTecnicoRoute =
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/cambiar-clave': typeof CambiarClaveRoute
   '/alumnos': typeof AuthenticatedAlumnosRoute
   '/avisos': typeof AuthenticatedAvisosRoute
+  '/contrato': typeof AuthenticatedContratoRoute
   '/cuerpo-tecnico': typeof AuthenticatedCuerpoTecnicoRoute
   '/info': typeof AuthenticatedInfoRoute
   '/inicio': typeof AuthenticatedInicioRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/cambiar-clave': typeof CambiarClaveRoute
   '/alumnos': typeof AuthenticatedAlumnosRoute
   '/avisos': typeof AuthenticatedAvisosRoute
+  '/contrato': typeof AuthenticatedContratoRoute
   '/cuerpo-tecnico': typeof AuthenticatedCuerpoTecnicoRoute
   '/info': typeof AuthenticatedInfoRoute
   '/inicio': typeof AuthenticatedInicioRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/cambiar-clave': typeof CambiarClaveRoute
   '/_authenticated/alumnos': typeof AuthenticatedAlumnosRoute
   '/_authenticated/avisos': typeof AuthenticatedAvisosRoute
+  '/_authenticated/contrato': typeof AuthenticatedContratoRoute
   '/_authenticated/cuerpo-tecnico': typeof AuthenticatedCuerpoTecnicoRoute
   '/_authenticated/info': typeof AuthenticatedInfoRoute
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
     | '/cambiar-clave'
     | '/alumnos'
     | '/avisos'
+    | '/contrato'
     | '/cuerpo-tecnico'
     | '/info'
     | '/inicio'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
     | '/cambiar-clave'
     | '/alumnos'
     | '/avisos'
+    | '/contrato'
     | '/cuerpo-tecnico'
     | '/info'
     | '/inicio'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/cambiar-clave'
     | '/_authenticated/alumnos'
     | '/_authenticated/avisos'
+    | '/_authenticated/contrato'
     | '/_authenticated/cuerpo-tecnico'
     | '/_authenticated/info'
     | '/_authenticated/inicio'
@@ -186,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAvisosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/contrato': {
+      id: '/_authenticated/contrato'
+      path: '/contrato'
+      fullPath: '/contrato'
+      preLoaderRoute: typeof AuthenticatedContratoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/cuerpo-tecnico': {
       id: '/_authenticated/cuerpo-tecnico'
       path: '/cuerpo-tecnico'
@@ -227,6 +246,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAlumnosRoute: typeof AuthenticatedAlumnosRoute
   AuthenticatedAvisosRoute: typeof AuthenticatedAvisosRoute
+  AuthenticatedContratoRoute: typeof AuthenticatedContratoRoute
   AuthenticatedCuerpoTecnicoRoute: typeof AuthenticatedCuerpoTecnicoRoute
   AuthenticatedInfoRoute: typeof AuthenticatedInfoRoute
   AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
@@ -237,6 +257,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAlumnosRoute: AuthenticatedAlumnosRoute,
   AuthenticatedAvisosRoute: AuthenticatedAvisosRoute,
+  AuthenticatedContratoRoute: AuthenticatedContratoRoute,
   AuthenticatedCuerpoTecnicoRoute: AuthenticatedCuerpoTecnicoRoute,
   AuthenticatedInfoRoute: AuthenticatedInfoRoute,
   AuthenticatedInicioRoute: AuthenticatedInicioRoute,
