@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { RecordatoriosAdmin } from "@/components/tictac/Recordatorios";
+import { ReportesAdmin } from "@/components/tictac/Reportes";
 import { useSesion, useSaludo, pesos, proximoEntrenamiento, fechaCorta, SEDES } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
@@ -147,6 +148,8 @@ function InicioAdmin() {
             : "Sin pagos muy atrasados. Todo tranquilo."}
         </p>
       </Tarjeta>
+
+      <ReportesAdmin />
     </>
   );
 }
@@ -271,6 +274,14 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
 
   return (
     <div className="space-y-6">
+      {data && !alumno ? (
+        <Tarjeta destacada>
+          <p className="text-lg font-bold">
+            No hay alumnos registrados en tu cuenta. Contacta a administración para vincular a tu
+            hijo o hija.
+          </p>
+        </Tarjeta>
+      ) : null}
       {bloqueado && alumno ? (
         <div className="rounded-2xl border-2 border-gold-brand bg-gold-brand/20 p-5">
           <p className="text-lg font-bold text-foreground">

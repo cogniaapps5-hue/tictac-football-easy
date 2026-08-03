@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { CargaMasiva } from "@/components/tictac/CargaMasiva";
+import { MatriculaManual } from "@/components/tictac/Matricula";
 import {
   useSesion,
   proximoEntrenamiento,
@@ -245,6 +246,7 @@ function Alumnos() {
       </Tarjeta>
 
       <CargaMasiva />
+      <MatriculaManual />
 
       <Tarjeta>
         <Label htmlFor="buscar" className="text-base">
@@ -324,7 +326,11 @@ function Alumnos() {
 
       {!lista.length ? (
         <Tarjeta>
-          <p className="text-base text-muted-foreground">No hay alumnos con estos filtros.</p>
+          <p className="text-lg font-semibold">
+            {data?.alumnos.length
+              ? "No hay alumnos con estos filtros."
+              : "No hay alumnos matriculados. Usa \u201cCargar Excel\u201d o \u201cMatricular Nuevo Alumno\u201d."}
+          </p>
         </Tarjeta>
       ) : null}
 
