@@ -326,9 +326,6 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
             🌟 Hola {nombreApoderado}, para que {alumno.name.split(" ")[0]} pueda entrenar con
             nosotros, necesitamos regularizar el pago de la mensualidad. ¡Te esperamos! 💙
           </p>
-          <Button asChild variant="alerta" size="gigante" className="mt-4">
-            <Link to="/mi-hijo">Subir Comprobante Ahora</Link>
-          </Button>
           <div className="mt-4">
             <SubirComprobante
               playerId={alumno.id}
@@ -508,14 +505,13 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
         ) : null}
         <div className="mt-4 space-y-4">
           {puedeSubirComprobante ? (
-            <Button
-              asChild
-              variant="alerta"
-              size="grande"
-              className="h-auto min-h-[60px] w-full py-4 text-base"
-            >
-              <Link to="/mi-hijo">Subir Comprobante</Link>
-            </Button>
+            alumno ? (
+              <SubirComprobante
+                playerId={alumno.id}
+                pagoId={pendiente?.id ?? rechazado?.id ?? null}
+                userId={userId}
+              />
+            ) : null
           ) : (
             <Button
               disabled
@@ -578,6 +574,11 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
           ))}
           {(data?.avisos ?? []).map((aviso) => (
             <li key={aviso.id} className="rounded-xl bg-secondary p-4">
+              <span
+                className={`mb-2 inline-block rounded-full px-3 py-1 text-sm font-bold ${categoriaAviso(aviso.category).clase}`}
+              >
+                {categoriaAviso(aviso.category).emoji} {categoriaAviso(aviso.category).etiqueta}
+              </span>
               <p className="text-base font-bold">{aviso.title}</p>
               <p className="text-base text-muted-foreground">{aviso.content}</p>
             </li>
@@ -605,9 +606,13 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex-col gap-4 sm:flex-col">
-            <Button asChild variant="alerta" size="grande">
-              <Link to="/mi-hijo">Subir Comprobante</Link>
-            </Button>
+            {alumno ? (
+              <SubirComprobante
+                playerId={alumno.id}
+                pagoId={pendiente?.id ?? null}
+                userId={userId}
+              />
+            ) : null}
             <Button variant="neutro" size="grande" onClick={() => setAvisoBloqueo(false)}>
               Después
             </Button>
