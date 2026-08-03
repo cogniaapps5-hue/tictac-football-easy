@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export type Rol = "admin" | "parent";
@@ -31,6 +32,21 @@ export function saludo() {
   if (h < 12) return "Buenos días";
   if (h < 20) return "Buenas tardes";
   return "Buenas noches";
+}
+
+/**
+ * Saludo según la hora del reloj del usuario. Se calcula después de hidratar
+ * (el servidor está en UTC) y se refresca cada minuto para que cambie solo.
+ */
+export function useSaludo() {
+  const [texto, setTexto] = useState("Hola");
+  useEffect(() => {
+    const actualizar = () => setTexto(saludo());
+    actualizar();
+    const id = setInterval(actualizar, 60_000);
+    return () => clearInterval(id);
+  }, []);
+  return texto;
 }
 
 const formatoCLP = new Intl.NumberFormat("es-CL", {
