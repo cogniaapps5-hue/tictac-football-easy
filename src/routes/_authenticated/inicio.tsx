@@ -263,8 +263,26 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
   const recordatorio =
     pagoDelMes || !alumno ? null : diaDelMes >= 6 ? "atrasado" : diaDelMes >= 1 ? "proximo" : null;
 
+  const pagosMes = (data?.pagos ?? []).filter((p) => p.due_date >= inicioMes && p.due_date < finMes);
+  const pagoAprobado = pagosMes.find((p) => p.status === "approved");
+  const pagoEnRevision = pagosMes.find((p) => p.status === "pending" && p.receipt_url);
+  const whatsapp = `https://wa.me/56912345678?text=${encodeURIComponent(
+    `Hola, necesito ayuda con el pago de la mensualidad de ${alumno?.name ?? "mi hijo/a"}`,
+  )}`;
+
   return (
     <div className="space-y-6">
+      {bloqueado && alumno ? (
+        <div className="rounded-2xl border-2 border-gold-brand bg-gold-brand/20 p-5">
+          <p className="text-lg font-bold text-foreground">
+            🌟 Hola {nombreApoderado}, para que {alumno.name.split(" ")[0]} pueda entrenar con
+            nosotros, necesitamos regularizar el pago de la mensualidad. ¡Te esperamos! 💙
+          </p>
+          <Button asChild variant="alerta" size="gigante" className="mt-4">
+            <Link to="/mi-hijo">Subir Comprobante Ahora</Link>
+          </Button>
+        </div>
+      ) : null}
       {cumpleaneros.map((c) => (
         <div
           key={c.id}
