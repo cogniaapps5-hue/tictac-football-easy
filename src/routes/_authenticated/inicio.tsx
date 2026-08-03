@@ -329,6 +329,14 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
           <Button asChild variant="alerta" size="gigante" className="mt-4">
             <Link to="/mi-hijo">Subir Comprobante Ahora</Link>
           </Button>
+          <div className="mt-4">
+            <SubirComprobante
+              playerId={alumno.id}
+              pagoId={pendiente?.id ?? null}
+              userId={userId}
+              etiqueta="Subir Comprobante Ahora"
+            />
+          </div>
         </div>
       ) : null}
       {cumpleaneros.map((c) => (
