@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
-import { Camera, Loader2, Phone, Save } from "lucide-react";
+import { useState } from "react";
+import { Phone, Save } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
+import { SubirComprobante } from "@/components/tictac/SubirComprobante";
 import { useSesion, pesos, fechaCorta } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/mi-hijo")({
@@ -28,10 +29,8 @@ export const Route = createFileRoute("/_authenticated/mi-hijo")({
 function MiHijo() {
   const { data: sesion } = useSesion();
   const queryClient = useQueryClient();
-  const archivoRef = useRef<HTMLInputElement>(null);
   const [editando, setEditando] = useState(false);
   const [contacto, setContacto] = useState({ nombre: "", telefono: "" });
-  const [subiendo, setSubiendo] = useState(false);
 
   const { data } = useQuery({
     queryKey: ["mi-hijo", sesion?.userId],
@@ -81,34 +80,6 @@ function MiHijo() {
 
   const alumno = data?.alumnos[0];
   const pendiente = data?.pagos.find((p) => p.status === "pending");
-
-  async function subirComprobante(file: File) {
-    if (!sesion || !pendiente) return;
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("La foto es muy pesada (máximo 10 MB)");
-      return;
-    }
-    setSubiendo(true);
-    const ruta = `${sesion.userId}/${pendiente.id}-${Date.now()}`;
-    const { error } = await supabase.storage.from("comprobantes").upload(ruta, file);
-    if (!error) {
-      const { error: err2 } = await supabase
-        .from("payments")
-        .update({ receipt_url: ruta })
-        .eq("id", pendiente.id);
-      if (err2) {
-        setSubiendo(false);
-        toast.error("No pudimos guardar el comprobante");
-        return;
-      }
-      queryClient.invalidateQueries({ queryKey: ["mi-hijo"] });
-      queryClient.invalidateQueries({ queryKey: ["resumen-padre"] });
-      toast.success("¡Comprobante enviado! La escuela lo revisará.");
-    } else {
-      toast.error("No pudimos subir la foto");
-    }
-    setSubiendo(false);
-  }
 
   if (!sesion) return null;
 
@@ -214,31 +185,17 @@ function MiHijo() {
                 </li>
               ))}
             </ul>
-            {pendiente ? (
+            {alumno ? (
               <>
-                <input
-                  ref={archivoRef}
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) void subirComprobante(file);
-                    e.target.value = "";
-                  }}
-                />
-                <Button
-                  variant="accion"
-                  size="grande"
-                  className="mt-4"
-                  disabled={subiendo}
-                  onClick={() => archivoRef.current?.click()}
-                >
-                  {subiendo ? <Loader2 className="animate-spin" /> : <Camera />}
-                  Subir Comprobante
-                </Button>
-                {pendiente.receipt_url ? (
+                <div className="mt-4">
+                  <SubirComprobante
+                    playerId={alumno.id}
+                    pagoId={pendiente?.id ?? null}
+                    userId={sesion.userId}
+                    variante="accion"
+                  />
+                </div>
+                {pendiente?.receipt_url ? (
                   <p className="mt-3 text-base text-muted-foreground">
                     Ya enviaste una foto. La escuela la está revisando.
                   </p>
