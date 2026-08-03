@@ -96,6 +96,7 @@ export type Database = {
       }
       notices: {
         Row: {
+          category: string
           content: string
           created_at: string
           id: string
@@ -103,6 +104,7 @@ export type Database = {
           title: string
         }
         Insert: {
+          category?: string
           content: string
           created_at?: string
           id?: string
@@ -110,6 +112,7 @@ export type Database = {
           title: string
         }
         Update: {
+          category?: string
           content?: string
           created_at?: string
           id?: string

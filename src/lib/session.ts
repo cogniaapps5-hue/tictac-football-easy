@@ -128,3 +128,44 @@ export function grupoPorAnio(anio: number): GrupoEtario {
   if (anio >= 2016) return "intermedios";
   return "avanzados";
 }
+
+/**
+ * Categorías de avisos. TIC TAC es una escuela formativa: no hay torneos ni
+ * reuniones de competencia, sí partidos amistosos e información importante.
+ */
+export const CATEGORIAS_AVISO: {
+  valor: string;
+  etiqueta: string;
+  emoji: string;
+  clase: string;
+}[] = [
+  {
+    valor: "partido_amistoso",
+    etiqueta: "Partido Amistoso",
+    emoji: "⚽",
+    clase: "bg-success/20 text-success",
+  },
+  {
+    valor: "informacion_importante",
+    etiqueta: "Información Importante",
+    emoji: "📢",
+    clase: "bg-gold-brand/25 text-gold-brand",
+  },
+  {
+    valor: "entrenamiento",
+    etiqueta: "Entrenamiento",
+    emoji: "🏃",
+    clase: "bg-cyan-brand/20 text-cyan-brand",
+  },
+  {
+    valor: "suspension",
+    etiqueta: "Suspensión",
+    emoji: "🌧️",
+    clase: "bg-danger/20 text-danger",
+  },
+  { valor: "otro", etiqueta: "Otro", emoji: "📝", clase: "bg-secondary text-muted-foreground" },
+];
+
+export function categoriaAviso(valor: string | null | undefined) {
+  return CATEGORIAS_AVISO.find((c) => c.valor === valor) ?? CATEGORIAS_AVISO[4];
+}

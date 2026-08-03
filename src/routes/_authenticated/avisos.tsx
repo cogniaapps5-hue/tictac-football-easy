@@ -11,7 +11,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Shell, Tarjeta } from "@/components/tictac/Shell";
-import { useSesion, fechaCorta, GRUPOS, grupoEtiqueta, SEDES, sedeDe } from "@/lib/session";
+import {
+  useSesion,
+  fechaCorta,
+  GRUPOS,
+  grupoEtiqueta,
+  SEDES,
+  sedeDe,
+  CATEGORIAS_AVISO,
+  categoriaAviso,
+} from "@/lib/session";
 
 function destinoEtiqueta(valor: string) {
   if (valor === "all") return "todos";
@@ -38,6 +47,7 @@ function Avisos() {
   const [titulo, setTitulo] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [destino, setDestino] = useState("all");
+  const [categoria, setCategoria] = useState("informacion_importante");
 
   const { data: avisos } = useQuery({
     queryKey: ["avisos"],
@@ -56,6 +66,7 @@ function Avisos() {
         title: titulo.trim().slice(0, 100),
         content: mensaje.trim().slice(0, 1000),
         target_category: destino,
+        category: categoria,
       });
       if (error) throw error;
     },
@@ -85,12 +96,28 @@ function Avisos() {
         <h2 className="text-xl font-bold">📢 Enviar aviso</h2>
         <div className="mt-4 space-y-4">
           <div className="space-y-2">
+            <Label className="text-base">Tipo de aviso</Label>
+            <div className="flex flex-wrap gap-4">
+              {CATEGORIAS_AVISO.map((c) => (
+                <Button
+                  key={c.valor}
+                  variant={categoria === c.valor ? "accion" : "neutro"}
+                  size="medio"
+                  className="h-auto min-h-[60px] flex-1 py-4 text-base"
+                  onClick={() => setCategoria(c.valor)}
+                >
+                  {c.emoji} {c.etiqueta}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-2">
             <Label className="text-base">Título</Label>
             <Input
               value={titulo}
               maxLength={100}
               onChange={(e) => setTitulo(e.target.value)}
-              placeholder="Torneo del sábado"
+              placeholder="Partido amistoso del sábado"
               className="h-14 rounded-xl text-lg"
             />
           </div>
@@ -153,6 +180,11 @@ function Avisos() {
         <ul className="mt-3 space-y-4">
           {(avisos ?? []).map((aviso) => (
             <li key={aviso.id} className="rounded-xl bg-secondary p-4">
+              <span
+                className={`mb-2 inline-block rounded-full px-3 py-1 text-sm font-bold ${categoriaAviso(aviso.category).clase}`}
+              >
+                {categoriaAviso(aviso.category).emoji} {categoriaAviso(aviso.category).etiqueta}
+              </span>
               <p className="text-base font-bold">{aviso.title}</p>
               <p className="text-base text-muted-foreground">{aviso.content}</p>
               <p className="mt-1 text-sm text-muted-foreground">
