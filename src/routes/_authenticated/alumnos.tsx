@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { exigirRol } from "@/lib/guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Search, UserPlus, Check, X } from "lucide-react";
@@ -21,6 +22,7 @@ import {
 } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/alumnos")({
+  beforeLoad: exigirRol("admin"),
   head: () => ({
     meta: [
       { title: "Alumnos — Escuela TIC TAC" },

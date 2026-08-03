@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { exigirRol } from "@/lib/guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { Camera, Loader2, Phone, Save } from "lucide-react";
@@ -12,6 +13,7 @@ import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { useSesion, pesos, fechaCorta } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/mi-hijo")({
+  beforeLoad: exigirRol("parent"),
   head: () => ({
     meta: [
       { title: "Mi Hijo — Escuela TIC TAC" },

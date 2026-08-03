@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { exigirRol } from "@/lib/guard";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FileText, Target, Users, Images, ScrollText } from "lucide-react";
@@ -9,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSesion } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/info")({
+  beforeLoad: exigirRol("parent"),
   head: () => ({
     meta: [
       { title: "Información — Escuela TIC TAC" },

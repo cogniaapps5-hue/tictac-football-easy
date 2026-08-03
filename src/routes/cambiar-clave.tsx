@@ -29,17 +29,33 @@ export const Route = createFileRoute("/cambiar-clave")({
 
 function CambiarClave() {
   const navigate = useNavigate();
+  const [obligatorio, setObligatorio] = useState(true);
+  const [correo, setCorreo] = useState("");
+  const [actual, setActual] = useState("");
   const [clave, setClave] = useState("");
   const [repetir, setRepetir] = useState("");
   const [cargando, setCargando] = useState(false);
 
   useEffect(() => {
-    void supabase.auth.getUser().then(({ data }) => {
+    void supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) navigate({ to: "/", replace: true });
+      else {
+        setCorreo(data.user.email ?? "");
+        const { data: perfil } = await supabase
+          .from("profiles")
+          .select("must_change_password")
+          .eq("id", data.user.id)
+          .maybeSingle();
+        setObligatorio(Boolean(perfil?.must_change_password));
+      }
     });
   }, [navigate]);
 
   async function guardar() {
+    if (!obligatorio && actual.length < 1) {
+      toast.error("Escribe tu contraseña actual");
+      return;
+    }
     if (clave.length < 6) {
       toast.error("Tu nueva contraseña debe tener al menos 6 caracteres");
       return;
@@ -49,6 +65,17 @@ function CambiarClave() {
       return;
     }
     setCargando(true);
+    if (!obligatorio) {
+      const { error: errorActual } = await supabase.auth.signInWithPassword({
+        email: correo,
+        password: actual,
+      });
+      if (errorActual) {
+        setCargando(false);
+        toast.error("Tu contraseña actual no es correcta");
+        return;
+      }
+    }
     const { data: userData } = await supabase.auth.getUser();
     const { error } = await supabase.auth.updateUser({ password: clave });
     if (error) {
@@ -63,16 +90,19 @@ function CambiarClave() {
         .eq("id", userData.user.id);
     }
     setCargando(false);
-    toast.success("✅ Tu nueva contraseña quedó guardada");
+    toast.success("Contraseña actualizada correctamente");
     navigate({ to: "/inicio", replace: true });
   }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-10">
-      <h1 className="text-center text-3xl font-extrabold">Crea tu contraseña personal</h1>
+      <h1 className="text-center text-3xl font-extrabold">
+        {obligatorio ? "Por seguridad, crea tu contraseña personal" : "Cambiar contraseña"}
+      </h1>
       <p className="mt-3 max-w-sm text-center text-lg text-muted-foreground">
-        Entraste con la contraseña temporal (el RUT de tu hijo). Para seguir usando la app, crea tu
-        propia clave.
+        {obligatorio
+          ? "Entraste con la contraseña temporal (el RUT de tu hijo). Para seguir usando la app, crea tu propia clave."
+          : "Escribe tu contraseña actual y luego la nueva clave que quieres usar."}
       </p>
 
       <form
@@ -82,6 +112,21 @@ function CambiarClave() {
           void guardar();
         }}
       >
+        {!obligatorio ? (
+          <div className="space-y-2">
+            <Label htmlFor="actual" className="text-base">
+              Contraseña actual
+            </Label>
+            <Input
+              id="actual"
+              type="password"
+              autoComplete="current-password"
+              value={actual}
+              onChange={(e) => setActual(e.target.value)}
+              className="h-14 rounded-xl text-lg"
+            />
+          </div>
+        ) : null}
         <div className="space-y-2">
           <Label htmlFor="nueva" className="text-base">
             Nueva contraseña
@@ -110,7 +155,7 @@ function CambiarClave() {
         </div>
         <Button type="submit" variant="accion" size="grande" disabled={cargando}>
           {cargando ? <Loader2 className="animate-spin" /> : <KeyRound />}
-          GUARDAR CONTRASEÑA
+          {obligatorio ? "GUARDAR NUEVA CONTRASEÑA" : "ACTUALIZAR CONTRASEÑA"}
         </Button>
       </form>
     </div>

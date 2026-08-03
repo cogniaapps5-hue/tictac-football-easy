@@ -10,6 +10,7 @@ import {
   ClipboardList,
   FileText,
   LogOut,
+  KeyRound,
   type LucideIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -34,6 +35,7 @@ const NAV_PADRE: Item[] = [
   { to: "/mi-hijo", label: "Mi Hijo", icon: User },
   { to: "/contrato", label: "Contrato", icon: FileText },
   { to: "/info", label: "Info", icon: BookOpen },
+  { to: "/cambiar-clave", label: "Clave", icon: KeyRound },
 ];
 
 export function Shell({

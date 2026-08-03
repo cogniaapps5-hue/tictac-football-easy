@@ -28,8 +28,6 @@ export const Route = createFileRoute("/")({
   component: Entrar,
 });
 
-const DEMO = ["admin@tictac.cl", "padre1@demo.cl", "padre2@demo.cl"];
-
 function Entrar() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -58,26 +56,14 @@ function Entrar() {
       return;
     }
     setCargando(true);
-    let { error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email: correo.trim(),
       password: clave,
     });
 
-    if (error && DEMO.includes(correo.trim().toLowerCase())) {
-      const alta = await supabase.auth.signUp({ email: correo.trim(), password: clave });
-      error = alta.error ?? null;
-      if (!error && !alta.data.session) {
-        const reintento = await supabase.auth.signInWithPassword({
-          email: correo.trim(),
-          password: clave,
-        });
-        error = reintento.error ?? null;
-      }
-    }
-
     setCargando(false);
     if (error) {
-      toast.error("No pudimos entrar. Revisa el correo y la contraseña.");
+      toast.error("Correo o contraseña incorrectos. Verifica tus datos e intenta nuevamente.");
       return;
     }
     toast.success("¡Bienvenido!");
@@ -138,28 +124,6 @@ function Entrar() {
           ENTRAR
         </Button>
       </form>
-
-      <div className="mt-8 w-full max-w-sm space-y-4">
-        <p className="text-center text-base text-muted-foreground">Cuentas de prueba</p>
-        <Button
-          variant="contorno"
-          size="medio"
-          className="w-full"
-          disabled={cargando}
-          onClick={() => void entrar("admin@tictac.cl", "demo123")}
-        >
-          Entrar como Administradora
-        </Button>
-        <Button
-          variant="contorno"
-          size="medio"
-          className="w-full"
-          disabled={cargando}
-          onClick={() => void entrar("padre1@demo.cl", "123456")}
-        >
-          Entrar como Apoderado
-        </Button>
-      </div>
     </div>
   );
 }

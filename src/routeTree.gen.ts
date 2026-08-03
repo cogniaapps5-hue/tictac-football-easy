@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as CambiarClaveRouteImport } from './routes/cambiar-clave'
+import { Route as ErrorAccesoRouteImport } from './routes/error-acceso'
 import { Route as AuthenticatedAlumnosRouteImport } from './routes/_authenticated/alumnos'
 import { Route as AuthenticatedAvisosRouteImport } from './routes/_authenticated/avisos'
 import { Route as AuthenticatedContratoRouteImport } from './routes/_authenticated/contrato'
@@ -33,6 +34,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const CambiarClaveRoute = CambiarClaveRouteImport.update({
   id: '/cambiar-clave',
   path: '/cambiar-clave',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ErrorAccesoRoute = ErrorAccesoRouteImport.update({
+  id: '/error-acceso',
+  path: '/error-acceso',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAlumnosRoute = AuthenticatedAlumnosRouteImport.update({
@@ -80,6 +86,7 @@ const AuthenticatedPagosRoute = AuthenticatedPagosRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cambiar-clave': typeof CambiarClaveRoute
+  '/error-acceso': typeof ErrorAccesoRoute
   '/alumnos': typeof AuthenticatedAlumnosRoute
   '/avisos': typeof AuthenticatedAvisosRoute
   '/contrato': typeof AuthenticatedContratoRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cambiar-clave': typeof CambiarClaveRoute
+  '/error-acceso': typeof ErrorAccesoRoute
   '/alumnos': typeof AuthenticatedAlumnosRoute
   '/avisos': typeof AuthenticatedAvisosRoute
   '/contrato': typeof AuthenticatedContratoRoute
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/cambiar-clave': typeof CambiarClaveRoute
+  '/error-acceso': typeof ErrorAccesoRoute
   '/_authenticated/alumnos': typeof AuthenticatedAlumnosRoute
   '/_authenticated/avisos': typeof AuthenticatedAvisosRoute
   '/_authenticated/contrato': typeof AuthenticatedContratoRoute
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/cambiar-clave'
+    | '/error-acceso'
     | '/alumnos'
     | '/avisos'
     | '/contrato'
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/cambiar-clave'
+    | '/error-acceso'
     | '/alumnos'
     | '/avisos'
     | '/contrato'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/cambiar-clave'
+    | '/error-acceso'
     | '/_authenticated/alumnos'
     | '/_authenticated/avisos'
     | '/_authenticated/contrato'
@@ -159,6 +171,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   CambiarClaveRoute: typeof CambiarClaveRoute
+  ErrorAccesoRoute: typeof ErrorAccesoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -182,6 +195,13 @@ declare module '@tanstack/react-router' {
       path: '/cambiar-clave'
       fullPath: '/cambiar-clave'
       preLoaderRoute: typeof CambiarClaveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/error-acceso': {
+      id: '/error-acceso'
+      path: '/error-acceso'
+      fullPath: '/error-acceso'
+      preLoaderRoute: typeof ErrorAccesoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/alumnos': {
@@ -272,6 +292,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   CambiarClaveRoute: CambiarClaveRoute,
+  ErrorAccesoRoute: ErrorAccesoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
