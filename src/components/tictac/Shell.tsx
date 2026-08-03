@@ -16,6 +16,7 @@ import {
 import type { ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { limpiarBorradores } from "@/lib/almacenamiento";
 import logoAsset from "@/assets/tictac-logo.jpg.asset.json";
 import { cn } from "@/lib/utils";
 import type { Rol } from "@/lib/session";
@@ -56,6 +57,7 @@ export function Shell({
   async function salir() {
     await queryClient.cancelQueries();
     queryClient.clear();
+    limpiarBorradores();
     await supabase.auth.signOut();
     navigate({ to: "/", replace: true });
   }

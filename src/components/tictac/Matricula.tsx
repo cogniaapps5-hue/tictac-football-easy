@@ -16,6 +16,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { edadDesde, grupoPorEdad } from "@/lib/carga-masiva-utils";
+import { borrarBorrador, guardarBorrador, leerBorrador } from "@/lib/almacenamiento";
 import {
   matricularAlumno,
   type EntradaMatricula,
@@ -72,14 +73,8 @@ export function MatriculaManual() {
   // Borrador local: si la administradora recarga la página, no pierde lo escrito.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const guardado = window.localStorage.getItem(BORRADOR);
-    if (guardado) {
-      try {
-        setForm({ ...VACIO, ...(JSON.parse(guardado) as typeof VACIO) });
-      } catch {
-        window.localStorage.removeItem(BORRADOR);
-      }
-    }
+    const guardado = leerBorrador<typeof VACIO>(BORRADOR);
+    if (guardado) setForm({ ...VACIO, ...guardado });
   }, []);
 
   const sucio =
@@ -89,7 +84,7 @@ export function MatriculaManual() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (sucio) window.localStorage.setItem(BORRADOR, JSON.stringify(form));
+    if (sucio) guardarBorrador(BORRADOR, form);
   }, [form, sucio]);
 
   useEffect(() => {
@@ -107,7 +102,7 @@ export function MatriculaManual() {
     onSuccess: (r) => {
       setCredenciales({ ...r, apoderado: form.nombre_apoderado, alumno: form.nombre_alumno });
       queryClient.invalidateQueries();
-      if (typeof window !== "undefined") window.localStorage.removeItem(BORRADOR);
+      borrarBorrador(BORRADOR);
       toast.success("Alumno matriculado correctamente");
       setAbierto(false);
       setTocado(false);
