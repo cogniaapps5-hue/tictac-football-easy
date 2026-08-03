@@ -1,10 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { Wallet, CalendarCheck, TriangleAlert, Megaphone, Apple, Check, X, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { RecordatoriosAdmin } from "@/components/tictac/Recordatorios";
 import { useSesion, useSaludo, pesos, proximoEntrenamiento, fechaCorta, SEDES } from "@/lib/session";
@@ -31,7 +40,7 @@ function Inicio() {
     </Shell>
   ) : (
     <Shell rol="parent" titulo="Escuela TIC TAC" subtitulo={`${saludoActual}, ${sesion.nombre}`}>
-      <InicioPadre userId={sesion.userId} />
+      <InicioPadre userId={sesion.userId} nombreApoderado={sesion.nombre} />
     </Shell>
   );
 }
@@ -142,10 +151,11 @@ function InicioAdmin() {
   );
 }
 
-function InicioPadre({ userId }: { userId: string }) {
+function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoderado: string }) {
   const proximoGeneral = proximoEntrenamiento();
   const fechasPosibles = SEDES.map((s) => proximoEntrenamiento(s.valor).iso);
   const queryClient = useQueryClient();
+  const [avisoBloqueo, setAvisoBloqueo] = useState(false);
 
   const { data } = useQuery({
     queryKey: ["resumen-padre", userId, fechasPosibles.join(",")],
