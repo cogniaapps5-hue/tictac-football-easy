@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { exigirRol } from "@/lib/guard";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -13,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSesion } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/cuerpo-tecnico")({
+  beforeLoad: exigirRol("admin"),
   head: () => ({
     meta: [
       { title: "Cuerpo Técnico — Escuela TIC TAC" },

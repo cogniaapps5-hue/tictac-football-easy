@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { exigirRol } from "@/lib/guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Send } from "lucide-react";
@@ -19,6 +20,7 @@ function destinoEtiqueta(valor: string) {
 }
 
 export const Route = createFileRoute("/_authenticated/avisos")({
+  beforeLoad: exigirRol("admin"),
   head: () => ({
     meta: [
       { title: "Avisos — Escuela TIC TAC" },

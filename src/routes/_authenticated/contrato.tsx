@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { exigirRol } from "@/lib/guard";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ import { useSesion } from "@/lib/session";
 import { REGLAMENTO } from "@/lib/reglamento";
 
 export const Route = createFileRoute("/_authenticated/contrato")({
+  beforeLoad: exigirRol("parent"),
   head: () => ({
     meta: [
       { title: "Contrato y Reglamento — Escuela TIC TAC" },
