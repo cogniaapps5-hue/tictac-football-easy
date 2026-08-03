@@ -403,31 +403,67 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
           <Wallet className="size-7 text-cyan-brand" />
           <h2 className="text-xl font-bold">Pagos</h2>
         </div>
-        {pendiente ? (
-          <p className="mt-2 text-base">
-            <Estado estado="pending" />
-            <span className="mt-2 block">
-              {pendiente.concept}: {pesos(pendiente.amount)} — vence {fechaCorta(pendiente.due_date)}
-            </span>
-          </p>
-        ) : (
-          <p className="mt-2 text-base">
+        {pagoAprobado ? (
+          <div className="mt-3 space-y-2">
             <Estado estado="approved" />
-            <span className="mt-2 block">Todo al día. ¡Gracias!</span>
-          </p>
+            <p className="text-lg font-bold">✅ ¡Todo en orden!</p>
+            <p className="text-base">
+              Tu pago de este mes está confirmado. {alumno?.name ?? "Tu hijo/a"} puede entrenar sin
+              problemas.
+            </p>
+            <p className="text-base">¡Nos vemos en la cancha! ⚽💙</p>
+          </div>
+        ) : pagoEnRevision ? (
+          <div className="mt-3 space-y-2">
+            <Estado estado="pending" />
+            <p className="text-lg font-bold">✅ ¡Comprobante recibido!</p>
+            <p className="text-base">
+              Estamos revisando tu pago. En cuanto lo confirmemos, te avisaremos.
+            </p>
+            <p className="text-base">
+              Mientras tanto, tu hijo puede entrenar normalmente. ¡Gracias por tu paciencia! 🙏
+            </p>
+          </div>
+        ) : (
+          <div className="mt-3 space-y-2">
+            <p className="text-lg font-bold">📋 Tu pago está pendiente</p>
+            <p className="text-base">
+              Sabemos que a veces se nos olvida subir el comprobante. Si ya pagaste, por favor súbelo
+              aquí para que podamos confirmarlo.
+            </p>
+            <p className="text-base">
+              Si necesitas ayuda, escríbenos por WhatsApp y te orientamos. 💬
+            </p>
+            {pendiente ? (
+              <p className="text-base text-muted-foreground">
+                {pendiente.concept}: {pesos(pendiente.amount)} — vence {fechaCorta(pendiente.due_date)}
+              </p>
+            ) : null}
+          </div>
         )}
         {rechazado ? (
           <div className="mt-3 flex items-start gap-3 rounded-xl bg-black/70 p-4 text-lg font-semibold text-white">
             <TriangleAlert className="mt-0.5 size-6 shrink-0 text-danger" />
             <span>
-              Pago rechazado
+              No pudimos confirmar tu último comprobante
               {rechazado.rejection_reason ? `: ${rechazado.rejection_reason}` : ""}
             </span>
           </div>
         ) : null}
-        <Button asChild variant="accion" size="grande" className="mt-4">
-          <Link to="/mi-hijo">Subir Comprobante</Link>
-        </Button>
+        {!pagoAprobado ? (
+          <div className="mt-4 space-y-4">
+            <Button asChild variant="alerta" size="grande">
+              <Link to="/mi-hijo">Subir Comprobante</Link>
+            </Button>
+            {!pagoEnRevision ? (
+              <Button asChild variant="contorno" size="grande">
+                <a href={whatsapp} target="_blank" rel="noreferrer">
+                  Contactar por WhatsApp
+                </a>
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
       </Tarjeta>
 
       <Tarjeta>
