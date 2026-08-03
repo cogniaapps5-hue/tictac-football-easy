@@ -526,6 +526,33 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
           ) : null}
         </ul>
       </Tarjeta>
+
+      <Dialog open={avisoBloqueo} onOpenChange={setAvisoBloqueo}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">¡Hola! 👋</DialogTitle>
+            <DialogDescription className="space-y-3 text-left text-base text-foreground">
+              <span className="block">
+                Notamos que tu pago de este mes está pendiente. Para confirmar la asistencia de{" "}
+                {alumno?.name ?? "tu hijo/a"}, primero necesitamos regularizar tu situación.
+              </span>
+              <span className="block">
+                No te preocupes, puedes subir tu comprobante ahora mismo y en cuanto lo revisemos, tu
+                acceso quedará habilitado.
+              </span>
+              <span className="block font-semibold">¿Quieres subir tu comprobante ahora?</span>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-col gap-4 sm:flex-col">
+            <Button asChild variant="alerta" size="grande">
+              <Link to="/mi-hijo">Subir Comprobante</Link>
+            </Button>
+            <Button variant="neutro" size="grande" onClick={() => setAvisoBloqueo(false)}>
+              Después
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
