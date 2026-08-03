@@ -255,15 +255,39 @@ export function CargaMasiva() {
           <p className="text-base">
             🧒 Alumnos a cargar: <strong>{datos.filas?.length ?? 0}</strong>
           </p>
-          <div className="space-y-2 rounded-xl bg-secondary p-4">
-            {(datos.filas ?? []).slice(0, 6).map((a, i) => (
-              <p key={i} className="text-base">
-                🧒 {a.nombre_alumno} — nace {a.fecha_nacimiento || "sin fecha"} —{" "}
-                {resumenEdad(a.fecha_nacimiento ?? "")} —{" "}
-                {a.dia_entrenamiento === "jueves" ? "Jueves" : "Martes"} —{" "}
-                {a.email || "sin apoderado"}
-              </p>
-            ))}
+          <div className="overflow-x-auto rounded-xl bg-secondary p-4">
+            <table className="w-full text-left text-base">
+              <thead>
+                <tr className="border-b-2 border-border">
+                  <th className="p-2 font-bold">Apoderado</th>
+                  <th className="p-2 font-bold">Email</th>
+                  <th className="p-2 font-bold">Alumno</th>
+                  <th className="p-2 font-bold">Edad</th>
+                  <th className="p-2 font-bold">Grupo</th>
+                  <th className="p-2 font-bold">Horario</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(datos.filas ?? []).map((a, i) => {
+                  const { edad, grupo } = edadYGrupo(a.fecha_nacimiento ?? "");
+                  return (
+                    <tr key={i} className="border-b border-border/50">
+                      <td className="p-2">{a.nombre_apoderado || "—"}</td>
+                      <td className="p-2">{a.email || "sin correo"}</td>
+                      <td className="p-2 font-semibold">🧒 {a.nombre_alumno}</td>
+                      <td className="p-2">{edad}</td>
+                      <td className="p-2">{grupo}</td>
+                      <td className="p-2">
+                        {textoHorario({
+                          martes: a.training_tuesday ?? true,
+                          jueves: a.training_thursday ?? false,
+                        })}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
           <Button
             variant="exito"
