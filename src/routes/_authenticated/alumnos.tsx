@@ -157,9 +157,24 @@ function Alumnos() {
 
   function tarjetaAlumno(alumno: (typeof lista)[number]) {
     const marca = data?.asistencia.find((a) => a.player_id === alumno.id);
+    // Hermanos: mismo apoderado (por cuenta o por correo registrado).
+    const hermanos = (data?.alumnos ?? []).filter(
+      (o) =>
+        o.id !== alumno.id &&
+        ((alumno.parent_id && o.parent_id === alumno.parent_id) ||
+          (!alumno.parent_id && alumno.parent_email && o.parent_email === alumno.parent_email)),
+    );
     return (
       <Tarjeta key={alumno.id}>
         <p className="text-xl font-bold">👤 {alumno.name}</p>
+        {alumno.parent_email ? (
+          <p className="text-base text-muted-foreground">📧 Apoderado: {alumno.parent_email}</p>
+        ) : null}
+        {hermanos.length ? (
+          <p className="mt-1 rounded-xl bg-secondary px-3 py-2 text-base font-semibold text-cyan-brand">
+            👨‍👩‍👧 Hermano/a de {hermanos.map((h) => h.name).join(", ")}
+          </p>
+        ) : null}
         <p className="text-base text-muted-foreground">{alumno.schedule}</p>
         {alumno.rut ? <p className="text-base text-muted-foreground">RUT {alumno.rut}</p> : null}
         {alumno.birth_date ? (

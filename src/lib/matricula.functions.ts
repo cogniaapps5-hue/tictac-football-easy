@@ -18,7 +18,12 @@ const entrada = z.object({
 });
 
 export type EntradaMatricula = z.input<typeof entrada>;
-export type ResultadoMatricula = { email: string; clave: string; nuevoUsuario: boolean };
+export type ResultadoMatricula = {
+  email: string;
+  clave: string;
+  nuevoUsuario: boolean;
+  hermanos: string[];
+};
 
 export const matricularAlumno = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -53,40 +58,52 @@ export const matricularAlumno = createServerFn({ method: "POST" })
       .select("id")
       .eq("email", email)
       .maybeSingle();
-    if (perfil) throw new Error("Este correo ya está registrado");
+    let parentId: string;
+    let nuevoUsuario = false;
 
-    const { data: creado, error: errorAuth } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password: clave,
-      email_confirm: true,
-      user_metadata: {
-        full_name: data.nombre_apoderado,
-        phone: data.telefono,
-        rut: data.rut_apoderado,
-      },
-    });
-    if (errorAuth || !creado.user) {
-      throw new Error(
-        errorAuth?.message.toLowerCase().includes("already")
-          ? "Este correo ya está registrado"
-          : "No pudimos crear la cuenta del apoderado. Intenta nuevamente.",
-      );
-    }
-    const parentId = creado.user.id;
-
-    await supabaseAdmin.from("profiles").upsert(
-      {
-        id: parentId,
+    if (perfil) {
+      // El apoderado ya existe: reutilizamos su cuenta para sumar otro hijo.
+      parentId = perfil.id;
+      await supabaseAdmin
+        .from("profiles")
+        .update({ full_name: data.nombre_apoderado, phone: data.telefono })
+        .eq("id", parentId);
+    } else {
+      const { data: creado, error: errorAuth } = await supabaseAdmin.auth.admin.createUser({
         email,
-        full_name: data.nombre_apoderado,
-        phone: data.telefono,
-        must_change_password: true,
-      },
-      { onConflict: "id" },
-    );
-    await supabaseAdmin
-      .from("user_roles")
-      .upsert({ user_id: parentId, role: "parent" }, { onConflict: "user_id,role" });
+        password: clave,
+        email_confirm: true,
+        user_metadata: {
+          full_name: data.nombre_apoderado,
+          phone: data.telefono,
+          rut: data.rut_apoderado,
+        },
+      });
+      if (errorAuth || !creado.user) {
+        throw new Error("No pudimos crear la cuenta del apoderado. Intenta nuevamente.");
+      }
+      parentId = creado.user.id;
+      nuevoUsuario = true;
+
+      await supabaseAdmin.from("profiles").upsert(
+        {
+          id: parentId,
+          email,
+          full_name: data.nombre_apoderado,
+          phone: data.telefono,
+          must_change_password: true,
+        },
+        { onConflict: "id" },
+      );
+      await supabaseAdmin
+        .from("user_roles")
+        .upsert({ user_id: parentId, role: "parent" }, { onConflict: "user_id,role" });
+    }
+
+    const { data: hermanosPrevios } = await supabaseAdmin
+      .from("players")
+      .select("name")
+      .eq("parent_id", parentId);
 
     const edad = edadDesde(data.fecha_nacimiento);
     const { error } = await supabaseAdmin.from("players").insert({
@@ -106,5 +123,10 @@ export const matricularAlumno = createServerFn({ method: "POST" })
     });
     if (error) throw new Error("No pudimos guardar al alumno. Intenta nuevamente.");
 
-    return { email, clave, nuevoUsuario: true };
+    return {
+      email,
+      clave,
+      nuevoUsuario,
+      hermanos: (hermanosPrevios ?? []).map((h) => h.name),
+    };
   });

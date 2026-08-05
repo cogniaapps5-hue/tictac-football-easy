@@ -168,6 +168,7 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
   const fechasPosibles = SEDES.map((s) => proximoEntrenamiento(s.valor).iso);
   const queryClient = useQueryClient();
   const [avisoBloqueo, setAvisoBloqueo] = useState(false);
+  const [hijoId, setHijoId] = useState<string | null>(null);
 
   const { data } = useQuery({
     queryKey: ["resumen-padre", userId, fechasPosibles.join(",")],
@@ -221,7 +222,9 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
     },
   });
 
-  const alumno = data?.alumnos[0];
+  const hijos = data?.alumnos ?? [];
+  const alumno = hijos.find((a) => a.id === hijoId) ?? hijos[0];
+  const pagosAlumno = (data?.pagos ?? []).filter((p) => p.player_id === alumno?.id);
   const proximo = proximoEntrenamiento(alumno?.training_day ?? proximoGeneral.dia);
 
   const responder = useMutation({
@@ -271,8 +274,8 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
   });
 
   const bloqueado = alumno?.access_status === "blocked";
-  const pendiente = data?.pagos.find((p) => p.status === "pending");
-  const rechazado = data?.pagos.find((p) => p.status === "rejected");
+  const pendiente = pagosAlumno.find((p) => p.status === "pending");
+  const rechazado = pagosAlumno.find((p) => p.status === "rejected");
   const respuesta = data?.asistencia.find(
     (a) => a.player_id === alumno?.id && a.session_date === proximo.iso,
   );
@@ -291,7 +294,7 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
   const diaDelMes = hoy.getDate();
   const inicioMes = new Date(anioActual, hoy.getMonth(), 1).toISOString().slice(0, 10);
   const finMes = new Date(anioActual, hoy.getMonth() + 1, 1).toISOString().slice(0, 10);
-  const pagoDelMes = (data?.pagos ?? []).find(
+  const pagoDelMes = pagosAlumno.find(
     (p) =>
       p.due_date >= inicioMes &&
       p.due_date < finMes &&
@@ -300,7 +303,7 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
   const recordatorio =
     pagoDelMes || !alumno ? null : diaDelMes >= 6 ? "atrasado" : diaDelMes >= 1 ? "proximo" : null;
 
-  const pagosMes = (data?.pagos ?? []).filter((p) => p.due_date >= inicioMes && p.due_date < finMes);
+  const pagosMes = pagosAlumno.filter((p) => p.due_date >= inicioMes && p.due_date < finMes);
   const pagoAprobado = pagosMes.find((p) => p.status === "approved");
   const pagoEnRevision = pagosMes.find((p) => p.status === "pending" && p.receipt_url);
   // El botón se habilita siempre que el padre necesite subir un comprobante:
@@ -312,6 +315,28 @@ function InicioPadre({ userId, nombreApoderado }: { userId: string; nombreApoder
 
   return (
     <div className="space-y-6">
+      {hijos.length > 1 ? (
+        <Tarjeta>
+          <h2 className="text-xl font-bold">👨‍👩‍👧‍👦 ¿Qué hijo quieres ver?</h2>
+          <div className="mt-4 flex flex-wrap gap-4">
+            {hijos.map((h) => (
+              <Button
+                key={h.id}
+                variant={h.id === alumno?.id ? "accion" : "neutro"}
+                size="medio"
+                aria-pressed={h.id === alumno?.id}
+                className="h-auto min-h-[60px] flex-1 py-4 text-base"
+                onClick={() => setHijoId(h.id)}
+              >
+                {h.name.split(" ")[0]}
+              </Button>
+            ))}
+          </div>
+          <p className="mt-3 text-base text-muted-foreground">
+            Estás viendo la información de {alumno?.name}.
+          </p>
+        </Tarjeta>
+      ) : null}
       {data && !alumno ? (
         <Tarjeta destacada>
           <p className="text-lg font-bold">
