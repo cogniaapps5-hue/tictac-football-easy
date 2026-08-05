@@ -135,10 +135,14 @@ export function MatriculaManual() {
   }
 
   const mensajeWsp = credenciales
-    ? `Hola ${credenciales.apoderado}, tu hijo ${credenciales.alumno} ha sido matriculado en Escuela TIC TAC. Usuario: ${credenciales.email}. Contraseña temporal: ${credenciales.clave}. Al entrar deberás crear tu propia clave.`
+    ? credenciales.nuevoUsuario
+      ? `Hola ${credenciales.apoderado}, tu hijo ${credenciales.alumno} ha sido matriculado en Escuela TIC TAC. Usuario: ${credenciales.email}. Contraseña temporal: ${credenciales.clave}. Al entrar deberás crear tu propia clave.`
+      : `Hola ${credenciales.apoderado}, ${credenciales.alumno} quedó matriculado en Escuela TIC TAC bajo tu misma cuenta (${credenciales.email}). Entra con tu clave de siempre y usa el selector de hijos para ver a cada uno.`
     : "";
   const textoCredenciales = credenciales
-    ? `Usuario: ${credenciales.email}\nContraseña temporal: ${credenciales.clave}`
+    ? credenciales.nuevoUsuario
+      ? `Usuario: ${credenciales.email}\nContraseña temporal: ${credenciales.clave}`
+      : `Usuario: ${credenciales.email}\nMantiene su contraseña actual`
     : "";
 
   return (
@@ -321,9 +325,19 @@ export function MatriculaManual() {
           </DialogHeader>
           <div className="rounded-xl border-2 border-gold-brand bg-black/70 p-4">
             <p className="text-lg font-semibold text-foreground">Usuario: {credenciales?.email}</p>
-            <p className="text-lg font-semibold text-foreground">
-              Contraseña temporal: {credenciales?.clave}
-            </p>
+            {credenciales?.nuevoUsuario ? (
+              <p className="text-lg font-semibold text-foreground">
+                Contraseña temporal: {credenciales.clave}
+              </p>
+            ) : (
+              <p className="text-lg font-semibold text-foreground">
+                👨‍👩‍👧 Este apoderado ya tenía cuenta. Mantiene su contraseña actual y ahora verá a{" "}
+                {[...(credenciales?.hermanos ?? []), credenciales?.alumno]
+                  .filter(Boolean)
+                  .join(" y ")}{" "}
+                con el selector de hijos.
+              </p>
+            )}
           </div>
           <Button
             variant="alerta"
