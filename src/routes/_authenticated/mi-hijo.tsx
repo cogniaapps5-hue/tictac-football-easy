@@ -31,6 +31,7 @@ function MiHijo() {
   const queryClient = useQueryClient();
   const [editando, setEditando] = useState(false);
   const [contacto, setContacto] = useState({ nombre: "", telefono: "" });
+  const [hijoId, setHijoId] = useState<string | null>(null);
 
   const { data } = useQuery({
     queryKey: ["mi-hijo", sesion?.userId],
@@ -78,13 +79,35 @@ function MiHijo() {
     onError: () => toast.error("No pudimos guardar el contacto"),
   });
 
-  const alumno = data?.alumnos[0];
-  const pendiente = data?.pagos.find((p) => p.status === "pending");
+  const hijos = data?.alumnos ?? [];
+  const alumno = hijos.find((a) => a.id === hijoId) ?? hijos[0];
+  const pagosAlumno = (data?.pagos ?? []).filter((p) => p.player_id === alumno?.id);
+  const asistenciaAlumno = (data?.asistencia ?? []).filter((a) => a.player_id === alumno?.id);
+  const pendiente = pagosAlumno.find((p) => p.status === "pending");
 
   if (!sesion) return null;
 
   return (
     <Shell rol={sesion.rol} titulo="Mi Hijo" subtitulo={alumno?.name}>
+      {hijos.length > 1 ? (
+        <Tarjeta>
+          <h2 className="text-xl font-bold">👨‍👩‍👧‍👦 ¿Qué hijo quieres ver?</h2>
+          <div className="mt-4 flex flex-wrap gap-4">
+            {hijos.map((h) => (
+              <Button
+                key={h.id}
+                variant={h.id === alumno?.id ? "accion" : "neutro"}
+                size="medio"
+                aria-pressed={h.id === alumno?.id}
+                className="h-auto min-h-[60px] flex-1 py-4 text-base"
+                onClick={() => setHijoId(h.id)}
+              >
+                {h.name.split(" ")[0]}
+              </Button>
+            ))}
+          </div>
+        </Tarjeta>
+      ) : null}
       {!alumno ? (
         <Tarjeta>
           <p className="text-base">Aún no tienes alumnos asociados a tu cuenta.</p>
@@ -156,13 +179,13 @@ function MiHijo() {
           <Tarjeta>
             <h2 className="text-xl font-bold">📅 Asistencia</h2>
             <ul className="mt-3 space-y-2">
-              {(data?.asistencia ?? []).map((a) => (
+              {asistenciaAlumno.map((a) => (
                 <li key={a.id} className="flex items-center justify-between rounded-xl bg-secondary p-3">
                   <span className="text-base">{fechaCorta(a.session_date)}</span>
                   <Estado estado={a.status} />
                 </li>
               ))}
-              {!data?.asistencia.length ? (
+              {!asistenciaAlumno.length ? (
                 <li className="text-base text-muted-foreground">Todavía sin registros.</li>
               ) : null}
             </ul>
@@ -171,7 +194,7 @@ function MiHijo() {
           <Tarjeta destacada={!!pendiente}>
             <h2 className="text-xl font-bold">💳 Pagos</h2>
             <ul className="mt-3 space-y-2">
-              {(data?.pagos ?? []).map((p) => (
+              {pagosAlumno.map((p) => (
                 <li key={p.id} className="rounded-xl bg-secondary p-3">
                   <div className="flex items-center justify-between">
                     <span className="text-base">
