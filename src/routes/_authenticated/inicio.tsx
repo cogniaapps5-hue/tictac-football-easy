@@ -105,7 +105,7 @@ function InicioAdmin() {
         <div className="flex items-start gap-4">
           <div
             className="flex size-10 shrink-0 items-center justify-center rounded-full bg-success text-success-foreground"
-            style={{ boxShadow: "0 0 16px 2px hsl(var(--success) / 0.5)" }}
+            style={{ boxShadow: "0 0 16px 2px color-mix(in oklab, var(--success) 45%, transparent)" }}
             aria-hidden="true"
           >
             <TrendingUp className="size-5" />
