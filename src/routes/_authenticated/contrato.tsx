@@ -64,6 +64,7 @@ function Contrato({ userId }: { userId: string }) {
       toast.success("Contrato aceptado correctamente");
       queryClient.invalidateQueries({ queryKey: ["contrato", userId] });
       queryClient.invalidateQueries({ queryKey: ["resumen-padre"] });
+      queryClient.invalidateQueries({ queryKey: ["contratos-admin"] });
     },
     onError: () => toast.error("No pudimos guardar tu aceptación. Intenta otra vez."),
   });
