@@ -17,6 +17,7 @@ import {
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { RecordatoriosAdmin } from "@/components/tictac/Recordatorios";
 import { ReportesAdmin } from "@/components/tictac/Reportes";
+import { ContratosAdmin } from "@/components/tictac/Contratos";
 import { SubirComprobante } from "@/components/tictac/SubirComprobante";
 import {
   useSesion,
@@ -181,6 +182,8 @@ function InicioAdmin() {
             : "Sin pagos muy atrasados. Todo tranquilo."}
         </p>
       </Tarjeta>
+
+      <ContratosAdmin />
 
       <ReportesAdmin />
     </>
