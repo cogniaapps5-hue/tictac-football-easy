@@ -1,33 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { Wallet, CalendarCheck, TriangleAlert, Megaphone, Apple, Check, X, Lock, TrendingUp } from "lucide-react";
-import { toast } from "sonner";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Wallet, CalendarCheck, TriangleAlert, Lock, TrendingUp } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
+import { Shell, Tarjeta } from "@/components/tictac/Shell";
 import { RecordatoriosAdmin } from "@/components/tictac/Recordatorios";
 import { ReportesAdmin } from "@/components/tictac/Reportes";
 import { ContratosAdmin } from "@/components/tictac/Contratos";
-import { SubirComprobante } from "@/components/tictac/SubirComprobante";
-import {
-  useSesion,
-  useSaludo,
-  pesos,
-  proximoEntrenamiento,
-  fechaCorta,
-  SEDES,
-  categoriaAviso,
-} from "@/lib/session";
+import { InicioPadre } from "@/components/tictac/InicioPadre";
+import { useSesion, useSaludo, pesos, proximoEntrenamiento } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
   head: () => ({
