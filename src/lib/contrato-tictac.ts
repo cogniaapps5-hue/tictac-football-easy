@@ -23,7 +23,7 @@ export const CONTRATO_TIC_TAC: BloqueContrato[] = [
     "x": "Desarrollar y fortalecer las habilidades técnicas, físicas, sociales y emocionales de niños, niñas a través de actividades de formación en fútbol, promoviendo la inclusión, el respeto y el trabajo en equipo en un entorno seguro y libre de discriminación"
   },
   {
-    "t": "p",
+    "t": "h",
     "x": "MISIÓN"
   },
   {
@@ -35,7 +35,7 @@ export const CONTRATO_TIC_TAC: BloqueContrato[] = [
     "x": "Buscamos potenciar no solo el aprendizaje y desarrollo de habilidades futbolísticas, sino también valores como el respeto, la empatía, el compañerismo, la responsabilidad, el autocuidado y la inclusión. Promovemos el juego, la recreación y el bienestar físico y emocional por sobre la competencia, acompañando a cada niño y niña en su proceso de crecimiento."
   },
   {
-    "t": "p",
+    "t": "h",
     "x": "VISIÓN"
   },
   {
