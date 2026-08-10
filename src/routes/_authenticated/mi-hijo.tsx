@@ -18,7 +18,10 @@ export const Route = createFileRoute("/_authenticated/mi-hijo")({
   head: () => ({
     meta: [
       { title: "Mi Hijo — Escuela TIC TAC" },
-      { name: "description", content: "Ficha, pagos y asistencia de tu hijo en la escuela TIC TAC." },
+      {
+        name: "description",
+        content: "Ficha, pagos y asistencia de tu hijo en la escuela TIC TAC.",
+      },
       { property: "og:title", content: "Mi Hijo — Escuela TIC TAC" },
       { property: "og:description", content: "Ficha, pagos y asistencia de tu hijo." },
     ],
@@ -36,8 +39,18 @@ function edadDe(fecha?: string | null) {
 }
 
 const MESES = [
-  "enero", "febrero", "marzo", "abril", "mayo", "junio",
-  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+  "enero",
+  "febrero",
+  "marzo",
+  "abril",
+  "mayo",
+  "junio",
+  "julio",
+  "agosto",
+  "septiembre",
+  "octubre",
+  "noviembre",
+  "diciembre",
 ];
 
 function MiHijo() {
@@ -59,7 +72,11 @@ function MiHijo() {
       const ids = (alumnos ?? []).map((a) => a.id);
       const [pagos, asistencia] = await Promise.all([
         ids.length
-          ? supabase.from("payments").select("*").in("player_id", ids).order("due_date", { ascending: false })
+          ? supabase
+              .from("payments")
+              .select("*")
+              .in("player_id", ids)
+              .order("due_date", { ascending: false })
           : Promise.resolve({ data: [] as never[] }),
         ids.length
           ? supabase
@@ -150,7 +167,9 @@ function MiHijo() {
           <Tarjeta destacada className="p-6">
             <p className="text-2xl font-black">👤 {alumno.name}</p>
             <ul className="mt-3 space-y-1 text-base text-muted-foreground">
-              {edadDe(alumno.birth_date) !== null ? <li>🎂 {edadDe(alumno.birth_date)} años</li> : null}
+              {edadDe(alumno.birth_date) !== null ? (
+                <li>🎂 {edadDe(alumno.birth_date)} años</li>
+              ) : null}
               <li>🏅 Categoría {grupoEtiqueta(alumno.age_group).split(" ")[0]}</li>
               {alumno.jersey_size ? <li>👕 Talla polera: {alumno.jersey_size}</li> : null}
               <li>📅 {alumno.schedule}</li>
@@ -201,7 +220,9 @@ function MiHijo() {
             ) : (
               <>
                 <p className="mt-2 text-lg">{alumno.emergency_contact_name ?? "Sin registrar"}</p>
-                <p className="text-lg text-muted-foreground">{alumno.emergency_contact_phone ?? ""}</p>
+                <p className="text-lg text-muted-foreground">
+                  {alumno.emergency_contact_phone ?? ""}
+                </p>
                 <Button
                   variant="contorno"
                   size="medio"
@@ -225,9 +246,7 @@ function MiHijo() {
 
             {pagoAprobado ? (
               <div className="mt-4 rounded-xl border-2 border-success bg-success/15 p-4">
-                <p className="text-lg font-bold text-success">
-                  ✅ Pago de {mesActual} confirmado
-                </p>
+                <p className="text-lg font-bold text-success">✅ Pago de {mesActual} confirmado</p>
               </div>
             ) : pagoEnRevision ? (
               <div className="mt-4 rounded-xl border-2 border-gold-brand bg-gold-brand/20 p-4">
@@ -239,7 +258,8 @@ function MiHijo() {
                 <p className="text-lg font-bold">📋 Pago del mes pendiente</p>
                 {pendiente ? (
                   <p className="mt-1 text-base text-muted-foreground">
-                    {pendiente.concept}: {pesos(pendiente.amount)} — vence {fechaCorta(pendiente.due_date)}
+                    {pendiente.concept}: {pesos(pendiente.amount)} — vence{" "}
+                    {fechaCorta(pendiente.due_date)}
                   </p>
                 ) : null}
               </div>
@@ -307,7 +327,10 @@ function MiHijo() {
             ) : null}
             <ul className="mt-3 space-y-2">
               {asistenciaAlumno.map((a) => (
-                <li key={a.id} className="flex items-center justify-between rounded-xl bg-secondary p-3">
+                <li
+                  key={a.id}
+                  className="flex items-center justify-between rounded-xl bg-secondary p-3"
+                >
                   <span className="text-base">
                     {a.status === "confirmed" ? "✅" : a.status === "absent" ? "❌" : "•"}{" "}
                     {fechaCorta(a.session_date)}

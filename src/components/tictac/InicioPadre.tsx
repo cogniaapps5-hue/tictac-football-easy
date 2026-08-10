@@ -7,12 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tarjeta, Estado } from "@/components/tictac/Shell";
-import {
-  SEDES,
-  categoriaAviso,
-  grupoEtiqueta,
-  proximoEntrenamiento,
-} from "@/lib/session";
+import { SEDES, categoriaAviso, grupoEtiqueta, proximoEntrenamiento } from "@/lib/session";
 
 function edadDe(fecha?: string | null) {
   if (!fecha) return null;
@@ -50,7 +45,11 @@ export function InicioPadre({
       const ids = (alumnos ?? []).map((a) => a.id);
       const [asistencia, avisos, perfil] = await Promise.all([
         ids.length
-          ? supabase.from("attendance").select("*").in("player_id", ids).in("session_date", fechasPosibles)
+          ? supabase
+              .from("attendance")
+              .select("*")
+              .in("player_id", ids)
+              .in("session_date", fechasPosibles)
           : Promise.resolve({ data: [] as never[] }),
         supabase.from("notices").select("*").order("created_at", { ascending: false }).limit(10),
         supabase.from("profiles").select("contract_accepted_at").eq("id", userId).maybeSingle(),
@@ -91,7 +90,9 @@ export function InicioPadre({
     },
     onSuccess: (_d, vars) => {
       queryClient.invalidateQueries({ queryKey: ["resumen-padre"] });
-      toast.success(vars.estado === "confirmed" ? "¡Listo! Te esperamos ⚽" : "Gracias por avisar 💙");
+      toast.success(
+        vars.estado === "confirmed" ? "¡Listo! Te esperamos ⚽" : "Gracias por avisar 💙",
+      );
     },
     onError: () => toast.error("No pudimos guardar tu respuesta. Intenta otra vez."),
   });
@@ -119,7 +120,9 @@ export function InicioPadre({
       ) : null}
 
       <section className="rounded-2xl border border-cyan-brand/40 bg-[linear-gradient(140deg,color-mix(in_oklab,var(--cyan-brand)_22%,var(--card)),color-mix(in_oklab,var(--cyan-brand)_6%,var(--card)))] p-7 shadow-card">
-        <p className="text-5xl" aria-hidden>⚽</p>
+        <p className="text-5xl" aria-hidden>
+          ⚽
+        </p>
         <h2 className="mt-3 text-2xl font-black leading-tight">Bienvenido a la Familia TIC TAC</h2>
         <p className="mt-2 text-lg font-semibold text-muted-foreground">
           Hola {nombreApoderado} 👋
@@ -134,7 +137,9 @@ export function InicioPadre({
           key={c.id}
           className="rounded-2xl border-[3px] border-gold-brand bg-gold-brand/25 p-5 text-center"
         >
-          <p className="animate-bounce text-3xl" aria-hidden>🎉🎂🎈</p>
+          <p className="animate-bounce text-3xl" aria-hidden>
+            🎉🎂🎈
+          </p>
           <p className="mt-2 text-xl font-black">¡Feliz Cumpleaños a {c.name}!</p>
           <p className="mt-1 text-lg font-semibold">El equipo TIC TAC te desea un gran día.</p>
         </div>
@@ -165,7 +170,9 @@ export function InicioPadre({
         </div>
         <p className="mt-4 text-lg font-bold">📅 Día: Martes y Jueves</p>
         <p className="mt-1 text-lg font-bold">⏰ Hora: 19:00 a 20:00 hrs</p>
-        <p className="mt-1 text-lg font-bold">📍 Sede: Rancho Rossi Peñuelas / Forza Club Simdempart</p>
+        <p className="mt-1 text-lg font-bold">
+          📍 Sede: Rancho Rossi Peñuelas / Forza Club Simdempart
+        </p>
         <p className="mt-3 text-base capitalize text-muted-foreground">
           Tu próxima clase: {proximo.texto} — {proximo.sede}
         </p>

@@ -88,16 +88,18 @@ function InicioAdmin() {
         <div className="flex items-start gap-4">
           <div
             className="flex size-10 shrink-0 items-center justify-center rounded-full bg-success text-success-foreground"
-            style={{ boxShadow: "0 0 16px 2px color-mix(in oklab, var(--success) 45%, transparent)" }}
+            style={{
+              boxShadow: "0 0 16px 2px color-mix(in oklab, var(--success) 45%, transparent)",
+            }}
             aria-hidden="true"
           >
             <TrendingUp className="size-5" />
           </div>
           <div className="min-w-0">
-            <h2 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Ingresos</h2>
-            <p className="text-[28px] font-extrabold leading-tight">
-              {pesos(data?.ingresos ?? 0)}
-            </p>
+            <h2 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              Ingresos
+            </h2>
+            <p className="text-[28px] font-extrabold leading-tight">{pesos(data?.ingresos ?? 0)}</p>
             <p className="text-xs font-semibold text-success">
               {data?.aprobados ?? 0} {data?.aprobados === 1 ? "pago aprobado" : "pagos aprobados"}
             </p>
@@ -144,8 +146,8 @@ function InicioAdmin() {
         <p className="text-base text-muted-foreground">por pago pendiente</p>
         {revision ? (
           <p className="mt-3 rounded-xl bg-black/70 p-3 text-base font-semibold text-white">
-            ⚠️ {revision} {revision === 1 ? "alumno fue bloqueado" : "alumnos fueron bloqueados"} hoy. Envía aviso
-            manual por WhatsApp si es necesario.
+            ⚠️ {revision} {revision === 1 ? "alumno fue bloqueado" : "alumnos fueron bloqueados"}{" "}
+            hoy. Envía aviso manual por WhatsApp si es necesario.
           </p>
         ) : null}
         <Button asChild variant="contorno" size="grande" className="mt-4">
@@ -171,4 +173,3 @@ function InicioAdmin() {
     </>
   );
 }
-
