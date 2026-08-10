@@ -1,8 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { FileText, Target, Users, Images, ScrollText } from "lucide-react";
+import { Target, Users, Images, Phone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Shell, Tarjeta } from "@/components/tictac/Shell";
@@ -33,46 +33,12 @@ function Info() {
     <Shell rol={sesion.rol} titulo="Información" subtitulo="Todo sobre la escuela">
       <Tarjeta>
         <div className="flex items-center gap-3">
-          <ScrollText className="size-6 text-gold-brand" />
-          <h2 className="text-xl font-bold">Contrato y Reglamento</h2>
-        </div>
-        <p className="mt-3 text-base text-muted-foreground">
-          Revisa y firma el reglamento interno de la escuela.
-        </p>
-        <Button asChild variant="alerta" size="grande" className="mt-4">
-          <Link to="/contrato">Ver Contrato</Link>
-        </Button>
-      </Tarjeta>
-
-      <Tarjeta>
-        <div className="flex items-center gap-3">
-          <FileText className="size-6 text-cyan-brand" />
-          <h2 className="text-xl font-bold">Reglamento</h2>
-        </div>
-        {abierto === "reglamento" ? (
-          <ul className="mt-3 list-disc space-y-2 pl-5 text-base text-muted-foreground">
-            <li>Llegar 15 minutos antes del entrenamiento.</li>
-            <li>Traer bidón de agua, canilleras y zapatos de fútbol.</li>
-            <li>Avisar la asistencia por la app antes de cada clase.</li>
-            <li>La mensualidad es de $20.000 mensuales y vence el día 15 de cada mes.</li>
-            <li>Respeto y buen trato con compañeros, profesores y árbitros.</li>
-          </ul>
-        ) : null}
-        <Button
-          variant="contorno"
-          size="medio"
-          className="mt-4 w-full"
-          onClick={() => alternar("reglamento")}
-        >
-          {abierto === "reglamento" ? "Cerrar" : "Ver documento"}
-        </Button>
-      </Tarjeta>
-
-      <Tarjeta>
-        <div className="flex items-center gap-3">
           <Target className="size-6 text-gold-brand" />
-          <h2 className="text-xl font-bold">Objetivo de la escuela</h2>
+          <h2 className="text-xl font-bold">Nuestra escuela</h2>
         </div>
+        <p className="mt-3 text-lg font-bold italic text-gold-brand">
+          “Todos jugamos, todos aprendemos y todos pertenecemos”
+        </p>
         <p className="mt-3 text-base text-muted-foreground">
           Formar jugadores con valores: disciplina, respeto y trabajo en equipo.
           {abierto === "objetivo"
@@ -90,6 +56,23 @@ function Info() {
       </Tarjeta>
 
       <NuestrosProfesores />
+
+      <Tarjeta>
+        <div className="flex items-center gap-3">
+          <Phone className="size-6 text-cyan-brand" />
+          <h2 className="text-xl font-bold">Contacto</h2>
+        </div>
+        <ul className="mt-3 space-y-2 text-base text-muted-foreground">
+          <li>💬 WhatsApp: +56 9 1234 5678</li>
+          <li>✉️ Correo: contacto@tictac.cl</li>
+          <li>📸 Instagram: @tictac.siemprefeliz</li>
+        </ul>
+        <Button asChild variant="accion" size="grande" className="mt-4">
+          <a href="https://wa.me/56912345678" target="_blank" rel="noreferrer">
+            Escribir por WhatsApp
+          </a>
+        </Button>
+      </Tarjeta>
 
       <Tarjeta>
         <div className="flex items-center gap-3">
