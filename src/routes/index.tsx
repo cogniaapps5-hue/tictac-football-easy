@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import logoAsset from "@/assets/tictac-logo.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Entrar — Escuela de Fútbol TIC TAC" },
