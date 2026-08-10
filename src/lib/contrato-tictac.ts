@@ -95,7 +95,7 @@ export const CONTRATO_TIC_TAC: BloqueContrato[] = [
     "x": "- Cuenta vista: N° 11 11 1644 1964"
   },
   {
-    "t": "h",
+    "t": "p",
     "x": "- RUT: 16.441.964-9"
   },
   {
