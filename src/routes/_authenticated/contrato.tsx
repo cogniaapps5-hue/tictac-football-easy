@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Shell, Tarjeta } from "@/components/tictac/Shell";
 import { supabase } from "@/integrations/supabase/client";
 import { useSesion } from "@/lib/session";
-import { REGLAMENTO } from "@/lib/reglamento";
+import { CONTRATO_TIC_TAC } from "@/lib/contrato-tictac";
 
 export const Route = createFileRoute("/_authenticated/contrato")({
   beforeLoad: exigirRol("parent"),
@@ -74,7 +74,7 @@ function Contrato({ userId }: { userId: string }) {
     <Tarjeta destacada={!vigente}>
       <div className="flex items-center gap-3">
         <ScrollText className="size-6 text-gold-brand" />
-        <h2 className="text-xl font-bold">Reglamento Interno Escuela TIC TAC</h2>
+        <h2 className="text-xl font-bold">Contrato y Normas TIC TAC 2026</h2>
       </div>
 
       {vigente ? (
@@ -91,17 +91,18 @@ function Contrato({ userId }: { userId: string }) {
         </div>
       ) : null}
 
-      <div className="mt-4 max-h-[420px] space-y-4 overflow-y-auto rounded-xl border border-border bg-secondary p-4 text-lg leading-relaxed text-foreground">
-        {REGLAMENTO.map((bloque) => (
-          <div key={bloque.titulo}>
-            <p className="text-xl font-bold">{bloque.titulo}</p>
-            <ul className="mt-1 list-disc space-y-1 pl-5 text-lg text-muted-foreground">
-              {bloque.puntos.map((p) => (
-                <li key={p}>{p}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
+      <div className="mt-4 max-h-[60vh] space-y-3 overflow-y-auto rounded-xl border border-border bg-secondary p-4 leading-relaxed text-foreground">
+        {CONTRATO_TIC_TAC.map((bloque, i) =>
+          bloque.t === "h" ? (
+            <p key={i} className="pt-2 text-lg font-bold text-gold-brand">
+              {bloque.x}
+            </p>
+          ) : (
+            <p key={i} className="whitespace-pre-line text-base text-foreground/90">
+              {bloque.x}
+            </p>
+          ),
+        )}
       </div>
 
       {vigente ? (
