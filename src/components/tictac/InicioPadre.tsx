@@ -37,6 +37,7 @@ export function InicioPadre({
   const fechasPosibles = SEDES.map((s) => proximoEntrenamiento(s.valor).iso);
   const queryClient = useQueryClient();
   const [hijoId, setHijoId] = useState<string | null>(null);
+  const [verTodos, setVerTodos] = useState(false);
 
   const { data } = useQuery({
     queryKey: ["resumen-padre", userId, fechasPosibles.join(",")],
@@ -51,7 +52,7 @@ export function InicioPadre({
         ids.length
           ? supabase.from("attendance").select("*").in("player_id", ids).in("session_date", fechasPosibles)
           : Promise.resolve({ data: [] as never[] }),
-        supabase.from("notices").select("*").order("created_at", { ascending: false }).limit(3),
+        supabase.from("notices").select("*").order("created_at", { ascending: false }).limit(10),
         supabase.from("profiles").select("contract_accepted_at").eq("id", userId).maybeSingle(),
       ]);
       return {
@@ -243,7 +244,7 @@ export function InicioPadre({
             <h2 className="text-xl font-bold">Avisos de la Escuela</h2>
           </div>
           <ul className="mt-4 space-y-4">
-            {data.avisos.slice(0, 3).map((aviso) => (
+            {data.avisos.slice(0, verTodos ? 10 : 3).map((aviso) => (
               <li key={aviso.id} className="rounded-xl bg-secondary p-4">
                 <span
                   className={`mb-2 inline-block rounded-full px-3 py-1 text-sm font-bold ${categoriaAviso(aviso.category).clase}`}
@@ -255,9 +256,16 @@ export function InicioPadre({
               </li>
             ))}
           </ul>
-          <Button asChild variant="contorno" size="grande" className="mt-5">
-            <Link to="/avisos">Ver todos los avisos</Link>
-          </Button>
+          {data.avisos.length > 3 ? (
+            <Button
+              variant="contorno"
+              size="grande"
+              className="mt-5"
+              onClick={() => setVerTodos(!verTodos)}
+            >
+              {verTodos ? "Ver menos avisos" : "Ver todos los avisos"}
+            </Button>
+          ) : null}
         </Tarjeta>
       ) : null}
     </div>
