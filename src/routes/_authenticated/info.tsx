@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Target, Users, Images, Phone } from "lucide-react";
+import { Target, Users, Images, Phone, ShieldCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Shell, Tarjeta } from "@/components/tictac/Shell";
