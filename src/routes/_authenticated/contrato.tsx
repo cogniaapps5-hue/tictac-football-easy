@@ -1,3 +1,4 @@
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useState } from "react";
@@ -11,7 +12,6 @@ import { Shell, Tarjeta } from "@/components/tictac/Shell";
 import { supabase } from "@/integrations/supabase/client";
 import { useSesion } from "@/lib/session";
 import { CONTRATO_TIC_TAC } from "@/lib/contrato-tictac";
-import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 
 export const Route = createFileRoute("/_authenticated/contrato")({
   beforeLoad: exigirRol("parent"),

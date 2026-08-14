@@ -1,3 +1,4 @@
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Wallet, CalendarCheck, TriangleAlert, Lock, TrendingUp } from "lucide-react";
@@ -10,7 +11,6 @@ import { ReportesAdmin } from "@/components/tictac/Reportes";
 import { ContratosAdmin } from "@/components/tictac/Contratos";
 import { InicioPadre } from "@/components/tictac/InicioPadre";
 import { useSesion, useSaludo, pesos, proximoEntrenamiento } from "@/lib/session";
-import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
   head: () => ({

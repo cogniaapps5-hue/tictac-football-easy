@@ -1,3 +1,4 @@
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -17,7 +18,6 @@ import {
 } from "@/components/ui/dialog";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { useSesion, pesos, fechaCorta, GRUPOS, grupoEtiqueta } from "@/lib/session";
-import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 
 export const Route = createFileRoute("/_authenticated/pagos")({
   beforeLoad: exigirRol("admin"),

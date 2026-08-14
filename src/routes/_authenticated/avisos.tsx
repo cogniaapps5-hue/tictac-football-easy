@@ -1,3 +1,4 @@
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -12,7 +13,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Shell, Tarjeta } from "@/components/tictac/Shell";
 import {
-import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
   useSesion,
   fechaCorta,
   GRUPOS,
