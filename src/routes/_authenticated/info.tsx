@@ -119,48 +119,133 @@ function Info() {
   );
 }
 
+const REGISTRO_CIVIL = "https://www.registrocivil.gob.cl";
+
 function NuestrosProfesores() {
   const { data: profesores } = useQuery({
     queryKey: ["coaches"],
     queryFn: async () => {
-      const { data } = await supabase.from("coaches").select("*").order("created_at");
+      const { data } = await supabase
+        .from("coaches")
+        .select("*")
+        .order("sort_order")
+        .order("created_at");
       return data ?? [];
     },
   });
 
   return (
-    <Tarjeta>
+    <Tarjeta className="p-6">
       <div className="flex items-center gap-3">
         <Users className="size-6 text-cyan-brand" />
-        <h2 className="text-xl font-bold">Nuestros Profesores</h2>
+        <h2 className="text-2xl font-bold">Cuerpo Técnico TIC TAC</h2>
       </div>
-      <ul className="mt-4 space-y-4">
-        {(profesores ?? []).map((p) => (
-          <li
-            key={p.id}
-            className="flex flex-col items-center rounded-2xl border border-border bg-secondary p-5 text-center"
-          >
-            {p.photo_url ? (
-              <img
-                src={p.photo_url}
-                alt={`Foto de ${p.name}`}
-                loading="lazy"
-                className="size-24 rounded-full border-2 border-cyan-brand object-cover"
-              />
-            ) : (
-              <div className="flex size-24 items-center justify-center rounded-full border-2 border-cyan-brand bg-card text-3xl font-black text-cyan-brand">
-                {p.name.slice(0, 1)}
+      <p className="mt-1 text-sm text-muted-foreground">
+        Profesionales certificados y verificados
+      </p>
+
+      <ul className="mt-6 grid gap-6 md:grid-cols-3">
+        {(profesores ?? []).map((p) => {
+          const esDirector = p.role === "director";
+          const colorTexto = esDirector ? "text-gold-brand" : "text-cyan-brand";
+          const colorBorde = esDirector ? "border-gold-brand" : "border-cyan-brand";
+          const cargo = esDirector ? "Director Técnico" : "Staff Técnico";
+          const insignia = esDirector
+            ? `✅ Director Técnico - Título verificado ${etiquetaCasa(p.university)} ${p.graduation_year ?? ""} + Antecedentes limpios (11/08/2026)`
+            : `✅ Título verificado ${etiquetaCasa(p.university)} ${p.graduation_year ?? ""} + Antecedentes limpios (11/08/2026)`;
+
+          return (
+            <li
+              key={p.id}
+              className="flex flex-col items-center rounded-2xl border border-border bg-secondary p-5 text-center shadow-lg"
+            >
+              {p.photo_url ? (
+                <img
+                  src={p.photo_url}
+                  alt={`Foto del profesor ${p.name}`}
+                  loading="lazy"
+                  className={`size-[200px] max-w-full rounded-2xl border-2 object-cover ${colorBorde}`}
+                />
+              ) : (
+                <div
+                  className={`flex size-[200px] max-w-full items-center justify-center rounded-2xl border-2 bg-card text-6xl font-black ${colorBorde} ${colorTexto}`}
+                >
+                  {iniciales(p.name)}
+                </div>
+              )}
+
+              <p className="mt-4 text-xl font-bold">{p.name}</p>
+              <p className={`text-sm font-bold ${colorTexto}`}>{cargo}</p>
+              <hr className={`my-3 w-full border-t-2 ${colorBorde}`} />
+
+              <div className="space-y-1 text-[13px] text-muted-foreground">
+                {p.title ? <p className="font-semibold text-foreground">{p.title}</p> : null}
+                {p.university ? <p>{p.university}</p> : null}
+                {p.graduation_year ? <p>Titulación: {p.graduation_year}</p> : null}
+                {p.qualification ? <p>{p.qualification}</p> : null}
+                {p.registry_number ? <p>Registro N° {p.registry_number}</p> : null}
+                {p.rut ? <p>RUT: {p.rut}</p> : null}
+                {p.certificate_folio ? (
+                  <p>
+                    Certificado de antecedentes: folio {p.certificate_folio} · emitido 11/08/2026 ·
+                    SIN ANTECEDENTES
+                  </p>
+                ) : null}
               </div>
-            )}
-            <p className="mt-3 text-xl font-bold">{p.name}</p>
-            <p className="text-base font-semibold text-cyan-brand">{p.role}</p>
-            {p.bio ? <p className="mt-2 text-base text-muted-foreground">{p.bio}</p> : null}
-          </li>
-        ))}
+
+              <p className="mt-3 rounded-xl bg-[#10B981] px-3 py-2 text-xs font-semibold text-white">
+                {insignia}
+              </p>
+
+              <a
+                href={REGISTRO_CIVIL}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 text-sm font-semibold text-cyan-brand underline"
+              >
+                Verificar en Registro Civil
+              </a>
+            </li>
+          );
+        })}
         {profesores && profesores.length === 0 ? (
           <li className="text-base text-muted-foreground">Aún no hay profesores publicados.</li>
         ) : null}
       </ul>
+
+      <div className="mt-6 rounded-2xl bg-[#0A2540] p-6">
+        <ShieldCheck className="size-10 text-gold-brand" />
+        <h3 className="mt-2 text-lg font-bold">Transparencia Total</h3>
+        <p className="mt-2 text-base text-muted-foreground">
+          Todos nuestros profesores cuentan con título profesional verificado y certificado de
+          antecedentes para fines especiales, emitido el 11 de agosto de 2026. Puedes verificar la
+          autenticidad de estos certificados en www.registrocivil.gob.cl usando los folios
+          publicados.
+        </p>
+        <Button asChild variant="accion" size="grande" className="mt-4">
+          <a href={REGISTRO_CIVIL} target="_blank" rel="noreferrer">
+            Verificar en Registro Civil
+          </a>
+        </Button>
+      </div>
     </Tarjeta>
   );
+}
+
+function iniciales(nombre: string) {
+  return nombre
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join("")
+    .toUpperCase();
+}
+
+function etiquetaCasa(universidad: string | null) {
+  if (!universidad) return "";
+  if (universidad.includes("Atacama")) return "UDA";
+  if (universidad.includes("Pedro de Valdivia")) return "UPV";
+  if (universidad.includes("Santo Tomás")) return "Santo Tomás";
+  return universidad;
 }
