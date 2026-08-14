@@ -42,12 +42,20 @@ function Entrar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
+  const MENSAJE_INACTIVO =
+    "Tu cuenta ha sido desactivada. Por favor, contacta a la administración de la escuela para regularizar tu situación.";
+
   async function irADestino(userId: string) {
     const { data: perfil } = await supabase
       .from("profiles")
-      .select("must_change_password")
+      .select("must_change_password, access_status")
       .eq("id", userId)
       .maybeSingle();
+    if (perfil?.access_status === "inactive") {
+      await supabase.auth.signOut();
+      toast.error(MENSAJE_INACTIVO, { duration: 10000 });
+      return;
+    }
     navigate({ to: perfil?.must_change_password ? "/cambiar-clave" : "/inicio", replace: true });
   }
 
