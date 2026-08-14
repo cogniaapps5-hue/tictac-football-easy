@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import logoAsset from "@/assets/tictac-logo.jpg.asset.json";
+import { limpiarSesion, sesionValida } from "@/lib/sesion";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -36,8 +37,8 @@ function Entrar() {
   const [cargando, setCargando] = useState(false);
 
   useEffect(() => {
-    void supabase.auth.getSession().then(({ data }) => {
-      if (data.session) void irADestino(data.session.user.id);
+    void sesionValida().then((sesion) => {
+      if (sesion?.user) void irADestino(sesion.user.id);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
@@ -52,7 +53,7 @@ function Entrar() {
       .eq("id", userId)
       .maybeSingle();
     if (perfil?.access_status === "inactive") {
-      await supabase.auth.signOut();
+      await limpiarSesion();
       toast.error(MENSAJE_INACTIVO, { duration: 10000 });
       return;
     }
