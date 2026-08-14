@@ -24,6 +24,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
   useSesion,
   proximoEntrenamiento,
   GRUPOS,
@@ -55,7 +56,7 @@ function semaforo(estado: string) {
 }
 
 function Alumnos() {
-  const { data: sesion } = useSesion();
+  const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
   const queryClient = useQueryClient();
   const [busqueda, setBusqueda] = useState("");
   const [agregando, setAgregando] = useState(false);
@@ -168,7 +169,14 @@ function Alumnos() {
     onError: () => toast.error("No pudimos restablecer al alumno"),
   });
 
-  if (!sesion) return null;
+  if (cargandoSesion) return <PantallaCargando />;
+  if (errorSesion || !sesion)
+    return (
+      <PantallaError
+        titulo="No pudimos cargar tu sesión"
+        onReintentar={() => void recargarSesion()}
+      />
+    );
   if (sesion.rol !== "admin") {
     return (
       <Shell rol="parent" titulo="Alumnos">

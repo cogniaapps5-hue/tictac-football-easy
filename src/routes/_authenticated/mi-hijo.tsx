@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { SubirComprobante } from "@/components/tictac/SubirComprobante";
 import { useSesion, pesos, fechaCorta, grupoEtiqueta } from "@/lib/session";
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 
 export const Route = createFileRoute("/_authenticated/mi-hijo")({
   beforeLoad: exigirRol("parent"),
@@ -54,7 +55,7 @@ const MESES = [
 ];
 
 function MiHijo() {
-  const { data: sesion } = useSesion();
+  const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
   const queryClient = useQueryClient();
   const [editando, setEditando] = useState(false);
   const [contacto, setContacto] = useState({ nombre: "", telefono: "" });
@@ -134,7 +135,14 @@ function MiHijo() {
     ? Math.round((asistio / asistenciaMes.length) * 100)
     : null;
 
-  if (!sesion) return null;
+  if (cargandoSesion) return <PantallaCargando />;
+  if (errorSesion || !sesion)
+    return (
+      <PantallaError
+        titulo="No pudimos cargar tu sesión"
+        onReintentar={() => void recargarSesion()}
+      />
+    );
 
   return (
     <Shell rol={sesion.rol} titulo="Mi Hijo" subtitulo={alumno?.name}>

@@ -11,6 +11,7 @@ import { Shell, Tarjeta } from "@/components/tictac/Shell";
 import { supabase } from "@/integrations/supabase/client";
 import { useSesion } from "@/lib/session";
 import { CONTRATO_TIC_TAC } from "@/lib/contrato-tictac";
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 
 export const Route = createFileRoute("/_authenticated/contrato")({
   beforeLoad: exigirRol("parent"),
@@ -26,8 +27,15 @@ export const Route = createFileRoute("/_authenticated/contrato")({
 });
 
 function ContratoPagina() {
-  const { data: sesion } = useSesion();
-  if (!sesion) return null;
+  const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
+  if (cargandoSesion) return <PantallaCargando />;
+  if (errorSesion || !sesion)
+    return (
+      <PantallaError
+        titulo="No pudimos cargar tu sesión"
+        onReintentar={() => void recargarSesion()}
+      />
+    );
 
   return (
     <Shell rol={sesion.rol} titulo="Contrato y Reglamento" subtitulo="Lee y firma el reglamento interno">

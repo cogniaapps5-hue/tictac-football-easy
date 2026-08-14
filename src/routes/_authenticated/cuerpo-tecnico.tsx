@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Shell, Tarjeta } from "@/components/tictac/Shell";
 import { supabase } from "@/integrations/supabase/client";
 import { useSesion } from "@/lib/session";
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 
 export const Route = createFileRoute("/_authenticated/cuerpo-tecnico")({
   beforeLoad: exigirRol("admin"),
@@ -33,7 +34,7 @@ type Formulario = { id?: string; name: string; role: string; photo_url: string; 
 const VACIO: Formulario = { name: "", role: "", photo_url: "", bio: "" };
 
 function CuerpoTecnico() {
-  const { data: sesion } = useSesion();
+  const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<Formulario | null>(null);
 
@@ -78,7 +79,14 @@ function CuerpoTecnico() {
     onError: () => toast.error("No pudimos eliminar al profesor."),
   });
 
-  if (!sesion) return null;
+  if (cargandoSesion) return <PantallaCargando />;
+  if (errorSesion || !sesion)
+    return (
+      <PantallaError
+        titulo="No pudimos cargar tu sesión"
+        onReintentar={() => void recargarSesion()}
+      />
+    );
   if (sesion.rol !== "admin") {
     return (
       <Shell rol={sesion.rol} titulo="Cuerpo Técnico">

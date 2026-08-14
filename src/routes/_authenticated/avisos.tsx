@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Shell, Tarjeta } from "@/components/tictac/Shell";
 import {
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
   useSesion,
   fechaCorta,
   GRUPOS,
@@ -42,7 +43,7 @@ export const Route = createFileRoute("/_authenticated/avisos")({
 });
 
 function Avisos() {
-  const { data: sesion } = useSesion();
+  const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
   const queryClient = useQueryClient();
   const [titulo, setTitulo] = useState("");
   const [mensaje, setMensaje] = useState("");
@@ -79,7 +80,14 @@ function Avisos() {
     onError: () => toast.error("No pudimos enviar el aviso"),
   });
 
-  if (!sesion) return null;
+  if (cargandoSesion) return <PantallaCargando />;
+  if (errorSesion || !sesion)
+    return (
+      <PantallaError
+        titulo="No pudimos cargar tu sesión"
+        onReintentar={() => void recargarSesion()}
+      />
+    );
   if (sesion.rol !== "admin") {
     return (
       <Shell rol="parent" titulo="Avisos">

@@ -10,6 +10,7 @@ import { ReportesAdmin } from "@/components/tictac/Reportes";
 import { ContratosAdmin } from "@/components/tictac/Contratos";
 import { InicioPadre } from "@/components/tictac/InicioPadre";
 import { useSesion, useSaludo, pesos, proximoEntrenamiento } from "@/lib/session";
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
   head: () => ({
@@ -24,9 +25,16 @@ export const Route = createFileRoute("/_authenticated/inicio")({
 });
 
 function Inicio() {
-  const { data: sesion } = useSesion();
+  const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
   const saludoActual = useSaludo();
-  if (!sesion) return null;
+  if (cargandoSesion) return <PantallaCargando />;
+  if (errorSesion || !sesion)
+    return (
+      <PantallaError
+        titulo="No pudimos cargar tu sesión"
+        onReintentar={() => void recargarSesion()}
+      />
+    );
   return sesion.rol === "admin" ? (
     <Shell rol="admin" titulo={`${saludoActual}, ${sesion.nombre}`} subtitulo="Escuela TIC TAC">
       <InicioAdmin />

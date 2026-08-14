@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Shell, Tarjeta } from "@/components/tictac/Shell";
 import { supabase } from "@/integrations/supabase/client";
 import { useSesion } from "@/lib/session";
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 
 export const Route = createFileRoute("/_authenticated/info")({
   beforeLoad: exigirRol("parent"),
@@ -23,9 +24,16 @@ export const Route = createFileRoute("/_authenticated/info")({
 });
 
 function Info() {
-  const { data: sesion } = useSesion();
+  const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
   const [abierto, setAbierto] = useState<string | null>(null);
-  if (!sesion) return null;
+  if (cargandoSesion) return <PantallaCargando />;
+  if (errorSesion || !sesion)
+    return (
+      <PantallaError
+        titulo="No pudimos cargar tu sesión"
+        onReintentar={() => void recargarSesion()}
+      />
+    );
 
   const alternar = (clave: string) => setAbierto(abierto === clave ? null : clave);
 

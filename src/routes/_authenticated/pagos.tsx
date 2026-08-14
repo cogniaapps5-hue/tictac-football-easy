@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { useSesion, pesos, fechaCorta, GRUPOS, grupoEtiqueta } from "@/lib/session";
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 
 export const Route = createFileRoute("/_authenticated/pagos")({
   beforeLoad: exigirRol("admin"),
@@ -131,7 +132,7 @@ const FilaPago = memo(function FilaPago({
 });
 
 function Pagos() {
-  const { data: sesion } = useSesion();
+  const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
   const queryClient = useQueryClient();
   const [filtro, setFiltro] = useState<Filtro>("pending");
   const [grupo, setGrupo] = useState<string>("todos");
@@ -221,7 +222,14 @@ function Pagos() {
   }, []);
   const abrirFoto = useCallback((ruta: string) => void verFoto(ruta), [verFoto]);
 
-  if (!sesion) return null;
+  if (cargandoSesion) return <PantallaCargando />;
+  if (errorSesion || !sesion)
+    return (
+      <PantallaError
+        titulo="No pudimos cargar tu sesión"
+        onReintentar={() => void recargarSesion()}
+      />
+    );
   if (sesion.rol !== "admin") {
     return (
       <Shell rol="parent" titulo="Pagos">
