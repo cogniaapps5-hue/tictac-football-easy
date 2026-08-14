@@ -1,6 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { KeyRound, Loader2 } from "lucide-react";
+import { Home, KeyRound, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -158,6 +158,15 @@ function CambiarClave() {
           {obligatorio ? "GUARDAR NUEVA CONTRASEÑA" : "ACTUALIZAR CONTRASEÑA"}
         </Button>
       </form>
+
+      {!obligatorio ? (
+        <Button asChild variant="contorno" size="grande" className="mt-6 w-full max-w-sm">
+          <Link to="/inicio">
+            <Home />
+            VOLVER AL INICIO
+          </Link>
+        </Button>
+      ) : null}
     </div>
   );
 }
