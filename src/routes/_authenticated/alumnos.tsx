@@ -209,7 +209,25 @@ function Alumnos() {
     );
     return (
       <Tarjeta key={alumno.id}>
-        <p className="text-xl font-bold">👤 {alumno.name}</p>
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-xl font-bold">👤 {alumno.name}</p>
+          {alumno.access_status !== "inactive" ? (
+            <button
+              type="button"
+              aria-label={`Archivar a ${alumno.name}`}
+              title="Archivar alumno"
+              className="flex size-[60px] shrink-0 items-center justify-center rounded-xl border border-danger/40 bg-danger/10 text-danger"
+              onClick={() => setPorArchivar({ id: alumno.id, nombre: alumno.name })}
+            >
+              <Trash2 className="size-6" />
+            </button>
+          ) : null}
+        </div>
+        {alumno.archived_at ? (
+          <p className="mt-1 text-base text-muted-foreground">
+            🗄️ Archivado el {new Date(alumno.archived_at).toLocaleDateString("es-CL")}
+          </p>
+        ) : null}
         {alumno.parent_email ? (
           <p className="text-base text-muted-foreground">📧 Apoderado: {alumno.parent_email}</p>
         ) : null}
@@ -270,6 +288,17 @@ function Alumnos() {
               : "Autorizar acceso excepcional"}
           </Button>
         ) : null}
+        {alumno.access_status === "inactive" ? (
+          <Button
+            variant="accion"
+            size="grande"
+            className="mt-4"
+            disabled={restablecer.isPending}
+            onClick={() => restablecer.mutate(alumno.id)}
+          >
+            Restablecer
+          </Button>
+        ) : (
         <div className="mt-4 flex gap-3">
           <Button
             variant="exito"
@@ -288,6 +317,7 @@ function Alumnos() {
             <X /> Faltó
           </Button>
         </div>
+        )}
       </Tarjeta>
     );
   }
