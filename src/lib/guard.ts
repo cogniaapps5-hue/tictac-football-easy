@@ -3,13 +3,16 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Rol } from "@/lib/session";
 
 /** Rol real del usuario autenticado (null si no hay sesión o no tiene rol). */
-export async function rolActual(): Promise<Rol | null> {
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) return null;
-  const { data: roles } = await supabase
+export async function rolActual(): Promise<Rol | null | "desconocido"> {
+  const { data: sesion } = await supabase.auth.getSession();
+  const user = sesion.session?.user;
+  if (!user) return null;
+  const { data: roles, error } = await supabase
     .from("user_roles")
     .select("role")
-    .eq("user_id", userData.user.id);
+    .eq("user_id", user.id);
+  // Falla de red: no sabemos el rol, pero tampoco cerramos la sesión.
+  if (error) return "desconocido";
   if (!roles?.length) return null;
   return roles.some((r) => r.role === "admin") ? "admin" : "parent";
 }
@@ -21,6 +24,7 @@ export async function rolActual(): Promise<Rol | null> {
 export function exigirRol(rol: Rol) {
   return async () => {
     const actual = await rolActual();
+    if (actual === "desconocido") return;
     if (!actual) throw redirect({ to: "/error-acceso" });
     if (actual !== rol) throw redirect({ to: "/inicio" });
   };

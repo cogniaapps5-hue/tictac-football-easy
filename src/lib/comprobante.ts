@@ -18,12 +18,6 @@ export function esImagen(file: File) {
   return file.type.startsWith("image/") || /\.(jpe?g|png|webp|heic|heif|gif|bmp)$/i.test(file.name);
 }
 
-function soportaWebp() {
-  if (typeof document === "undefined") return false;
-  const canvas = document.createElement("canvas");
-  return canvas.toDataURL("image/webp").startsWith("data:image/webp");
-}
-
 async function cargarImagen(file: File): Promise<HTMLImageElement> {
   const url = URL.createObjectURL(file);
   try {
@@ -54,13 +48,11 @@ export async function prepararArchivo(file: File, anchoMaximo = 800): Promise<Ar
     const ctx = canvas.getContext("2d");
     if (!ctx) throw new Error("sin canvas");
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    const usarWebp = soportaWebp();
-    const tipo = usarWebp ? "image/webp" : "image/jpeg";
     const blob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob(resolve, tipo, 0.82),
+      canvas.toBlob(resolve, "image/jpeg", 0.8),
     );
     if (!blob) throw new Error("sin blob");
-    return { blob, extension: usarWebp ? "webp" : "jpg", tipo };
+    return { blob, extension: "jpg", tipo: "image/jpeg" };
   } catch {
     const extension = (file.name.split(".").pop() || "jpg").toLowerCase().slice(0, 5);
     return { blob: file, extension, tipo: file.type || "image/jpeg" };
