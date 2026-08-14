@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Search, UserPlus, Check, X } from "lucide-react";
+import { Search, UserPlus, Check, X, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +12,17 @@ import { Label } from "@/components/ui/label";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { CargaMasiva } from "@/components/tictac/CargaMasiva";
 import { MatriculaManual } from "@/components/tictac/Matricula";
+import { archivarAlumno, restablecerAlumno } from "@/lib/archivar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   useSesion,
   proximoEntrenamiento,
@@ -39,6 +50,7 @@ function semaforo(estado: string) {
   if (estado === "blocked") return "🔴 Bloqueado";
   if (estado === "pending_review") return "🟡 En revisión";
   if (estado === "exception") return "⚪ Excepción";
+  if (estado === "inactive") return "⚫ Archivado";
   return "🟢 Activo";
 }
 
@@ -49,6 +61,8 @@ function Alumnos() {
   const [agregando, setAgregando] = useState(false);
   const [grupoFiltro, setGrupoFiltro] = useState<string>("todos");
   const [soloAlDia, setSoloAlDia] = useState(false);
+  const [vista, setVista] = useState<"activos" | "archivados">("activos");
+  const [porArchivar, setPorArchivar] = useState<{ id: string; nombre: string } | null>(null);
   const [diaFiltro, setDiaFiltro] = useState<DiaEntrenamiento>(proximoEntrenamiento().dia);
   const proximo = proximoEntrenamiento(diaFiltro);
   const sedeActual = sedeDe(diaFiltro);
@@ -129,6 +143,31 @@ function Alumnos() {
     onError: () => toast.error("No pudimos cambiar el acceso"),
   });
 
+  const archivar = useMutation({
+    mutationFn: (playerId: string) => archivarAlumno(playerId),
+    onSuccess: (resultado) => {
+      queryClient.invalidateQueries({ queryKey: ["alumnos"] });
+      queryClient.invalidateQueries({ queryKey: ["resumen-admin"] });
+      setPorArchivar(null);
+      toast.success(
+        resultado.apoderadoBloqueado
+          ? "Alumno archivado. El apoderado quedó sin acceso."
+          : "Alumno archivado. El apoderado mantiene acceso por sus otros hijos.",
+      );
+    },
+    onError: () => toast.error("No pudimos archivar al alumno"),
+  });
+
+  const restablecer = useMutation({
+    mutationFn: (playerId: string) => restablecerAlumno(playerId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["alumnos"] });
+      queryClient.invalidateQueries({ queryKey: ["resumen-admin"] });
+      toast.success("Alumno restablecido");
+    },
+    onError: () => toast.error("No pudimos restablecer al alumno"),
+  });
+
   if (!sesion) return null;
   if (sesion.rol !== "admin") {
     return (
@@ -141,15 +180,19 @@ function Alumnos() {
   }
 
   const texto = busqueda.trim().toLowerCase();
+  const archivados = vista === "archivados";
   const lista = (data?.alumnos ?? []).filter(
     (a) =>
+      (archivados ? a.access_status === "inactive" : a.access_status !== "inactive") &&
       (!texto ||
         a.name.toLowerCase().includes(texto) ||
         (a.rut ?? "").toLowerCase().includes(texto)) &&
       (grupoFiltro === "todos" || a.age_group === grupoFiltro) &&
-      a.training_day === diaFiltro &&
+      (archivados || a.training_day === diaFiltro) &&
       (!soloAlDia || a.access_status === "active" || a.access_status === "exception"),
   );
+  const totalActivos = (data?.alumnos ?? []).filter((a) => a.access_status !== "inactive").length;
+  const totalArchivados = (data?.alumnos ?? []).filter((a) => a.access_status === "inactive").length;
 
   const gruposVisibles = GRUPOS.filter(
     (g) => grupoFiltro === "todos" || grupoFiltro === g.valor,
@@ -166,7 +209,25 @@ function Alumnos() {
     );
     return (
       <Tarjeta key={alumno.id}>
-        <p className="text-xl font-bold">👤 {alumno.name}</p>
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-xl font-bold">👤 {alumno.name}</p>
+          {alumno.access_status !== "inactive" ? (
+            <button
+              type="button"
+              aria-label={`Archivar a ${alumno.name}`}
+              title="Archivar alumno"
+              className="flex size-[60px] shrink-0 items-center justify-center rounded-xl border border-danger/40 bg-danger/10 text-danger"
+              onClick={() => setPorArchivar({ id: alumno.id, nombre: alumno.name })}
+            >
+              <Trash2 className="size-6" />
+            </button>
+          ) : null}
+        </div>
+        {alumno.archived_at ? (
+          <p className="mt-1 text-base text-muted-foreground">
+            🗄️ Archivado el {new Date(alumno.archived_at).toLocaleDateString("es-CL")}
+          </p>
+        ) : null}
         {alumno.parent_email ? (
           <p className="text-base text-muted-foreground">📧 Apoderado: {alumno.parent_email}</p>
         ) : null}
@@ -227,6 +288,17 @@ function Alumnos() {
               : "Autorizar acceso excepcional"}
           </Button>
         ) : null}
+        {alumno.access_status === "inactive" ? (
+          <Button
+            variant="accion"
+            size="grande"
+            className="mt-4"
+            disabled={restablecer.isPending}
+            onClick={() => restablecer.mutate(alumno.id)}
+          >
+            Restablecer
+          </Button>
+        ) : (
         <div className="mt-4 flex gap-3">
           <Button
             variant="exito"
@@ -245,6 +317,7 @@ function Alumnos() {
             <X /> Faltó
           </Button>
         </div>
+        )}
       </Tarjeta>
     );
   }
@@ -260,8 +333,34 @@ function Alumnos() {
         <p className="mt-1 text-base capitalize text-muted-foreground">{proximo.texto}</p>
       </Tarjeta>
 
-      <CargaMasiva />
-      <MatriculaManual />
+      <Tarjeta>
+        <p className="text-base font-semibold">Estado de matrícula</p>
+        <div className="mt-2 flex gap-4">
+          <Button
+            variant={vista === "activos" ? "accion" : "neutro"}
+            size="medio"
+            className="h-auto min-h-[60px] flex-1 py-4 text-base"
+            onClick={() => setVista("activos")}
+          >
+            Activos ({totalActivos})
+          </Button>
+          <Button
+            variant={vista === "archivados" ? "accion" : "neutro"}
+            size="medio"
+            className="h-auto min-h-[60px] flex-1 py-4 text-base"
+            onClick={() => setVista("archivados")}
+          >
+            Archivados ({totalArchivados})
+          </Button>
+        </div>
+      </Tarjeta>
+
+      {vista === "activos" ? (
+        <>
+          <CargaMasiva />
+          <MatriculaManual />
+        </>
+      ) : null}
 
       <Tarjeta>
         <Label htmlFor="buscar" className="text-base">
@@ -427,6 +526,34 @@ function Alumnos() {
           <UserPlus /> Agregar Alumno
         </Button>
       )}
+
+      <AlertDialog
+        open={Boolean(porArchivar)}
+        onOpenChange={(abierto) => !abierto && setPorArchivar(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-2xl">¿Archivar alumno?</AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
+              Esta acción desactivará el acceso de {porArchivar?.nombre} y ocultará su ficha de la
+              lista activa. Los datos históricos (pagos, asistencia) se conservarán. ¿Continuar?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="min-h-[60px] text-base">Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="min-h-[60px] bg-danger text-base text-danger-foreground hover:bg-danger/90"
+              disabled={archivar.isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                if (porArchivar) archivar.mutate(porArchivar.id);
+              }}
+            >
+              Sí, archivar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Shell>
   );
 }

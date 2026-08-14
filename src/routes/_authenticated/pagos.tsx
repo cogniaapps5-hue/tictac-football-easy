@@ -41,7 +41,7 @@ type Pago = {
   due_date: string;
   receipt_url: string | null;
   rejection_reason: string | null;
-  players: { name: string; age_group: string } | null;
+  players: { name: string; age_group: string; access_status: string } | null;
 };
 
 /**
@@ -145,7 +145,7 @@ function Pagos() {
       const { data } = await supabase
         .from("payments")
         .select(
-          "id, status, amount, concept, due_date, receipt_url, rejection_reason, players(name, age_group)",
+          "id, status, amount, concept, due_date, receipt_url, rejection_reason, players(name, age_group, access_status)",
         )
         .order("created_at", { ascending: false });
       return (data ?? []) as unknown as Pago[];
@@ -233,7 +233,11 @@ function Pagos() {
   }
 
   const porGrupo = (pagos ?? []).filter(
-    (p) => grupo === "todos" || p.players?.age_group === grupo,
+    (p) =>
+      (grupo === "todos" || p.players?.age_group === grupo) &&
+      // Los alumnos archivados salen de la bandeja activa; su historial sigue
+      // disponible en el Reporte de Pagos.
+      p.players?.access_status !== "inactive",
   );
   const lista = porGrupo.filter((p) => p.status === filtro);
   const pendientes = porGrupo.filter((p) => p.status === "pending").length;
