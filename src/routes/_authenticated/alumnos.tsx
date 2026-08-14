@@ -526,6 +526,34 @@ function Alumnos() {
           <UserPlus /> Agregar Alumno
         </Button>
       )}
+
+      <AlertDialog
+        open={Boolean(porArchivar)}
+        onOpenChange={(abierto) => !abierto && setPorArchivar(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-2xl">¿Archivar alumno?</AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
+              Esta acción desactivará el acceso de {porArchivar?.nombre} y ocultará su ficha de la
+              lista activa. Los datos históricos (pagos, asistencia) se conservarán. ¿Continuar?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="min-h-[60px] text-base">Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="min-h-[60px] bg-danger text-base text-danger-foreground hover:bg-danger/90"
+              disabled={archivar.isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                if (porArchivar) archivar.mutate(porArchivar.id);
+              }}
+            >
+              Sí, archivar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Shell>
   );
 }
