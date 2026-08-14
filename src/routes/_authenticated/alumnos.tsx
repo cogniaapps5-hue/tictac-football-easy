@@ -333,8 +333,34 @@ function Alumnos() {
         <p className="mt-1 text-base capitalize text-muted-foreground">{proximo.texto}</p>
       </Tarjeta>
 
-      <CargaMasiva />
-      <MatriculaManual />
+      <Tarjeta>
+        <p className="text-base font-semibold">Estado de matrícula</p>
+        <div className="mt-2 flex gap-4">
+          <Button
+            variant={vista === "activos" ? "accion" : "neutro"}
+            size="medio"
+            className="h-auto min-h-[60px] flex-1 py-4 text-base"
+            onClick={() => setVista("activos")}
+          >
+            Activos ({totalActivos})
+          </Button>
+          <Button
+            variant={vista === "archivados" ? "accion" : "neutro"}
+            size="medio"
+            className="h-auto min-h-[60px] flex-1 py-4 text-base"
+            onClick={() => setVista("archivados")}
+          >
+            Archivados ({totalArchivados})
+          </Button>
+        </div>
+      </Tarjeta>
+
+      {vista === "activos" ? (
+        <>
+          <CargaMasiva />
+          <MatriculaManual />
+        </>
+      ) : null}
 
       <Tarjeta>
         <Label htmlFor="buscar" className="text-base">
