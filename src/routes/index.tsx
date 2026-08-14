@@ -56,6 +56,7 @@ function Entrar() {
       toast.error(MENSAJE_INACTIVO, { duration: 10000 });
       return;
     }
+    toast.success("¡Bienvenido!");
     navigate({ to: perfil?.must_change_password ? "/cambiar-clave" : "/inicio", replace: true });
   }
 
