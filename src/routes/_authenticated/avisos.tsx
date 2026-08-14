@@ -53,13 +53,19 @@ function Avisos() {
   const [destino, setDestino] = useState("all");
   const [categoria, setCategoria] = useState("informacion_importante");
 
-  const { data: avisos } = useQuery({
+  const {
+    data: avisos,
+    isLoading: cargandoAvisos,
+    isError: falloAvisos,
+    refetch: recargarAvisos,
+  } = useQuery({
     queryKey: ["avisos"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("notices")
         .select("*")
         .order("created_at", { ascending: false });
+      if (error) throw error;
       return data ?? [];
     },
   });

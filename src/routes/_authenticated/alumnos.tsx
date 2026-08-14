@@ -78,13 +78,21 @@ function Alumnos() {
     parent_email: "",
   });
 
-  const { data } = useQuery({
+  const {
+    data,
+    isLoading: cargandoDatos,
+    isError: falloDatos,
+    error: errorDatos,
+    refetch: recargarDatos,
+  } = useQuery({
     queryKey: ["alumnos", proximo.iso],
     queryFn: async () => {
       const [alumnos, asistencia] = await Promise.all([
         supabase.from("players").select("*").order("name"),
         supabase.from("attendance").select("*").eq("session_date", proximo.iso),
       ]);
+      if (alumnos.error) throw alumnos.error;
+      if (asistencia.error) throw asistencia.error;
       return { alumnos: alumnos.data ?? [], asistencia: asistencia.data ?? [] };
     },
   });

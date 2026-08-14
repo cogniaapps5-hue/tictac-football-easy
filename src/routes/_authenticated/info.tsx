@@ -133,14 +133,19 @@ function Info() {
 const REGISTRO_CIVIL = "https://www.registrocivil.gob.cl";
 
 function NuestrosProfesores() {
-  const { data: profesores } = useQuery({
+  const {
+    data: profesores,
+    isLoading: cargandoProfes,
+    isError: falloProfes,
+  } = useQuery({
     queryKey: ["coaches"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("coaches")
         .select("*")
         .order("sort_order")
         .order("created_at");
+      if (error) throw error;
       return data ?? [];
     },
   });

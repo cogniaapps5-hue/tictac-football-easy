@@ -41,10 +41,16 @@ function CuerpoTecnico() {
   const queryClient = useQueryClient();
   const [form, setForm] = useState<Formulario | null>(null);
 
-  const { data: profesores } = useQuery({
+  const {
+    data: profesores,
+    isLoading: cargandoProfes,
+    isError: falloProfes,
+    refetch: recargarProfes,
+  } = useQuery({
     queryKey: ["coaches"],
     queryFn: async () => {
-      const { data } = await supabase.from("coaches").select("*").order("created_at");
+      const { data, error } = await supabase.from("coaches").select("*").order("created_at");
+      if (error) throw error;
       return data ?? [];
     },
   });

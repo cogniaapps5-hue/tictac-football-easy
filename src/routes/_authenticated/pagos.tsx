@@ -143,15 +143,22 @@ function Pagos() {
   const [rechazo, setRechazo] = useState<{ id: string; nombre: string } | null>(null);
   const [motivo, setMotivo] = useState("");
 
-  const { data: pagos } = useQuery({
+  const {
+    data: pagos,
+    isLoading: cargandoPagos,
+    isError: falloPagos,
+    error: errorPagos,
+    refetch: recargarPagos,
+  } = useQuery({
     queryKey: ["pagos"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("payments")
         .select(
           "id, status, amount, concept, due_date, receipt_url, rejection_reason, players(name, age_group, access_status)",
         )
         .order("created_at", { ascending: false });
+      if (error) throw error;
       return (data ?? []) as unknown as Pago[];
     },
   });

@@ -54,11 +54,12 @@ function Contrato({ userId }: { userId: string }) {
   const { data: perfil } = useQuery({
     queryKey: ["contrato", userId],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
         .select("contract_accepted_at")
         .eq("id", userId)
         .maybeSingle();
+      if (error) throw error;
       return data ?? null;
     },
   });

@@ -64,11 +64,16 @@ function MiHijo() {
   const [contacto, setContacto] = useState({ nombre: "", telefono: "" });
   const [hijoId, setHijoId] = useState<string | null>(null);
 
-  const { data } = useQuery({
+  const {
+    data,
+    isLoading: cargandoDatos,
+    isError: falloDatos,
+    refetch: recargarDatos,
+  } = useQuery({
     queryKey: ["mi-hijo", sesion?.userId],
     enabled: !!sesion,
     queryFn: async () => {
-      const { data: alumnos } = await supabase
+      const { data: alumnos, error: errorAlumnos } = await supabase
         .from("players")
         .select("*")
         .eq("parent_id", sesion!.userId)
@@ -91,6 +96,9 @@ function MiHijo() {
               .limit(20)
           : Promise.resolve({ data: [] as never[] }),
       ]);
+      if (errorAlumnos) throw errorAlumnos;
+      if (pagos.error) throw pagos.error;
+      if (asistencia.error) throw asistencia.error;
       return { alumnos: alumnos ?? [], pagos: pagos.data ?? [], asistencia: asistencia.data ?? [] };
     },
   });
