@@ -58,7 +58,7 @@ export function Shell({
     await queryClient.cancelQueries();
     queryClient.clear();
     limpiarBorradores();
-    await supabase.auth.signOut();
+    await limpiarSesion();
     navigate({ to: "/", replace: true });
   }
 
