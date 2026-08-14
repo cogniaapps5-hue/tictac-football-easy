@@ -313,6 +313,7 @@ export type Database = {
         Row: {
           access_status: Database["public"]["Enums"]["access_status"]
           age_group: Database["public"]["Enums"]["age_group"]
+          archived_at: string | null
           birth_date: string | null
           birth_year: number | null
           coach: string
@@ -335,6 +336,7 @@ export type Database = {
         Insert: {
           access_status?: Database["public"]["Enums"]["access_status"]
           age_group?: Database["public"]["Enums"]["age_group"]
+          archived_at?: string | null
           birth_date?: string | null
           birth_year?: number | null
           coach?: string
@@ -357,6 +359,7 @@ export type Database = {
         Update: {
           access_status?: Database["public"]["Enums"]["access_status"]
           age_group?: Database["public"]["Enums"]["age_group"]
+          archived_at?: string | null
           birth_date?: string | null
           birth_year?: number | null
           coach?: string
@@ -388,6 +391,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          access_status: string
+          archived_at: string | null
           contract_accepted_at: string | null
           created_at: string
           email: string
@@ -397,6 +402,8 @@ export type Database = {
           phone: string | null
         }
         Insert: {
+          access_status?: string
+          archived_at?: string | null
           contract_accepted_at?: string | null
           created_at?: string
           email: string
@@ -406,6 +413,8 @@ export type Database = {
           phone?: string | null
         }
         Update: {
+          access_status?: string
+          archived_at?: string | null
           contract_accepted_at?: string | null
           created_at?: string
           email?: string
@@ -480,7 +489,12 @@ export type Database = {
       }
     }
     Enums: {
-      access_status: "active" | "pending_review" | "blocked" | "exception"
+      access_status:
+        | "active"
+        | "pending_review"
+        | "blocked"
+        | "exception"
+        | "inactive"
       age_group: "iniciados" | "intermedios" | "avanzados"
       app_role: "admin" | "parent"
       training_day: "martes" | "jueves"
@@ -611,7 +625,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      access_status: ["active", "pending_review", "blocked", "exception"],
+      access_status: [
+        "active",
+        "pending_review",
+        "blocked",
+        "exception",
+        "inactive",
+      ],
       age_group: ["iniciados", "intermedios", "avanzados"],
       app_role: ["admin", "parent"],
       training_day: ["martes", "jueves"],
