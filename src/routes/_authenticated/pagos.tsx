@@ -30,6 +30,9 @@ export const Route = createFileRoute("/_authenticated/pagos")({
     ],
   }),
   component: Pagos,
+  errorComponent: ({ error }) => (
+    <PantallaError detalle={error instanceof Error ? error.message : undefined} />
+  ),
 });
 
 type Filtro = "pending" | "approved" | "rejected";

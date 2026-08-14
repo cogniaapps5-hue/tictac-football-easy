@@ -45,6 +45,9 @@ export const Route = createFileRoute("/_authenticated/alumnos")({
     ],
   }),
   component: Alumnos,
+  errorComponent: ({ error }) => (
+    <PantallaError detalle={error instanceof Error ? error.message : undefined} />
+  ),
 });
 
 function semaforo(estado: string) {

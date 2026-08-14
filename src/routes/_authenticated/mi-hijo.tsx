@@ -28,6 +28,9 @@ export const Route = createFileRoute("/_authenticated/mi-hijo")({
     ],
   }),
   component: MiHijo,
+  errorComponent: ({ error }) => (
+    <PantallaError detalle={error instanceof Error ? error.message : undefined} />
+  ),
 });
 
 function edadDe(fecha?: string | null) {

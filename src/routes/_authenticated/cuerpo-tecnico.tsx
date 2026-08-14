@@ -27,6 +27,9 @@ export const Route = createFileRoute("/_authenticated/cuerpo-tecnico")({
     ],
   }),
   component: CuerpoTecnico,
+  errorComponent: ({ error }) => (
+    <PantallaError detalle={error instanceof Error ? error.message : undefined} />
+  ),
 });
 
 type Formulario = { id?: string; name: string; role: string; photo_url: string; bio: string };

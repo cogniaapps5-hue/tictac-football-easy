@@ -40,6 +40,9 @@ export const Route = createFileRoute("/_authenticated/avisos")({
     ],
   }),
   component: Avisos,
+  errorComponent: ({ error }) => (
+    <PantallaError detalle={error instanceof Error ? error.message : undefined} />
+  ),
 });
 
 function Avisos() {

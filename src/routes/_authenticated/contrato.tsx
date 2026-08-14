@@ -24,6 +24,9 @@ export const Route = createFileRoute("/_authenticated/contrato")({
     ],
   }),
   component: ContratoPagina,
+  errorComponent: ({ error }) => (
+    <PantallaError detalle={error instanceof Error ? error.message : undefined} />
+  ),
 });
 
 function ContratoPagina() {
