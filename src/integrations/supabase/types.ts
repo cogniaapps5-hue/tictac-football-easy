@@ -49,29 +49,59 @@ export type Database = {
       coaches: {
         Row: {
           bio: string
+          certificate_date: string | null
+          certificate_folio: string | null
+          certificate_type: string | null
           created_at: string
+          graduation_year: number | null
           id: string
           name: string
           photo_url: string | null
+          qualification: string | null
+          registry_number: string | null
           role: string
+          rut: string | null
+          sort_order: number
+          title: string | null
+          university: string | null
           updated_at: string
         }
         Insert: {
           bio?: string
+          certificate_date?: string | null
+          certificate_folio?: string | null
+          certificate_type?: string | null
           created_at?: string
+          graduation_year?: number | null
           id?: string
           name: string
           photo_url?: string | null
+          qualification?: string | null
+          registry_number?: string | null
           role?: string
+          rut?: string | null
+          sort_order?: number
+          title?: string | null
+          university?: string | null
           updated_at?: string
         }
         Update: {
           bio?: string
+          certificate_date?: string | null
+          certificate_folio?: string | null
+          certificate_type?: string | null
           created_at?: string
+          graduation_year?: number | null
           id?: string
           name?: string
           photo_url?: string | null
+          qualification?: string | null
+          registry_number?: string | null
           role?: string
+          rut?: string | null
+          sort_order?: number
+          title?: string | null
+          university?: string | null
           updated_at?: string
         }
         Relationships: []
