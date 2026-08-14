@@ -1,5 +1,3 @@
-    navigate({ to: perfil?.must_change_password ? "/cambiar-clave" : "/inicio", replace: true });
-  }
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { LogIn, Loader2 } from "lucide-react";
