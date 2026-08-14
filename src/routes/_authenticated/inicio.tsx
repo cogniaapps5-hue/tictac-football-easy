@@ -68,7 +68,13 @@ function InicioAdmin() {
     },
   });
 
-  const { data } = useQuery({
+  const {
+    data,
+    isLoading: cargando,
+    isError: fallo,
+    error: errorResumen,
+    refetch,
+  } = useQuery({
     queryKey: ["resumen-admin", proximo.iso],
     queryFn: async () => {
       const [pagos, alumnos, asistencia] = await Promise.all([
@@ -76,6 +82,8 @@ function InicioAdmin() {
         supabase.from("players").select("id, access_status").neq("access_status", "inactive"),
         supabase.from("attendance").select("id, status").eq("session_date", proximo.iso),
       ]);
+      const fallida = [pagos, alumnos, asistencia].find((r) => r.error);
+      if (fallida?.error) throw fallida.error;
       const activos = (pagos.data ?? []).filter(
         (p) => (p.players as { access_status?: string } | null)?.access_status !== "inactive",
       );
@@ -98,6 +106,13 @@ function InicioAdmin() {
 
   return (
     <>
+      {cargando ? <PantallaCargando texto="Cargando resumen…" /> : null}
+      {fallo ? (
+        <PantallaError
+          detalle={errorResumen instanceof Error ? errorResumen.message : undefined}
+          onReintentar={() => void refetch()}
+        />
+      ) : null}
       <Tarjeta>
         <div className="flex items-start gap-4">
           <div
