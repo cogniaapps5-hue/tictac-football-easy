@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { limpiarSesion, sesionValida } from "@/lib/sesion";
+import { PantallaCargando, PantallaError } from "@/components/tictac/Estados";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -25,4 +26,9 @@ export const Route = createFileRoute("/_authenticated")({
     return { user };
   },
   component: () => <Outlet />,
+  pendingMs: 0,
+  pendingComponent: () => <PantallaCargando texto="Entrando…" />,
+  errorComponent: ({ error }) => (
+    <PantallaError detalle={error instanceof Error ? error.message : undefined} />
+  ),
 });
