@@ -14,9 +14,9 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { limpiarBorradores } from "@/lib/almacenamiento";
+import { limpiarSesion } from "@/lib/sesion";
 import logoAsset from "@/assets/tictac-logo.jpg.asset.json";
 import { cn } from "@/lib/utils";
 import type { Rol } from "@/lib/session";
