@@ -159,20 +159,12 @@ function NuestrosProfesores() {
               key={p.id}
               className="flex flex-col items-center rounded-2xl border border-border bg-secondary p-5 text-center shadow-lg"
             >
-              {p.photo_url ? (
-                <img
-                  src={p.photo_url}
-                  alt={`Foto del profesor ${p.name}`}
-                  loading="lazy"
-                  className={`size-[200px] max-w-full rounded-2xl border-2 object-cover ${colorBorde}`}
-                />
-              ) : (
-                <div
-                  className={`flex size-[200px] max-w-full items-center justify-center rounded-2xl border-2 bg-card text-6xl font-black ${colorBorde} ${colorTexto}`}
-                >
-                  {iniciales(p.name)}
-                </div>
-              )}
+              <FotoProfesor
+                url={p.photo_url}
+                nombre={p.name}
+                colorBorde={colorBorde}
+                colorTexto={colorTexto}
+              />
 
               <p className="mt-4 text-xl font-bold">{p.name}</p>
               <p className={`text-sm font-bold ${colorTexto}`}>{cargo}</p>
