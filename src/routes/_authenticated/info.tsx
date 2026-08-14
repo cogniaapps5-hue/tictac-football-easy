@@ -234,6 +234,50 @@ function iniciales(nombre: string) {
     .toUpperCase();
 }
 
+function FotoProfesor({
+  url,
+  nombre,
+  colorBorde,
+  colorTexto,
+}: {
+  url: string | null;
+  nombre: string;
+  colorBorde: string;
+  colorTexto: string;
+}) {
+  const [error, setError] = useState(false);
+
+  if (!url || error) {
+    return (
+      <div
+        className={`flex size-[200px] max-w-full items-center justify-center rounded-2xl border-2 bg-card text-6xl font-black ${colorBorde} ${colorTexto}`}
+      >
+        {iniciales(nombre)}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={url}
+      alt={`Foto del profesor ${nombre}`}
+      loading="lazy"
+      onError={() => setError(true)}
+      className={`size-[200px] max-w-full rounded-2xl border-2 object-cover ${colorBorde}`}
+    />
+  );
+}
+
+function inicialesLegacy(nombre: string) {
+  return nombre
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join("")
+    .toUpperCase();
+}
+
 function etiquetaCasa(universidad: string | null) {
   if (!universidad) return "";
   if (universidad.includes("Atacama")) return "UDA";
