@@ -61,11 +61,14 @@ function InicioAdmin() {
     queryKey: ["resumen-admin", proximo.iso],
     queryFn: async () => {
       const [pagos, alumnos, asistencia] = await Promise.all([
-        supabase.from("payments").select("id, status, due_date, amount"),
-        supabase.from("players").select("id, access_status"),
+        supabase.from("payments").select("id, status, due_date, amount, players(access_status)"),
+        supabase.from("players").select("id, access_status").neq("access_status", "inactive"),
         supabase.from("attendance").select("id, status").eq("session_date", proximo.iso),
       ]);
-      const pendientes = (pagos.data ?? []).filter((p) => p.status === "pending");
+      const activos = (pagos.data ?? []).filter(
+        (p) => (p.players as { access_status?: string } | null)?.access_status !== "inactive",
+      );
+      const pendientes = activos.filter((p) => p.status === "pending");
       const aprobados = (pagos.data ?? []).filter((p) => p.status === "approved");
       const atrasados = pendientes.filter(
         (p) => new Date(p.due_date).getTime() < Date.now() - 1000 * 60 * 60 * 24 * 60,
