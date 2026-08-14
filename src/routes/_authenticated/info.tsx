@@ -63,14 +63,20 @@ function Info() {
           <h2 className="text-xl font-bold">Contacto</h2>
         </div>
         <ul className="mt-3 space-y-2 text-base text-muted-foreground">
-          <li>💬 WhatsApp: +56 9 1234 5678</li>
-          <li>✉️ Correo: contacto@tictac.cl</li>
+          <li>✉️ Correo oficial: centrodeportivotictac@gmail.com</li>
+          <li>👤 Director: Luis Felipe Guerrero Ossa</li>
+          <li>💬 WhatsApp: grupo oficial de apoderados</li>
           <li>📸 Instagram: @tictac.siemprefeliz</li>
         </ul>
+        <div className="mt-4 rounded-xl bg-secondary p-4 text-base">
+          <p className="font-bold text-gold-brand">Datos para transferencia</p>
+          <p className="mt-2 text-muted-foreground">Paola Monserrat Ugalde Rojo</p>
+          <p className="text-muted-foreground">Banco Tenpo — Cuenta vista N° 11 11 1644 1964</p>
+          <p className="text-muted-foreground">RUT: 16.441.964-9</p>
+          <p className="text-muted-foreground">Correo: centrodeportivotictac@gmail.com</p>
+        </div>
         <Button asChild variant="accion" size="grande" className="mt-4">
-          <a href="https://wa.me/56912345678" target="_blank" rel="noreferrer">
-            Escribir por WhatsApp
-          </a>
+          <a href="mailto:centrodeportivotictac@gmail.com">Escribir un correo</a>
         </Button>
       </Tarjeta>
 
@@ -81,15 +87,15 @@ function Info() {
         </div>
         <ul className="mt-3 space-y-4">
           <li className="rounded-xl bg-secondary p-4">
-            <p className="text-base font-bold">Carlos Martínez</p>
+            <p className="text-base font-bold">Martes 19:00 a 20:00 hrs</p>
             <p className="text-base text-muted-foreground">
-              Martes 19:00 a 20:00 hrs — 📍 Rancho Rossi Peñuelas
+              📍 Forza Training Club — Las Azucenas #505, Sindempart, Coquimbo
             </p>
           </li>
           <li className="rounded-xl bg-secondary p-4">
-            <p className="text-base font-bold">Luis Fuentes</p>
+            <p className="text-base font-bold">Jueves 19:00 a 20:00 hrs</p>
             <p className="text-base text-muted-foreground">
-              Jueves 19:00 a 20:00 hrs — 📍 Forza Club Simdempart
+              📍 Rancho Rossi — Parcela 28, Vegas Sur Peñuelas, Coquimbo
             </p>
           </li>
         </ul>
@@ -104,8 +110,8 @@ function Info() {
           Las fotos de los partidos se comparten por WhatsApp con cada categoría.
         </p>
         <Button asChild variant="alerta" size="grande" className="mt-4">
-          <a href="https://wa.me/56912345678" target="_blank" rel="noreferrer">
-            Pedir fotos por WhatsApp
+          <a href="mailto:centrodeportivotictac@gmail.com?subject=Solicitud%20de%20fotos">
+            Pedir fotos por correo
           </a>
         </Button>
       </Tarjeta>
