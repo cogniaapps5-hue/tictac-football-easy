@@ -13,6 +13,8 @@ export function ContratosAdmin() {
         supabase.from("profiles").select("id, full_name, email, contract_accepted_at").order("full_name"),
         supabase.from("players").select("id, name, parent_id, parent_email"),
       ]);
+      if (perfiles.error) throw perfiles.error;
+      if (alumnos.error) throw alumnos.error;
       return (perfiles.data ?? []).map((p) => ({
         ...p,
         hijos: (alumnos.data ?? [])
