@@ -1,3 +1,4 @@
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useState } from "react";
@@ -23,11 +24,21 @@ export const Route = createFileRoute("/_authenticated/contrato")({
     ],
   }),
   component: ContratoPagina,
+  errorComponent: ({ error }) => (
+    <PantallaError detalle={error instanceof Error ? error.message : undefined} />
+  ),
 });
 
 function ContratoPagina() {
-  const { data: sesion } = useSesion();
-  if (!sesion) return null;
+  const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
+  if (cargandoSesion) return <PantallaCargando />;
+  if (errorSesion || !sesion)
+    return (
+      <PantallaError
+        titulo="No pudimos cargar tu sesión"
+        onReintentar={() => void recargarSesion()}
+      />
+    );
 
   return (
     <Shell rol={sesion.rol} titulo="Contrato y Reglamento" subtitulo="Lee y firma el reglamento interno">
@@ -43,11 +54,12 @@ function Contrato({ userId }: { userId: string }) {
   const { data: perfil } = useQuery({
     queryKey: ["contrato", userId],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
         .select("contract_accepted_at")
         .eq("id", userId)
         .maybeSingle();
+      if (error) throw error;
       return data ?? null;
     },
   });

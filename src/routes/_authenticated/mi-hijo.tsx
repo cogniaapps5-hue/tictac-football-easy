@@ -1,3 +1,4 @@
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -27,6 +28,9 @@ export const Route = createFileRoute("/_authenticated/mi-hijo")({
     ],
   }),
   component: MiHijo,
+  errorComponent: ({ error }) => (
+    <PantallaError detalle={error instanceof Error ? error.message : undefined} />
+  ),
 });
 
 function edadDe(fecha?: string | null) {
@@ -54,17 +58,22 @@ const MESES = [
 ];
 
 function MiHijo() {
-  const { data: sesion } = useSesion();
+  const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
   const queryClient = useQueryClient();
   const [editando, setEditando] = useState(false);
   const [contacto, setContacto] = useState({ nombre: "", telefono: "" });
   const [hijoId, setHijoId] = useState<string | null>(null);
 
-  const { data } = useQuery({
+  const {
+    data,
+    isLoading: cargandoDatos,
+    isError: falloDatos,
+    refetch: recargarDatos,
+  } = useQuery({
     queryKey: ["mi-hijo", sesion?.userId],
     enabled: !!sesion,
     queryFn: async () => {
-      const { data: alumnos } = await supabase
+      const { data: alumnos, error: errorAlumnos } = await supabase
         .from("players")
         .select("*")
         .eq("parent_id", sesion!.userId)
@@ -77,7 +86,7 @@ function MiHijo() {
               .select("*")
               .in("player_id", ids)
               .order("due_date", { ascending: false })
-          : Promise.resolve({ data: [] as never[] }),
+          : Promise.resolve({ data: [] as never[], error: null }),
         ids.length
           ? supabase
               .from("attendance")
@@ -85,8 +94,11 @@ function MiHijo() {
               .in("player_id", ids)
               .order("session_date", { ascending: false })
               .limit(20)
-          : Promise.resolve({ data: [] as never[] }),
+          : Promise.resolve({ data: [] as never[], error: null }),
       ]);
+      if (errorAlumnos) throw errorAlumnos;
+      if ("error" in pagos && pagos.error) throw pagos.error;
+      if ("error" in asistencia && asistencia.error) throw asistencia.error;
       return { alumnos: alumnos ?? [], pagos: pagos.data ?? [], asistencia: asistencia.data ?? [] };
     },
   });
@@ -134,10 +146,22 @@ function MiHijo() {
     ? Math.round((asistio / asistenciaMes.length) * 100)
     : null;
 
-  if (!sesion) return null;
+  if (cargandoSesion) return <PantallaCargando />;
+  if (errorSesion || !sesion)
+    return (
+      <PantallaError
+        titulo="No pudimos cargar tu sesión"
+        onReintentar={() => void recargarSesion()}
+      />
+    );
 
   return (
     <Shell rol={sesion.rol} titulo="Mi Hijo" subtitulo={alumno?.name}>
+      {cargandoDatos ? <PantallaCargando texto="Cargando información…" /> : null}
+      {falloDatos ? <PantallaError onReintentar={() => void recargarDatos()} /> : null}
+      {!cargandoDatos && !falloDatos && !hijos.length ? (
+        <EstadoVacio emoji="👦" texto="No hay alumnos asociados a tu cuenta. Escribe a la escuela." />
+      ) : null}
       {hijos.length > 1 ? (
         <Tarjeta>
           <h2 className="text-xl font-bold">👨‍👩‍👧‍👦 ¿Qué hijo quieres ver?</h2>

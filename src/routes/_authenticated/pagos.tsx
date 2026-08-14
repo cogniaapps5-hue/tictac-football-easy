@@ -1,3 +1,4 @@
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -29,6 +30,9 @@ export const Route = createFileRoute("/_authenticated/pagos")({
     ],
   }),
   component: Pagos,
+  errorComponent: ({ error }) => (
+    <PantallaError detalle={error instanceof Error ? error.message : undefined} />
+  ),
 });
 
 type Filtro = "pending" | "approved" | "rejected";
@@ -131,7 +135,7 @@ const FilaPago = memo(function FilaPago({
 });
 
 function Pagos() {
-  const { data: sesion } = useSesion();
+  const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
   const queryClient = useQueryClient();
   const [filtro, setFiltro] = useState<Filtro>("pending");
   const [grupo, setGrupo] = useState<string>("todos");
@@ -139,15 +143,22 @@ function Pagos() {
   const [rechazo, setRechazo] = useState<{ id: string; nombre: string } | null>(null);
   const [motivo, setMotivo] = useState("");
 
-  const { data: pagos } = useQuery({
+  const {
+    data: pagos,
+    isLoading: cargandoPagos,
+    isError: falloPagos,
+    error: errorPagos,
+    refetch: recargarPagos,
+  } = useQuery({
     queryKey: ["pagos"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("payments")
         .select(
           "id, status, amount, concept, due_date, receipt_url, rejection_reason, players(name, age_group, access_status)",
         )
         .order("created_at", { ascending: false });
+      if (error) throw error;
       return (data ?? []) as unknown as Pago[];
     },
   });
@@ -221,7 +232,14 @@ function Pagos() {
   }, []);
   const abrirFoto = useCallback((ruta: string) => void verFoto(ruta), [verFoto]);
 
-  if (!sesion) return null;
+  if (cargandoSesion) return <PantallaCargando />;
+  if (errorSesion || !sesion)
+    return (
+      <PantallaError
+        titulo="No pudimos cargar tu sesión"
+        onReintentar={() => void recargarSesion()}
+      />
+    );
   if (sesion.rol !== "admin") {
     return (
       <Shell rol="parent" titulo="Pagos">
@@ -244,6 +262,16 @@ function Pagos() {
 
   return (
     <Shell rol="admin" titulo="Pagos" subtitulo="Revisa los comprobantes">
+      {cargandoPagos ? <PantallaCargando texto="Cargando pagos…" /> : null}
+      {falloPagos ? (
+        <PantallaError
+          detalle={errorPagos instanceof Error ? errorPagos.message : undefined}
+          onReintentar={() => void recargarPagos()}
+        />
+      ) : null}
+      {!cargandoPagos && !falloPagos && !(pagos ?? []).length ? (
+        <EstadoVacio emoji="💳" texto="No hay pagos registrados todavía." />
+      ) : null}
       <Tarjeta>
         <div className="flex gap-4">
           {(

@@ -1,3 +1,4 @@
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useState } from "react";
@@ -26,6 +27,9 @@ export const Route = createFileRoute("/_authenticated/cuerpo-tecnico")({
     ],
   }),
   component: CuerpoTecnico,
+  errorComponent: ({ error }) => (
+    <PantallaError detalle={error instanceof Error ? error.message : undefined} />
+  ),
 });
 
 type Formulario = { id?: string; name: string; role: string; photo_url: string; bio: string };
@@ -33,14 +37,20 @@ type Formulario = { id?: string; name: string; role: string; photo_url: string; 
 const VACIO: Formulario = { name: "", role: "", photo_url: "", bio: "" };
 
 function CuerpoTecnico() {
-  const { data: sesion } = useSesion();
+  const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<Formulario | null>(null);
 
-  const { data: profesores } = useQuery({
+  const {
+    data: profesores,
+    isLoading: cargandoProfes,
+    isError: falloProfes,
+    refetch: recargarProfes,
+  } = useQuery({
     queryKey: ["coaches"],
     queryFn: async () => {
-      const { data } = await supabase.from("coaches").select("*").order("created_at");
+      const { data, error } = await supabase.from("coaches").select("*").order("created_at");
+      if (error) throw error;
       return data ?? [];
     },
   });
@@ -78,7 +88,14 @@ function CuerpoTecnico() {
     onError: () => toast.error("No pudimos eliminar al profesor."),
   });
 
-  if (!sesion) return null;
+  if (cargandoSesion) return <PantallaCargando />;
+  if (errorSesion || !sesion)
+    return (
+      <PantallaError
+        titulo="No pudimos cargar tu sesión"
+        onReintentar={() => void recargarSesion()}
+      />
+    );
   if (sesion.rol !== "admin") {
     return (
       <Shell rol={sesion.rol} titulo="Cuerpo Técnico">
@@ -91,6 +108,11 @@ function CuerpoTecnico() {
 
   return (
     <Shell rol="admin" titulo="Cuerpo Técnico" subtitulo="Profesores de la escuela">
+      {cargandoProfes ? <PantallaCargando texto="Cargando profesores…" /> : null}
+      {falloProfes ? <PantallaError onReintentar={() => void recargarProfes()} /> : null}
+      {!cargandoProfes && !falloProfes && !(profesores ?? []).length ? (
+        <EstadoVacio emoji="🧑‍🏫" texto="Aún no hay profesores cargados." />
+      ) : null}
       {form ? (
         <Tarjeta destacada>
           <h2 className="text-xl font-bold">{form.id ? "Editar profesor" : "Nuevo profesor"}</h2>

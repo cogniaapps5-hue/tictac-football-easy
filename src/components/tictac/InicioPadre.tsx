@@ -1,3 +1,4 @@
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -34,10 +35,16 @@ export function InicioPadre({
   const [hijoId, setHijoId] = useState<string | null>(null);
   const [verTodos, setVerTodos] = useState(false);
 
-  const { data } = useQuery({
+  const {
+    data,
+    isLoading: cargando,
+    isError: fallo,
+    error: errorDatos,
+    refetch,
+  } = useQuery({
     queryKey: ["resumen-padre", userId, fechasPosibles.join(",")],
     queryFn: async () => {
-      const { data: alumnos } = await supabase
+      const { data: alumnos, error: errorAlumnos } = await supabase
         .from("players")
         .select("*")
         .eq("parent_id", userId)
@@ -50,10 +57,14 @@ export function InicioPadre({
               .select("*")
               .in("player_id", ids)
               .in("session_date", fechasPosibles)
-          : Promise.resolve({ data: [] as never[] }),
+          : Promise.resolve({ data: [] as never[], error: null }),
         supabase.from("notices").select("*").order("created_at", { ascending: false }).limit(10),
         supabase.from("profiles").select("contract_accepted_at").eq("id", userId).maybeSingle(),
       ]);
+      if (errorAlumnos) throw errorAlumnos;
+      if ("error" in asistencia && asistencia.error) throw asistencia.error;
+      if (avisos.error) throw avisos.error;
+      if (perfil.error) throw perfil.error;
       return {
         alumnos: alumnos ?? [],
         asistencia: asistencia.data ?? [],
@@ -97,8 +108,23 @@ export function InicioPadre({
     onError: () => toast.error("No pudimos guardar tu respuesta. Intenta otra vez."),
   });
 
+  if (cargando) return <PantallaCargando texto="Cargando tu información…" />;
+  if (fallo)
+    return (
+      <PantallaError
+        detalle={errorDatos instanceof Error ? errorDatos.message : undefined}
+        onReintentar={() => void refetch()}
+      />
+    );
+
   return (
     <div className="animate-fade-in space-y-6">
+      {!hijos.length ? (
+        <EstadoVacio
+          emoji="👦"
+          texto="Todavía no hay alumnos asociados a tu cuenta. Escríbele a la escuela para activarlos."
+        />
+      ) : null}
       {hijos.length > 1 ? (
         <Tarjeta>
           <h2 className="text-xl font-bold">👨‍👩‍👧‍👦 ¿Qué hijo quieres ver?</h2>

@@ -1,3 +1,4 @@
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -39,23 +40,32 @@ export const Route = createFileRoute("/_authenticated/avisos")({
     ],
   }),
   component: Avisos,
+  errorComponent: ({ error }) => (
+    <PantallaError detalle={error instanceof Error ? error.message : undefined} />
+  ),
 });
 
 function Avisos() {
-  const { data: sesion } = useSesion();
+  const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
   const queryClient = useQueryClient();
   const [titulo, setTitulo] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [destino, setDestino] = useState("all");
   const [categoria, setCategoria] = useState("informacion_importante");
 
-  const { data: avisos } = useQuery({
+  const {
+    data: avisos,
+    isLoading: cargandoAvisos,
+    isError: falloAvisos,
+    refetch: recargarAvisos,
+  } = useQuery({
     queryKey: ["avisos"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("notices")
         .select("*")
         .order("created_at", { ascending: false });
+      if (error) throw error;
       return data ?? [];
     },
   });
@@ -79,7 +89,14 @@ function Avisos() {
     onError: () => toast.error("No pudimos enviar el aviso"),
   });
 
-  if (!sesion) return null;
+  if (cargandoSesion) return <PantallaCargando />;
+  if (errorSesion || !sesion)
+    return (
+      <PantallaError
+        titulo="No pudimos cargar tu sesión"
+        onReintentar={() => void recargarSesion()}
+      />
+    );
   if (sesion.rol !== "admin") {
     return (
       <Shell rol="parent" titulo="Avisos">
@@ -92,6 +109,11 @@ function Avisos() {
 
   return (
     <Shell rol="admin" titulo="Avisos" subtitulo="Avisa a los apoderados">
+      {cargandoAvisos ? <PantallaCargando texto="Cargando avisos…" /> : null}
+      {falloAvisos ? <PantallaError onReintentar={() => void recargarAvisos()} /> : null}
+      {!cargandoAvisos && !falloAvisos && !(avisos ?? []).length ? (
+        <EstadoVacio emoji="📢" texto="Aún no has enviado avisos." />
+      ) : null}
       <Tarjeta destacada>
         <h2 className="text-xl font-bold">📢 Enviar aviso</h2>
         <div className="mt-4 space-y-4">

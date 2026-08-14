@@ -1,3 +1,4 @@
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -44,6 +45,9 @@ export const Route = createFileRoute("/_authenticated/alumnos")({
     ],
   }),
   component: Alumnos,
+  errorComponent: ({ error }) => (
+    <PantallaError detalle={error instanceof Error ? error.message : undefined} />
+  ),
 });
 
 function semaforo(estado: string) {
@@ -55,7 +59,7 @@ function semaforo(estado: string) {
 }
 
 function Alumnos() {
-  const { data: sesion } = useSesion();
+  const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
   const queryClient = useQueryClient();
   const [busqueda, setBusqueda] = useState("");
   const [agregando, setAgregando] = useState(false);
@@ -74,13 +78,21 @@ function Alumnos() {
     parent_email: "",
   });
 
-  const { data } = useQuery({
+  const {
+    data,
+    isLoading: cargandoDatos,
+    isError: falloDatos,
+    error: errorDatos,
+    refetch: recargarDatos,
+  } = useQuery({
     queryKey: ["alumnos", proximo.iso],
     queryFn: async () => {
       const [alumnos, asistencia] = await Promise.all([
         supabase.from("players").select("*").order("name"),
         supabase.from("attendance").select("*").eq("session_date", proximo.iso),
       ]);
+      if (alumnos.error) throw alumnos.error;
+      if (asistencia.error) throw asistencia.error;
       return { alumnos: alumnos.data ?? [], asistencia: asistencia.data ?? [] };
     },
   });
@@ -168,7 +180,14 @@ function Alumnos() {
     onError: () => toast.error("No pudimos restablecer al alumno"),
   });
 
-  if (!sesion) return null;
+  if (cargandoSesion) return <PantallaCargando />;
+  if (errorSesion || !sesion)
+    return (
+      <PantallaError
+        titulo="No pudimos cargar tu sesión"
+        onReintentar={() => void recargarSesion()}
+      />
+    );
   if (sesion.rol !== "admin") {
     return (
       <Shell rol="parent" titulo="Alumnos">
@@ -324,6 +343,16 @@ function Alumnos() {
 
   return (
     <Shell rol="admin" titulo="Alumnos" subtitulo={`${data?.alumnos.length ?? 0} inscritos`}>
+      {cargandoDatos ? <PantallaCargando texto="Cargando alumnos…" /> : null}
+      {falloDatos ? (
+        <PantallaError
+          detalle={errorDatos instanceof Error ? errorDatos.message : undefined}
+          onReintentar={() => void recargarDatos()}
+        />
+      ) : null}
+      {!cargandoDatos && !falloDatos && !(data?.alumnos ?? []).length ? (
+        <EstadoVacio emoji="⚽" texto="No hay alumnos registrados todavía." />
+      ) : null}
       <Tarjeta destacada className="border-[3px]">
         <h2 className="text-2xl font-black">📋 Lista de Asistencia</h2>
         <p className="mt-2 text-xl font-bold text-cyan-brand">

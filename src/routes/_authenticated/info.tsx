@@ -1,3 +1,4 @@
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useState } from "react";
@@ -20,12 +21,22 @@ export const Route = createFileRoute("/_authenticated/info")({
     ],
   }),
   component: Info,
+  errorComponent: ({ error }) => (
+    <PantallaError detalle={error instanceof Error ? error.message : undefined} />
+  ),
 });
 
 function Info() {
-  const { data: sesion } = useSesion();
+  const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
   const [abierto, setAbierto] = useState<string | null>(null);
-  if (!sesion) return null;
+  if (cargandoSesion) return <PantallaCargando />;
+  if (errorSesion || !sesion)
+    return (
+      <PantallaError
+        titulo="No pudimos cargar tu sesión"
+        onReintentar={() => void recargarSesion()}
+      />
+    );
 
   const alternar = (clave: string) => setAbierto(abierto === clave ? null : clave);
 
@@ -122,14 +133,19 @@ function Info() {
 const REGISTRO_CIVIL = "https://www.registrocivil.gob.cl";
 
 function NuestrosProfesores() {
-  const { data: profesores } = useQuery({
+  const {
+    data: profesores,
+    isLoading: cargandoProfes,
+    isError: falloProfes,
+  } = useQuery({
     queryKey: ["coaches"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("coaches")
         .select("*")
         .order("sort_order")
         .order("created_at");
+      if (error) throw error;
       return data ?? [];
     },
   });

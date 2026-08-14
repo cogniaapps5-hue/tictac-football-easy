@@ -1,3 +1,4 @@
+import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Wallet, CalendarCheck, TriangleAlert, Lock, TrendingUp } from "lucide-react";
@@ -21,12 +22,22 @@ export const Route = createFileRoute("/_authenticated/inicio")({
     ],
   }),
   component: Inicio,
+  errorComponent: ({ error }) => (
+    <PantallaError detalle={error instanceof Error ? error.message : undefined} />
+  ),
 });
 
 function Inicio() {
-  const { data: sesion } = useSesion();
+  const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
   const saludoActual = useSaludo();
-  if (!sesion) return null;
+  if (cargandoSesion) return <PantallaCargando />;
+  if (errorSesion || !sesion)
+    return (
+      <PantallaError
+        titulo="No pudimos cargar tu sesión"
+        onReintentar={() => void recargarSesion()}
+      />
+    );
   return sesion.rol === "admin" ? (
     <Shell rol="admin" titulo={`${saludoActual}, ${sesion.nombre}`} subtitulo="Escuela TIC TAC">
       <InicioAdmin />
@@ -57,7 +68,13 @@ function InicioAdmin() {
     },
   });
 
-  const { data } = useQuery({
+  const {
+    data,
+    isLoading: cargando,
+    isError: fallo,
+    error: errorResumen,
+    refetch,
+  } = useQuery({
     queryKey: ["resumen-admin", proximo.iso],
     queryFn: async () => {
       const [pagos, alumnos, asistencia] = await Promise.all([
@@ -65,6 +82,8 @@ function InicioAdmin() {
         supabase.from("players").select("id, access_status").neq("access_status", "inactive"),
         supabase.from("attendance").select("id, status").eq("session_date", proximo.iso),
       ]);
+      const fallida = [pagos, alumnos, asistencia].find((r) => r.error);
+      if (fallida?.error) throw fallida.error;
       const activos = (pagos.data ?? []).filter(
         (p) => (p.players as { access_status?: string } | null)?.access_status !== "inactive",
       );
@@ -87,6 +106,13 @@ function InicioAdmin() {
 
   return (
     <>
+      {cargando ? <PantallaCargando texto="Cargando resumen…" /> : null}
+      {fallo ? (
+        <PantallaError
+          detalle={errorResumen instanceof Error ? errorResumen.message : undefined}
+          onReintentar={() => void refetch()}
+        />
+      ) : null}
       <Tarjeta>
         <div className="flex items-start gap-4">
           <div
