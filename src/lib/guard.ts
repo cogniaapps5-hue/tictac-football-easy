@@ -1,11 +1,11 @@
 import { redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import type { Rol } from "@/lib/session";
+import { sesionValida } from "@/lib/sesion";
 
 /** Rol real del usuario autenticado (null si no hay sesión o no tiene rol). */
 export async function rolActual(): Promise<Rol | null | "desconocido"> {
-  const { data: sesion } = await supabase.auth.getSession();
-  const user = sesion.session?.user;
+  const user = (await sesionValida())?.user;
   if (!user) return null;
   const { data: roles, error } = await supabase
     .from("user_roles")
