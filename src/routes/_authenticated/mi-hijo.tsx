@@ -86,7 +86,7 @@ function MiHijo() {
               .select("*")
               .in("player_id", ids)
               .order("due_date", { ascending: false })
-          : Promise.resolve({ data: [] as never[] }),
+          : Promise.resolve({ data: [] as never[], error: null }),
         ids.length
           ? supabase
               .from("attendance")
@@ -94,11 +94,11 @@ function MiHijo() {
               .in("player_id", ids)
               .order("session_date", { ascending: false })
               .limit(20)
-          : Promise.resolve({ data: [] as never[] }),
+          : Promise.resolve({ data: [] as never[], error: null }),
       ]);
       if (errorAlumnos) throw errorAlumnos;
-      if (pagos.error) throw pagos.error;
-      if (asistencia.error) throw asistencia.error;
+      if ("error" in pagos && pagos.error) throw pagos.error;
+      if ("error" in asistencia && asistencia.error) throw asistencia.error;
       return { alumnos: alumnos ?? [], pagos: pagos.data ?? [], asistencia: asistencia.data ?? [] };
     },
   });
