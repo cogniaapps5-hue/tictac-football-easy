@@ -54,13 +54,11 @@ export async function prepararArchivo(file: File, anchoMaximo = 800): Promise<Ar
     const ctx = canvas.getContext("2d");
     if (!ctx) throw new Error("sin canvas");
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    const usarWebp = soportaWebp();
-    const tipo = usarWebp ? "image/webp" : "image/jpeg";
     const blob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob(resolve, tipo, 0.82),
+      canvas.toBlob(resolve, "image/jpeg", 0.8),
     );
     if (!blob) throw new Error("sin blob");
-    return { blob, extension: usarWebp ? "webp" : "jpg", tipo };
+    return { blob, extension: "jpg", tipo: "image/jpeg" };
   } catch {
     const extension = (file.name.split(".").pop() || "jpg").toLowerCase().slice(0, 5);
     return { blob: file, extension, tipo: file.type || "image/jpeg" };
