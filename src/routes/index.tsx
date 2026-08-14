@@ -1,3 +1,5 @@
+    navigate({ to: perfil?.must_change_password ? "/cambiar-clave" : "/inicio", replace: true });
+  }
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { LogIn, Loader2 } from "lucide-react";
@@ -75,7 +77,6 @@ function Entrar() {
       toast.error("Correo o contraseña incorrectos. Verifica tus datos e intenta nuevamente.");
       return;
     }
-    toast.success("¡Bienvenido!");
     const { data: sesion } = await supabase.auth.getUser();
     if (sesion.user) await irADestino(sesion.user.id);
     else navigate({ to: "/inicio", replace: true });
