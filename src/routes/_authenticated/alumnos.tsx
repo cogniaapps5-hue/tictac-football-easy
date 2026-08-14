@@ -343,6 +343,16 @@ function Alumnos() {
 
   return (
     <Shell rol="admin" titulo="Alumnos" subtitulo={`${data?.alumnos.length ?? 0} inscritos`}>
+      {cargandoDatos ? <PantallaCargando texto="Cargando alumnos…" /> : null}
+      {falloDatos ? (
+        <PantallaError
+          detalle={errorDatos instanceof Error ? errorDatos.message : undefined}
+          onReintentar={() => void recargarDatos()}
+        />
+      ) : null}
+      {!cargandoDatos && !falloDatos && !(data?.alumnos ?? []).length ? (
+        <EstadoVacio emoji="⚽" texto="No hay alumnos registrados todavía." />
+      ) : null}
       <Tarjeta destacada className="border-[3px]">
         <h2 className="text-2xl font-black">📋 Lista de Asistencia</h2>
         <p className="mt-2 text-xl font-bold text-cyan-brand">

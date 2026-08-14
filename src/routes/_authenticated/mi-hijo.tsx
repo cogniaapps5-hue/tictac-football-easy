@@ -157,6 +157,11 @@ function MiHijo() {
 
   return (
     <Shell rol={sesion.rol} titulo="Mi Hijo" subtitulo={alumno?.name}>
+      {cargandoDatos ? <PantallaCargando texto="Cargando información…" /> : null}
+      {falloDatos ? <PantallaError onReintentar={() => void recargarDatos()} /> : null}
+      {!cargandoDatos && !falloDatos && !hijos.length ? (
+        <EstadoVacio emoji="👦" texto="No hay alumnos asociados a tu cuenta. Escribe a la escuela." />
+      ) : null}
       {hijos.length > 1 ? (
         <Tarjeta>
           <h2 className="text-xl font-bold">👨‍👩‍👧‍👦 ¿Qué hijo quieres ver?</h2>

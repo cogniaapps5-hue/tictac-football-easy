@@ -108,6 +108,11 @@ function CuerpoTecnico() {
 
   return (
     <Shell rol="admin" titulo="Cuerpo Técnico" subtitulo="Profesores de la escuela">
+      {cargandoProfes ? <PantallaCargando texto="Cargando profesores…" /> : null}
+      {falloProfes ? <PantallaError onReintentar={() => void recargarProfes()} /> : null}
+      {!cargandoProfes && !falloProfes && !(profesores ?? []).length ? (
+        <EstadoVacio emoji="🧑‍🏫" texto="Aún no hay profesores cargados." />
+      ) : null}
       {form ? (
         <Tarjeta destacada>
           <h2 className="text-xl font-bold">{form.id ? "Editar profesor" : "Nuevo profesor"}</h2>

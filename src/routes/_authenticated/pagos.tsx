@@ -262,6 +262,16 @@ function Pagos() {
 
   return (
     <Shell rol="admin" titulo="Pagos" subtitulo="Revisa los comprobantes">
+      {cargandoPagos ? <PantallaCargando texto="Cargando pagos…" /> : null}
+      {falloPagos ? (
+        <PantallaError
+          detalle={errorPagos instanceof Error ? errorPagos.message : undefined}
+          onReintentar={() => void recargarPagos()}
+        />
+      ) : null}
+      {!cargandoPagos && !falloPagos && !(pagos ?? []).length ? (
+        <EstadoVacio emoji="💳" texto="No hay pagos registrados todavía." />
+      ) : null}
       <Tarjeta>
         <div className="flex gap-4">
           {(

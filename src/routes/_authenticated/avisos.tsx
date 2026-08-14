@@ -109,6 +109,11 @@ function Avisos() {
 
   return (
     <Shell rol="admin" titulo="Avisos" subtitulo="Avisa a los apoderados">
+      {cargandoAvisos ? <PantallaCargando texto="Cargando avisos…" /> : null}
+      {falloAvisos ? <PantallaError onReintentar={() => void recargarAvisos()} /> : null}
+      {!cargandoAvisos && !falloAvisos && !(avisos ?? []).length ? (
+        <EstadoVacio emoji="📢" texto="Aún no has enviado avisos." />
+      ) : null}
       <Tarjeta destacada>
         <h2 className="text-xl font-bold">📢 Enviar aviso</h2>
         <div className="mt-4 space-y-4">
