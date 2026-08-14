@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Search, UserPlus, Check, X } from "lucide-react";
+import { Search, UserPlus, Check, X, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +12,17 @@ import { Label } from "@/components/ui/label";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { CargaMasiva } from "@/components/tictac/CargaMasiva";
 import { MatriculaManual } from "@/components/tictac/Matricula";
+import { archivarAlumno, restablecerAlumno } from "@/lib/archivar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   useSesion,
   proximoEntrenamiento,
@@ -39,6 +50,7 @@ function semaforo(estado: string) {
   if (estado === "blocked") return "🔴 Bloqueado";
   if (estado === "pending_review") return "🟡 En revisión";
   if (estado === "exception") return "⚪ Excepción";
+  if (estado === "inactive") return "⚫ Archivado";
   return "🟢 Activo";
 }
 
