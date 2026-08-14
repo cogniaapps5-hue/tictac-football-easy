@@ -18,12 +18,6 @@ export function esImagen(file: File) {
   return file.type.startsWith("image/") || /\.(jpe?g|png|webp|heic|heif|gif|bmp)$/i.test(file.name);
 }
 
-function soportaWebp() {
-  if (typeof document === "undefined") return false;
-  const canvas = document.createElement("canvas");
-  return canvas.toDataURL("image/webp").startsWith("data:image/webp");
-}
-
 async function cargarImagen(file: File): Promise<HTMLImageElement> {
   const url = URL.createObjectURL(file);
   try {
