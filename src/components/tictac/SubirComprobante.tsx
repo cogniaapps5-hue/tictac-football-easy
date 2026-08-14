@@ -75,21 +75,48 @@ export function SubirComprobante({
     mutationFn: async () => {
       if (!archivo) return;
       setError(null);
-      setProgreso(15);
+      setProgreso(10);
+      console.log("[comprobante] paso 1: archivo elegido", archivo.name, archivo.size);
+
+      // Paso 2: confirmar sesión activa (sin cerrarla nunca desde aquí).
+      const { data: sesion } = await supabase.auth.getSession();
+      const uid = sesion.session?.user?.id ?? userId;
+      if (!uid) throw new Error("Tu sesión se pausó. Vuelve a entrar y reintenta.");
+      console.log("[comprobante] paso 2: sesión activa", Boolean(sesion.session));
+
+      setProgreso(25);
       const listo = await prepararArchivo(archivo);
+      console.log("[comprobante] paso 3: comprimido", listo.tipo, listo.blob.size);
       setProgreso(45);
-      const ruta = `${userId}/${playerId}-${Date.now()}.${listo.extension}`;
-      const { error: errSubida } = await supabase.storage
-        .from("comprobantes")
-        .upload(ruta, listo.blob, { contentType: listo.tipo, upsert: false });
-      if (errSubida) throw new Error("No pudimos subir el archivo. Revisa tu conexión.");
+
+      // Paso 4: subir con un reintento automático si falla la red.
+      let ruta = "";
+      let ultimo: string | null = null;
+      for (let intento = 1; intento <= 2; intento++) {
+        ruta = `${uid}/${playerId}-${Date.now()}.${listo.extension}`;
+        const { error: errSubida } = await supabase.storage
+          .from("comprobantes")
+          .upload(ruta, listo.blob, { contentType: listo.tipo, upsert: false });
+        if (!errSubida) {
+          ultimo = null;
+          break;
+        }
+        ultimo = errSubida.message;
+        console.error(`[comprobante] error de subida (intento ${intento})`, errSubida);
+        if (intento === 1) await new Promise((r) => setTimeout(r, 1200));
+      }
+      if (ultimo) throw new Error("Error al subir comprobante. Intenta nuevamente");
+      console.log("[comprobante] paso 4: subido a storage", ruta);
       setProgreso(80);
       if (pagoId) {
         const { error: errPago } = await supabase
           .from("payments")
           .update({ receipt_url: ruta })
           .eq("id", pagoId);
-        if (errPago) throw new Error("Subimos la foto pero no pudimos guardarla en tu pago.");
+        if (errPago) {
+          console.error("[comprobante] error al guardar en payments", errPago);
+          throw new Error("Subimos la foto pero no pudimos guardarla en tu pago.");
+        }
       } else {
         const hoy = new Date();
         const vence = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-06`;
@@ -100,8 +127,12 @@ export function SubirComprobante({
           concept: "Mensualidad",
           due_date: vence,
         });
-        if (errNuevo) throw new Error("Subimos la foto pero no pudimos registrar tu pago.");
+        if (errNuevo) {
+          console.error("[comprobante] error al crear el pago", errNuevo);
+          throw new Error("Subimos la foto pero no pudimos registrar tu pago.");
+        }
       }
+      console.log("[comprobante] paso 5: URL guardada en payments");
       setProgreso(100);
     },
     onSuccess: () => {
@@ -112,8 +143,13 @@ export function SubirComprobante({
       cerrar();
     },
     onError: (e: unknown) => {
+      // Nunca cerramos sesión ni navegamos: el apoderado se queda aquí y reintenta.
+      console.error("[comprobante] falló el envío", e);
       setProgreso(0);
-      setError(e instanceof Error ? e.message : "No pudimos enviar tu comprobante.");
+      const mensaje =
+        e instanceof Error ? e.message : "Error al subir comprobante. Intenta nuevamente";
+      setError(mensaje);
+      toast.error(mensaje);
     },
   });
 
