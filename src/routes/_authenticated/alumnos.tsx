@@ -61,6 +61,8 @@ function Alumnos() {
   const [agregando, setAgregando] = useState(false);
   const [grupoFiltro, setGrupoFiltro] = useState<string>("todos");
   const [soloAlDia, setSoloAlDia] = useState(false);
+  const [vista, setVista] = useState<"activos" | "archivados">("activos");
+  const [porArchivar, setPorArchivar] = useState<{ id: string; nombre: string } | null>(null);
   const [diaFiltro, setDiaFiltro] = useState<DiaEntrenamiento>(proximoEntrenamiento().dia);
   const proximo = proximoEntrenamiento(diaFiltro);
   const sedeActual = sedeDe(diaFiltro);
@@ -141,6 +143,31 @@ function Alumnos() {
     onError: () => toast.error("No pudimos cambiar el acceso"),
   });
 
+  const archivar = useMutation({
+    mutationFn: (playerId: string) => archivarAlumno(playerId),
+    onSuccess: (resultado) => {
+      queryClient.invalidateQueries({ queryKey: ["alumnos"] });
+      queryClient.invalidateQueries({ queryKey: ["resumen-admin"] });
+      setPorArchivar(null);
+      toast.success(
+        resultado.apoderadoBloqueado
+          ? "Alumno archivado. El apoderado quedó sin acceso."
+          : "Alumno archivado. El apoderado mantiene acceso por sus otros hijos.",
+      );
+    },
+    onError: () => toast.error("No pudimos archivar al alumno"),
+  });
+
+  const restablecer = useMutation({
+    mutationFn: (playerId: string) => restablecerAlumno(playerId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["alumnos"] });
+      queryClient.invalidateQueries({ queryKey: ["resumen-admin"] });
+      toast.success("Alumno restablecido");
+    },
+    onError: () => toast.error("No pudimos restablecer al alumno"),
+  });
+
   if (!sesion) return null;
   if (sesion.rol !== "admin") {
     return (
@@ -153,15 +180,19 @@ function Alumnos() {
   }
 
   const texto = busqueda.trim().toLowerCase();
+  const archivados = vista === "archivados";
   const lista = (data?.alumnos ?? []).filter(
     (a) =>
+      (archivados ? a.access_status === "inactive" : a.access_status !== "inactive") &&
       (!texto ||
         a.name.toLowerCase().includes(texto) ||
         (a.rut ?? "").toLowerCase().includes(texto)) &&
       (grupoFiltro === "todos" || a.age_group === grupoFiltro) &&
-      a.training_day === diaFiltro &&
+      (archivados || a.training_day === diaFiltro) &&
       (!soloAlDia || a.access_status === "active" || a.access_status === "exception"),
   );
+  const totalActivos = (data?.alumnos ?? []).filter((a) => a.access_status !== "inactive").length;
+  const totalArchivados = (data?.alumnos ?? []).filter((a) => a.access_status === "inactive").length;
 
   const gruposVisibles = GRUPOS.filter(
     (g) => grupoFiltro === "todos" || grupoFiltro === g.valor,
