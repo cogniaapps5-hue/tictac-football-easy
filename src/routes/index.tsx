@@ -48,7 +48,7 @@ function Entrar() {
   async function irADestino(userId: string) {
     const { data: perfil } = await supabase
       .from("profiles")
-      .select("must_change_password, access_status")
+      .select("access_status")
       .eq("id", userId)
       .maybeSingle();
     if (perfil?.access_status === "inactive") {
@@ -57,7 +57,8 @@ function Entrar() {
       return;
     }
     toast.success("¡Bienvenido!");
-    navigate({ to: perfil?.must_change_password ? "/cambiar-clave" : "/inicio", replace: true });
+    // Siempre directo al inicio: sin pantalla intermedia de cambio de clave.
+    navigate({ to: "/inicio", replace: true });
   }
 
   async function entrar(correo: string, clave: string) {

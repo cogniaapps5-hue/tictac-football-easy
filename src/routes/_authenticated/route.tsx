@@ -10,17 +10,13 @@ export const Route = createFileRoute("/_authenticated")({
     const user = sesion.session?.user;
     if (!user) throw redirect({ to: "/" });
     const [perfilRes, rolesRes] = await Promise.all([
-      supabase
-        .from("profiles")
-        .select("must_change_password")
-        .eq("id", user.id)
-        .maybeSingle(),
+      supabase.from("profiles").select("id").eq("id", user.id).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", user.id),
     ]);
     // Si la consulta falló por red, dejamos pasar: las vistas ya manejan datos vacíos.
     if (perfilRes.error || rolesRes.error) return { user };
     if (!perfilRes.data || !rolesRes.data?.length) throw redirect({ to: "/error-acceso" });
-    if (perfilRes.data.must_change_password) throw redirect({ to: "/cambiar-clave" });
+    // Sin redirección forzada a "/cambiar-clave": el cambio de clave es opcional.
     return { user };
   },
   component: () => <Outlet />,

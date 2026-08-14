@@ -29,7 +29,8 @@ export const Route = createFileRoute("/cambiar-clave")({
 
 function CambiarClave() {
   const navigate = useNavigate();
-  const [obligatorio, setObligatorio] = useState(true);
+  // Nunca es obligatorio: siempre se puede volver al inicio.
+  const [obligatorio] = useState(false);
   const [correo, setCorreo] = useState("");
   const [actual, setActual] = useState("");
   const [clave, setClave] = useState("");
@@ -41,12 +42,6 @@ function CambiarClave() {
       if (!data.user) navigate({ to: "/", replace: true });
       else {
         setCorreo(data.user.email ?? "");
-        const { data: perfil } = await supabase
-          .from("profiles")
-          .select("must_change_password")
-          .eq("id", data.user.id)
-          .maybeSingle();
-        setObligatorio(Boolean(perfil?.must_change_password));
       }
     });
   }, [navigate]);
