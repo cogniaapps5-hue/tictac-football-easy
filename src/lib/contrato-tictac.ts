@@ -1,57 +1,9 @@
-// Texto íntegro del contrato oficial entregado por la escuela (2026).
+// Texto legal oficial del contrato TIC TAC Siempre Feliz (2026).
 export type BloqueContrato = { t: "h" | "p"; x: string };
 
 export const CONTRATO_TIC_TAC: BloqueContrato[] = [
   {
     "t": "h",
-    "x": "\"TIC TAC Siempre Feliz: Todos jugamos, todos aprendemos, todos pertenecemos.\""
-  },
-  {
-    "t": "h",
-    "x": "OBJETIVO GENERAL"
-  },
-  {
-    "t": "p",
-    "x": "Desarrollar una escuela de fútbol formativa e inclusiva que promueva el desarrollo integral de niños, niñas mediante la práctica deportiva, fortaleciendo sus habilidades futbolísticas, físicas, emocionales y sociales en un ambiente seguro, respetuoso, recreativo y libre de discriminación, donde cada participante pueda aprender, disfrutar y desarrollarse de acuerdo con sus propias capacidades, siendo felices."
-  },
-  {
-    "t": "h",
-    "x": "OBJETIVO ESPECÍFICO"
-  },
-  {
-    "t": "p",
-    "x": "Desarrollar y fortalecer las habilidades técnicas, físicas, sociales y emocionales de niños, niñas a través de actividades de formación en fútbol, promoviendo la inclusión, el respeto y el trabajo en equipo en un entorno seguro y libre de discriminación"
-  },
-  {
-    "t": "h",
-    "x": "MISIÓN"
-  },
-  {
-    "t": "p",
-    "x": "La Escuela de Fútbol Formativa e Inclusiva TIC TAC Siempre Feliz tiene como misión formar niños, niñas a través del fútbol, entregando un espacio seguro, acogedor y respetuoso donde todos puedan participar independiente de sus habilidades, características o nivel deportivo."
-  },
-  {
-    "t": "p",
-    "x": "Buscamos potenciar no solo el aprendizaje y desarrollo de habilidades futbolísticas, sino también valores como el respeto, la empatía, el compañerismo, la responsabilidad, el autocuidado y la inclusión. Promovemos el juego, la recreación y el bienestar físico y emocional por sobre la competencia, acompañando a cada niño y niña en su proceso de crecimiento."
-  },
-  {
-    "t": "h",
-    "x": "VISIÓN"
-  },
-  {
-    "t": "p",
-    "x": "Ser una escuela de fútbol formativa e inclusiva reconocida a nivel local y regional por generar oportunidades de participación deportiva para todos los niños, niñas, convirtiéndose en un referente de inclusión, formación integral y bienestar a través del fútbol."
-  },
-  {
-    "t": "p",
-    "x": "A futuro, TIC TAC Siempre Feliz busca consolidarse como un proyecto deportivo y social sostenible, ampliando sus categorías, programas y alianzas, incorporando profesionales y especialistas que permitan atender diversas necesidades, desarrollando actividades comunitarias y creando espacios"
-  },
-  {
-    "t": "p",
-    "x": "donde el fútbol sea una herramienta para educar, integrar y transformar positivamente la vida de niños, niñas, familias y comunidades."
-  },
-  {
-    "t": "p",
     "x": "Por favor, revise con detención las presentes condiciones y protocolos de la Escuela TIC TAC Siempre Feliz"
   },
   {
@@ -80,7 +32,7 @@ export const CONTRATO_TIC_TAC: BloqueContrato[] = [
   },
   {
     "t": "p",
-    "x": "El/la Apoderado/a acuerda pagar una inscripción inicial de 5.000 pesos y cancelar el valor de la polera de entrenamiento de $10.000 pesos, además de una mensualidad de 20.000 pesos."
+    "x": "El/la Apoderado/a acuerda pagar una inscripción inicial de $5.000 pesos y cancelar el valor de la polera de entrenamiento de $10.000 pesos, además de una mensualidad de $20.000 pesos."
   },
   {
     "t": "p",
@@ -108,11 +60,11 @@ export const CONTRATO_TIC_TAC: BloqueContrato[] = [
   },
   {
     "t": "p",
-    "x": "El pago se debe realizar los 5 primeros días de cada mes o de acuerdo a la fecha acordada."
+    "x": "El valor de la matrícula y mensualidad se reajustará anualmente. El nuevo valor será informado al/la Apoderado/a durante el mes de diciembre, previo al inicio del nuevo año de actividades, y será aplicable a contar del mes de enero del año siguiente."
   },
   {
     "t": "p",
-    "x": "El valor de la matricula y mensualidad se reajustará cada año."
+    "x": "En caso de que un/a alumno/a se incorpore a la escuela durante el transcurso del mes, independiente de la fecha de ingreso, deberá cancelar igualmente la totalidad de los valores correspondientes a la inscripción, a la polera de entrenamiento y la mensualidad. El pago de estos conceptos no será proporcional ni se calculará en función de los días restantes del mes. Asimismo, a partir del mes siguiente, el/la Apoderado/a deberá efectuar el pago de la mensualidad dentro de los primeros 5 días de cada mes, siendo el día 5 la fecha máxima establecida para efectuar dicho pago."
   },
   {
     "t": "h",
@@ -128,7 +80,7 @@ export const CONTRATO_TIC_TAC: BloqueContrato[] = [
   },
   {
     "t": "p",
-    "x": "Las clases se realizan en la Forza Training Club, Las Azucenas #505 Sindempart, Coquimbo, los días marte de 19:00 hrs hasta 20:00 hrs y en Rancho Rossi, parcela 28 vegas sur Peñuelas, Coquimbo, los días jueves de 19:00 hrs hasta 20:00 hrs. Sin embargo, ante algún evento deportivo o no deportivo que impida la correcta realización de una clase, ésta se cambiará a otra dependencia siempre y cuando exista disponibilidad del nuevo espacio."
+    "x": "Las clases se realizan en la Forza Training Club, Las Azucenas #505 Sindempart, Coquimbo, los días martes de 19:00 hrs hasta 20:00 hrs y en Rancho Rossi, parcela 28 vegas sur Peñuelas, Coquimbo, los días jueves de 19:00 hrs hasta 20:00 hrs. Sin embargo, ante algún evento deportivo o no deportivo que impida la correcta realización de una clase, ésta se cambiará a otra dependencia siempre y cuando exista disponibilidad del nuevo espacio."
   },
   {
     "t": "p",
@@ -148,35 +100,35 @@ export const CONTRATO_TIC_TAC: BloqueContrato[] = [
   },
   {
     "t": "p",
-    "x": "Informar a la Escuela TIC TAC Siempre Feliz, cualquier condición médica del menor que pueda ser relevante para su participación en los programas de entrenamiento."
+    "x": "- Informar a la Escuela TIC TAC Siempre Feliz, cualquier condición médica del menor que pueda ser relevante para su participación en los programas de entrenamiento."
   },
   {
     "t": "p",
-    "x": "Acompañar al alumno/a en cada entrenamiento o designar a un adulto responsable en su reemplazo."
+    "x": "- Acompañar al alumno/a en cada entrenamiento o designar a un adulto responsable en su reemplazo."
   },
   {
     "t": "p",
-    "x": "Enviar una colación saludable de fácil manipulación y agua a su hijo/a por cada sesión de entrenamiento."
+    "x": "- Enviar una colación saludable de fácil manipulación y agua a su hijo/a por cada sesión de entrenamiento."
   },
   {
     "t": "p",
-    "x": "Se compromete a garantizar que el menor asista puntualmente a las sesiones de entrenamiento y siga las reglas de Escuela TIC TAC Siempre Feliz."
+    "x": "- Se compromete a garantizar que el menor asista puntualmente a las sesiones de entrenamiento y siga las reglas de Escuela TIC TAC Siempre Feliz."
   },
   {
     "t": "p",
-    "x": "El/la alumno/a debe ser recogido puntualmente al finalizar las sesiones de entrenamiento."
+    "x": "- El/la alumno/a debe ser recogido puntualmente al finalizar las sesiones de entrenamiento."
   },
   {
     "t": "p",
-    "x": "Ingresar al espacio de entrenamiento solo con la autorización de los profesores a cargo del entrenamiento."
+    "x": "- Ingresar al espacio de entrenamiento solo con la autorización de los profesores a cargo del entrenamiento."
   },
   {
     "t": "p",
-    "x": "No interferir en el entrenamiento ni distraer al alumno/a mientras participa en cada sesión. Específicamente evitando situaciones como: realizar llamados de atención, gritar instrucciones, ingresar al entrenamiento, llamar a los profesores durante entrenamientos."
+    "x": "- No interferir en el entrenamiento ni distraer al alumno/a mientras participa en cada sesión. Específicamente evitando situaciones como: realizar llamados de atención, gritar instrucciones, ingresar al entrenamiento, llamar a los profesores durante entrenamientos."
   },
   {
     "t": "p",
-    "x": "Enviar resultado y análisis médico de electrocardiograma (se solicita una vez por año)"
+    "x": "- Enviar resultado y análisis médico de electrocardiograma (se solicita una vez por año)."
   },
   {
     "t": "h",
@@ -276,7 +228,7 @@ export const CONTRATO_TIC_TAC: BloqueContrato[] = [
   },
   {
     "t": "p",
-    "x": "El canal oficial de comunicación entre la Escuela TIC TAC Siempre Feliz y apoderados, es el grupo de WhatsApp. Este canal de comunicación, estará a abierto y a disposición ante cualquier inquietud, los días de lunes a domingo, exceptuando los horarios de entrenamientos."
+    "x": "El canal oficial de comunicación entre la Escuela TIC TAC Siempre Feliz y apoderados, es el grupo de WhatsApp. Este canal de comunicación, estará abierto y a disposición ante cualquier inquietud, los días de lunes a domingo, exceptuando los horarios de entrenamientos."
   },
   {
     "t": "p",
@@ -296,11 +248,11 @@ export const CONTRATO_TIC_TAC: BloqueContrato[] = [
   },
   {
     "t": "p",
-    "x": "Autoriza fotografías y/o videos de su hijo/a para que se publiquen en las redes sociales de la Escuela TIC TAC Siempre Feliz."
+    "x": "- Autoriza fotografías y/o videos de su hijo/a para que se publiquen en las redes sociales de la Escuela TIC TAC Siempre Feliz."
   },
   {
     "t": "p",
-    "x": "Autoriza a su hijo/a a realizar entrenamiento de mediana a una alta intensidad: correr, saltar y participar de encuentros amistosos."
+    "x": "- Autoriza a su hijo/a a realizar entrenamiento de mediana a una alta intensidad: correr, saltar y participar de encuentros amistosos."
   },
   {
     "t": "p",
@@ -308,6 +260,6 @@ export const CONTRATO_TIC_TAC: BloqueContrato[] = [
   },
   {
     "t": "p",
-    "x": "Declaro conocer y aceptar cada uno de los puntos expuestos en el contrato. Comprometiéndome a cumplirlos y a fomentar el lema de la escuela en cada entrenamiento y actividades"
+    "x": "Declaro conocer y aceptar cada uno de los puntos expuestos en el contrato. Comprometiéndome a cumplirlos y a fomentar el lema de la escuela en cada entrenamiento y actividades."
   }
 ];
