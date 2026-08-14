@@ -268,16 +268,6 @@ function FotoProfesor({
   );
 }
 
-function inicialesLegacy(nombre: string) {
-  return nombre
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0])
-    .join("")
-    .toUpperCase();
-}
-
 function etiquetaCasa(universidad: string | null) {
   if (!universidad) return "";
   if (universidad.includes("Atacama")) return "UDA";
