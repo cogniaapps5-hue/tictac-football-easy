@@ -263,7 +263,7 @@ function FotoProfesor({
       alt={`Foto del profesor ${nombre}`}
       loading="lazy"
       onError={() => setError(true)}
-      className={`size-[200px] max-w-full rounded-2xl border-2 object-cover ${colorBorde}`}
+      className={`h-[280px] w-full rounded-2xl border-2 bg-card object-contain ${colorBorde}`}
     />
   );
 }
