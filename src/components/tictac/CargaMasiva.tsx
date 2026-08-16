@@ -22,7 +22,7 @@ import {
   type ResultadoCarga,
 } from "@/lib/carga-masiva.functions";
 
-const GRUPOS = { iniciados: "Iniciados", intermedios: "Intermedios", avanzados: "Avanzados" };
+const GRUPOS = { iniciados: "Grupo 1", intermedios: "Grupo 2", avanzados: "Grupo 3" };
 
 function edadYGrupo(fechaTexto: string) {
   const iso = parseFechaNacimiento(fechaTexto);

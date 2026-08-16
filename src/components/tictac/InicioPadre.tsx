@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tarjeta, Estado } from "@/components/tictac/Shell";
-import { SEDES, categoriaAviso, grupoEtiqueta, proximoEntrenamiento } from "@/lib/session";
+import { SEDES, categoriaAviso, grupoCorto, grupoEtiqueta, proximoEntrenamiento } from "@/lib/session";
 
 function edadDe(fecha?: string | null) {
   if (!fecha) return null;
@@ -153,7 +153,7 @@ export function InicioPadre({
         <p className="mt-2 text-lg font-semibold text-muted-foreground">
           Hola {nombreApoderado} 👋
         </p>
-        <p className="mt-4 text-[20px] font-bold italic text-gold-brand">
+        <p className="mt-4 text-center text-[20px] font-bold italic text-gold-brand">
           “Todos jugamos, todos aprendemos y todos pertenecemos”
         </p>
       </section>
@@ -257,7 +257,7 @@ export function InicioPadre({
             <div className="min-w-0">
               <h2 className="truncate text-xl font-bold">{alumno.name}</h2>
               <p className="text-base text-muted-foreground">
-                Categoría {grupoEtiqueta(alumno.age_group).split(" ")[0]}
+                Categoría {grupoCorto(alumno.age_group)}
               </p>
               {edadDe(alumno.birth_date) !== null ? (
                 <p className="text-base text-muted-foreground">{edadDe(alumno.birth_date)} años</p>
