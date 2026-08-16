@@ -42,8 +42,6 @@ function edadDe(fecha?: string | null) {
   return edad;
 }
 
-const MESES = [
-
 /**
  * Equipo docente y sede según el día de entrenamiento más próximo
  * (martes o jueves). Los martes y jueves muestran el equipo del día.
@@ -56,7 +54,7 @@ function equipoDelDia(fecha: Date) {
   return martes;
 }
 
-const MESES_LISTA = [
+const MESES = [
   "enero",
   "febrero",
   "marzo",
@@ -70,7 +68,6 @@ const MESES_LISTA = [
   "noviembre",
   "diciembre",
 ];
-const MESES = MESES_LISTA;
 
 function MiHijo() {
   const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
