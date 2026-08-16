@@ -43,6 +43,20 @@ function edadDe(fecha?: string | null) {
 }
 
 const MESES = [
+
+/**
+ * Equipo docente y sede según el día de entrenamiento más próximo
+ * (martes o jueves). Los martes y jueves muestran el equipo del día.
+ */
+function equipoDelDia(fecha: Date) {
+  const martes = { profesores: "Profesores: Sebastián y Felipe", sede: "Rancho Rossi" };
+  const jueves = { profesores: "Profesores: Sebastián y Christopher", sede: "Forza Training Club" };
+  const d = fecha.getDay();
+  if (d === 4 || d === 5 || d === 6) return jueves;
+  return martes;
+}
+
+const MESES_LISTA = [
   "enero",
   "febrero",
   "marzo",
@@ -56,6 +70,7 @@ const MESES = [
   "noviembre",
   "diciembre",
 ];
+const MESES = MESES_LISTA;
 
 function MiHijo() {
   const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
@@ -137,6 +152,7 @@ function MiHijo() {
   const pagoAprobado = pagosMes.find((p) => p.status === "approved");
   const pagoEnRevision = pagosMes.find((p) => p.status === "pending" && p.receipt_url);
   const mesActual = MESES[hoy.getMonth()];
+  const equipoDia = equipoDelDia(hoy);
 
   const asistenciaMes = asistenciaAlumno.filter(
     (a) => a.session_date >= inicioMes && a.session_date < finMes,
