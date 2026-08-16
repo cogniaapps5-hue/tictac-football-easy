@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { SubirComprobante } from "@/components/tictac/SubirComprobante";
-import { useSesion, pesos, fechaCorta, grupoEtiqueta } from "@/lib/session";
+import { useSesion, pesos, fechaCorta, grupoCorto } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/mi-hijo")({
   beforeLoad: exigirRol("parent"),
@@ -194,7 +194,7 @@ function MiHijo() {
               {edadDe(alumno.birth_date) !== null ? (
                 <li>🎂 {edadDe(alumno.birth_date)} años</li>
               ) : null}
-              <li>🏅 Categoría {grupoEtiqueta(alumno.age_group).split(" ")[0]}</li>
+              <li>🏅 Categoría {grupoCorto(alumno.age_group)}</li>
               {alumno.jersey_size ? <li>👕 Talla polera: {alumno.jersey_size}</li> : null}
               <li>📅 {alumno.schedule}</li>
               <li>👨‍🏫 Profesor: {alumno.coach}</li>
@@ -212,6 +212,8 @@ function MiHijo() {
           <Tarjeta>
             <div className="flex items-center gap-3">
               <Phone className="size-6 text-cyan-brand" />
+              <h2 className="text-xl font-bold">Contacto de emergencia</h2>
+            </div>
               <h2 className="text-xl font-bold">Contacto de emergencia</h2>
             </div>
             {editando ? (
