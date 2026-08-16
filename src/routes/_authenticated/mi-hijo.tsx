@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { SubirComprobante } from "@/components/tictac/SubirComprobante";
-import { useSesion, pesos, fechaCorta, grupoEtiqueta } from "@/lib/session";
+import { useSesion, pesos, fechaCorta, grupoCorto } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/mi-hijo")({
   beforeLoad: exigirRol("parent"),
@@ -40,6 +40,18 @@ function edadDe(fecha?: string | null) {
   let edad = hoy.getFullYear() - a;
   if (hoy.getMonth() + 1 < m || (hoy.getMonth() + 1 === m && hoy.getDate() < d)) edad -= 1;
   return edad;
+}
+
+/**
+ * Equipo docente y sede según el día de entrenamiento más próximo
+ * (martes o jueves). Los martes y jueves muestran el equipo del día.
+ */
+function equipoDelDia(fecha: Date) {
+  const martes = { profesores: "Profesores: Sebastián y Felipe", sede: "Rancho Rossi" };
+  const jueves = { profesores: "Profesores: Sebastián y Christopher", sede: "Forza Training Club" };
+  const d = fecha.getDay();
+  if (d === 4 || d === 5 || d === 6) return jueves;
+  return martes;
 }
 
 const MESES = [
@@ -137,6 +149,7 @@ function MiHijo() {
   const pagoAprobado = pagosMes.find((p) => p.status === "approved");
   const pagoEnRevision = pagosMes.find((p) => p.status === "pending" && p.receipt_url);
   const mesActual = MESES[hoy.getMonth()];
+  const equipoDia = equipoDelDia(hoy);
 
   const asistenciaMes = asistenciaAlumno.filter(
     (a) => a.session_date >= inicioMes && a.session_date < finMes,
@@ -194,7 +207,7 @@ function MiHijo() {
               {edadDe(alumno.birth_date) !== null ? (
                 <li>🎂 {edadDe(alumno.birth_date)} años</li>
               ) : null}
-              <li>🏅 Categoría {grupoEtiqueta(alumno.age_group).split(" ")[0]}</li>
+              <li>🏅 Categoría {grupoCorto(alumno.age_group)}</li>
               {alumno.jersey_size ? <li>👕 Talla polera: {alumno.jersey_size}</li> : null}
               <li>📅 {alumno.schedule}</li>
               <li>👨‍🏫 Profesor: {alumno.coach}</li>
@@ -207,6 +220,12 @@ function MiHijo() {
                 </p>
               </div>
             ) : null}
+          </Tarjeta>
+
+          <Tarjeta className="p-6">
+            <h2 className="text-xl font-bold">👨‍🏫 Profesores de hoy</h2>
+            <p className="mt-2 text-lg font-bold text-cyan-brand">{equipoDia.profesores}</p>
+            <p className="mt-1 text-base text-muted-foreground">📍 Sede: {equipoDia.sede}</p>
           </Tarjeta>
 
           <Tarjeta>

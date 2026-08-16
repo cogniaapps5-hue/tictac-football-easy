@@ -24,7 +24,7 @@ import {
 } from "@/lib/matricula.functions";
 
 const TALLAS = ["S", "M", "L", "XL", "Otro"];
-const GRUPOS = { iniciados: "Iniciados", intermedios: "Intermedios", avanzados: "Avanzados" };
+const GRUPOS = { iniciados: "Grupo 1", intermedios: "Grupo 2", avanzados: "Grupo 3" };
 
 const VACIO = {
   nombre_apoderado: "",

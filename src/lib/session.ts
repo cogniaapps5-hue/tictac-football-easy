@@ -112,15 +112,20 @@ export function proximoEntrenamiento(dia?: string | null) {
 }
 
 export const GRUPOS: { valor: GrupoEtario; etiqueta: string; emoji: string; color: string }[] = [
-  { valor: "iniciados", etiqueta: "Iniciados (7-8)", emoji: "🟢", color: "text-success" },
-  { valor: "intermedios", etiqueta: "Intermedios (9-10)", emoji: "🟡", color: "text-gold-brand" },
-  { valor: "avanzados", etiqueta: "Avanzados (11-12)", emoji: "🔵", color: "text-cyan-brand" },
+  { valor: "iniciados", etiqueta: "Grupo 1 (7-8)", emoji: "🟢", color: "text-success" },
+  { valor: "intermedios", etiqueta: "Grupo 2 (9-10)", emoji: "🟡", color: "text-gold-brand" },
+  { valor: "avanzados", etiqueta: "Grupo 3 (11-12)", emoji: "🔵", color: "text-cyan-brand" },
 ];
 
 export const DIAS = SEDES;
 
 export function grupoEtiqueta(grupo: string) {
   return GRUPOS.find((g) => g.valor === grupo)?.etiqueta ?? grupo;
+}
+
+/** Nombre corto del grupo, sin el rango de edad. Ej: "Grupo 1". */
+export function grupoCorto(grupo: string) {
+  return grupoEtiqueta(grupo).replace(/\s*\(.*\)$/, "");
 }
 
 export function grupoPorAnio(anio: number): GrupoEtario {

@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { LogIn, Loader2 } from "lucide-react";
+import { LogIn, Loader2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -35,6 +35,7 @@ function Entrar() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [cargando, setCargando] = useState(false);
+  const [verClave, setVerClave] = useState(false);
 
   useEffect(() => {
     void sesionValida().then((sesion) => {
@@ -90,7 +91,7 @@ function Entrar() {
         alt="Escuela de fútbol TIC TAC"
         width={160}
         height={160}
-        className="h-40 w-40"
+        className="h-40 w-40 rounded-full border-4 border-cyan-brand object-cover"
       />
       <h1 className="mt-4 text-center text-3xl font-extrabold">TIC TAC</h1>
       <p className="mt-1 text-center text-lg text-muted-foreground">Siempre Feliz</p>
@@ -120,15 +121,25 @@ function Entrar() {
           <Label htmlFor="password" className="text-base">
             Tu contraseña
           </Label>
-          <Input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            placeholder="••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="h-14 rounded-xl text-lg"
-          />
+          <div className="relative">
+            <Input
+              id="password"
+              type={verClave ? "text" : "password"}
+              autoComplete="current-password"
+              placeholder="••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="h-14 rounded-xl pr-16 text-lg"
+            />
+            <button
+              type="button"
+              onClick={() => setVerClave((v) => !v)}
+              aria-label={verClave ? "Ocultar contraseña" : "Mostrar contraseña"}
+              className="absolute right-1 top-1 flex size-12 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground"
+            >
+              {verClave ? <EyeOff className="size-6" /> : <Eye className="size-6" />}
+            </button>
+          </div>
         </div>
         <Button type="submit" variant="accion" size="grande" disabled={cargando}>
           {cargando ? <Loader2 className="animate-spin" /> : <LogIn />}
