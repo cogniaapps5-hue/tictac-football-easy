@@ -214,6 +214,8 @@ function MiHijo() {
               <Phone className="size-6 text-cyan-brand" />
               <h2 className="text-xl font-bold">Contacto de emergencia</h2>
             </div>
+              <h2 className="text-xl font-bold">Contacto de emergencia</h2>
+            </div>
             {editando ? (
               <div className="mt-4 space-y-4">
                 <div className="space-y-2">
