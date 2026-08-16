@@ -209,6 +209,12 @@ function MiHijo() {
             ) : null}
           </Tarjeta>
 
+          <Tarjeta className="p-6">
+            <h2 className="text-xl font-bold">👨‍🏫 Profesores de hoy</h2>
+            <p className="mt-2 text-lg font-bold text-cyan-brand">{equipoDia.profesores}</p>
+            <p className="mt-1 text-base text-muted-foreground">📍 Sede: {equipoDia.sede}</p>
+          </Tarjeta>
+
           <Tarjeta>
             <div className="flex items-center gap-3">
               <Phone className="size-6 text-cyan-brand" />
