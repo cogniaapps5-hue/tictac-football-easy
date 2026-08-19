@@ -229,7 +229,14 @@ function Alumnos() {
     return (
       <Tarjeta key={alumno.id}>
         <div className="flex items-start justify-between gap-3">
-          <p className="text-xl font-bold">👤 {alumno.name}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-xl font-bold">👤 {alumno.name}</p>
+            {alumno.is_scholarship ? (
+              <span className="rounded-lg border-2 border-gold-brand bg-gold-brand/20 px-2 py-1 text-sm font-black text-gold-brand">
+                🎓 BECADO
+              </span>
+            ) : null}
+          </div>
           {alumno.access_status !== "inactive" ? (
             <button
               type="button"
@@ -299,7 +306,11 @@ function Alumnos() {
             </p>
           ) : null}
         </div>
-        <p className="mt-2 text-base font-semibold">{semaforo(alumno.access_status)}</p>
+        <p className="mt-2 text-base font-semibold">
+          {alumno.is_scholarship
+            ? "Estado: Becado (Exento de pago)"
+            : semaforo(alumno.access_status)}
+        </p>
         <div className="mt-3">
           <Estado estado={marca?.status ?? "no_response"} />
         </div>
