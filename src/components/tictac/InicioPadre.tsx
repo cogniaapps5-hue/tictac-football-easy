@@ -8,7 +8,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tarjeta, Estado } from "@/components/tictac/Shell";
-import { SEDES, categoriaAviso, grupoCorto, grupoEtiqueta, proximoEntrenamiento } from "@/lib/session";
+import { SEDES, grupoCorto, proximoEntrenamiento } from "@/lib/session";
+import { estiloAviso, ordenarAvisos } from "@/lib/avisos";
 
 function edadDe(fecha?: string | null) {
   if (!fecha) return null;
@@ -75,6 +76,10 @@ export function InicioPadre({
   });
 
   const hijos = data?.alumnos ?? [];
+  const avisosOrdenados = ordenarAvisos(
+    (data?.avisos ?? []) as { category: string; created_at: string; id: string; title: string; content: string }[],
+  );
+  const avisosVisibles = verTodos ? avisosOrdenados : avisosOrdenados.slice(0, 2);
   const alumno = hijos.find((a) => a.id === hijoId) ?? hijos[0];
   const proximo = proximoEntrenamiento(alumno?.training_day ?? null);
   const bloqueado = alumno?.access_status === "blocked";
@@ -157,6 +162,42 @@ export function InicioPadre({
           “Todos jugamos, todos aprendemos y todos pertenecemos”
         </p>
       </section>
+
+      {avisosVisibles.length ? (
+        <section className="space-y-4">
+          {avisosVisibles.map((aviso) => {
+            const estilo = estiloAviso(aviso.category);
+            return (
+              <article
+                key={aviso.id}
+                className={`flex gap-4 rounded-2xl border-[3px] p-6 ${estilo.clase}`}
+              >
+                <span className="text-4xl leading-none" aria-hidden>
+                  {estilo.emoji}
+                </span>
+                <div className="min-w-0">
+                  <p className={`text-sm font-bold uppercase tracking-wide ${estilo.texto}`}>
+                    {estilo.etiqueta}
+                  </p>
+                  <p className="mt-1 text-xl font-black leading-tight">{aviso.title}</p>
+                  <p className="mt-1 text-base text-muted-foreground">{aviso.content}</p>
+                  <p className="mt-2 text-sm font-semibold text-muted-foreground">
+                    {new Date(aviso.created_at).toLocaleDateString("es-CL", {
+                      day: "numeric",
+                      month: "long",
+                    })}
+                  </p>
+                </div>
+              </article>
+            );
+          })}
+          {avisosOrdenados.length > 2 ? (
+            <Button asChild variant="contorno" size="grande">
+              <Link to="/info">Ver todos los avisos</Link>
+            </Button>
+          ) : null}
+        </section>
+      ) : null}
 
       {cumpleaneros.map((c) => (
         <div
