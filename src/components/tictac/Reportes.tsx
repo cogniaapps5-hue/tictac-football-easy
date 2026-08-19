@@ -309,7 +309,7 @@ export function ReportesAdmin() {
                 className="capitalize"
                 onClick={() => setFiltroGrupo(f)}
               >
-                {f}
+                {f === "todos" ? "Todos" : grupoCorto(f)}
               </Button>
             ))}
           </div>
