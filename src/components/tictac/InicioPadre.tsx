@@ -2,7 +2,7 @@ import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/ticta
 import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { CalendarDays, Check, Megaphone, User, X } from "lucide-react";
+import { CalendarDays, Check, User, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -34,7 +34,6 @@ export function InicioPadre({
   const fechasPosibles = SEDES.map((s) => proximoEntrenamiento(s.valor).iso);
   const queryClient = useQueryClient();
   const [hijoId, setHijoId] = useState<string | null>(null);
-  const [verTodos, setVerTodos] = useState(false);
 
   const {
     data,
@@ -79,7 +78,7 @@ export function InicioPadre({
   const avisosOrdenados = ordenarAvisos(
     (data?.avisos ?? []) as { category: string; created_at: string; id: string; title: string; content: string }[],
   );
-  const avisosVisibles = verTodos ? avisosOrdenados : avisosOrdenados.slice(0, 2);
+  const avisosVisibles = avisosOrdenados.slice(0, 2);
   const alumno = hijos.find((a) => a.id === hijoId) ?? hijos[0];
   const proximo = proximoEntrenamiento(alumno?.training_day ?? null);
   const bloqueado = alumno?.access_status === "blocked";
