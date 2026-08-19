@@ -262,6 +262,20 @@ function Alumnos() {
             🎂 Nació el {new Date(`${alumno.birth_date}T12:00:00`).toLocaleDateString("es-CL")}
           </p>
         ) : null}
+        {(() => {
+          if (!alumno.birth_date) return null;
+          const nac = new Date(`${alumno.birth_date}T12:00:00`);
+          const hoy = new Date();
+          let edad = hoy.getFullYear() - nac.getFullYear();
+          const m = hoy.getMonth() - nac.getMonth();
+          if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad -= 1;
+          if (edad >= 7 && edad <= 12) return null;
+          return (
+            <p className="mt-1 rounded-xl border-2 border-gold-brand bg-gold-brand/15 px-3 py-2 text-base font-bold text-gold-brand">
+              ⚠️ Revisar edad: {edad} años (fuera del rango 7-12)
+            </p>
+          );
+        })()}
         {alumno.jersey_size ? (
           <p className="text-base text-muted-foreground">👕 Talla polera {alumno.jersey_size}</p>
         ) : null}
