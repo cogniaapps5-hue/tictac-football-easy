@@ -311,37 +311,6 @@ export function InicioPadre({
         </Tarjeta>
       ) : null}
 
-      {data?.avisos.length ? (
-        <Tarjeta className="p-6">
-          <div className="flex items-center gap-3">
-            <Megaphone className="size-7 text-gold-brand" />
-            <h2 className="text-xl font-bold">Avisos de la Escuela</h2>
-          </div>
-          <ul className="mt-4 space-y-4">
-            {data.avisos.slice(0, verTodos ? 10 : 3).map((aviso) => (
-              <li key={aviso.id} className="rounded-xl bg-secondary p-4">
-                <span
-                  className={`mb-2 inline-block rounded-full px-3 py-1 text-sm font-bold ${categoriaAviso(aviso.category).clase}`}
-                >
-                  {categoriaAviso(aviso.category).emoji} {categoriaAviso(aviso.category).etiqueta}
-                </span>
-                <p className="text-base font-bold">{aviso.title}</p>
-                <p className="text-base text-muted-foreground">{aviso.content}</p>
-              </li>
-            ))}
-          </ul>
-          {data.avisos.length > 3 ? (
-            <Button
-              variant="contorno"
-              size="grande"
-              className="mt-5"
-              onClick={() => setVerTodos(!verTodos)}
-            >
-              {verTodos ? "Ver menos avisos" : "Ver todos los avisos"}
-            </Button>
-          ) : null}
-        </Tarjeta>
-      ) : null}
     </div>
   );
 }
