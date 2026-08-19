@@ -140,7 +140,8 @@ function MiHijo() {
   const asistenciaAlumno = (data?.asistencia ?? []).filter((a) => a.player_id === alumno?.id);
   const pendiente = pagosAlumno.find((p) => p.status === "pending");
   const rechazado = pagosAlumno.find((p) => p.status === "rejected");
-  const bloqueado = alumno?.access_status === "blocked";
+  const becado = alumno?.is_scholarship === true;
+  const bloqueado = alumno?.access_status === "blocked" && !becado;
 
   const hoy = new Date();
   const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1).toISOString().slice(0, 10);
@@ -287,7 +288,14 @@ function MiHijo() {
           <Tarjeta className="p-6">
             <h2 className="text-xl font-bold">💳 Pagos y Comprobantes</h2>
 
-            {pagoAprobado ? (
+            {becado ? (
+              <div className="mt-4 rounded-xl border-2 border-gold-brand bg-gold-brand/20 p-4">
+                <p className="text-lg font-bold text-gold-brand">🎓 Alumno becado</p>
+                <p className="mt-1 text-base">
+                  Exento de pago: no necesitas subir comprobantes ni pagar mensualidad. 💙
+                </p>
+              </div>
+            ) : pagoAprobado ? (
               <div className="mt-4 rounded-xl border-2 border-success bg-success/15 p-4">
                 <p className="text-lg font-bold text-success">✅ Pago de {mesActual} confirmado</p>
               </div>
@@ -325,7 +333,7 @@ function MiHijo() {
             ) : null}
 
             <div className="mt-4">
-              {pagoAprobado ? (
+              {becado ? null : pagoAprobado ? (
                 <Button
                   disabled
                   size="grande"

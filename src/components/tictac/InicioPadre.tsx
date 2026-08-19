@@ -81,7 +81,9 @@ export function InicioPadre({
   const avisosVisibles = avisosOrdenados.slice(0, 2);
   const alumno = hijos.find((a) => a.id === hijoId) ?? hijos[0];
   const proximo = proximoEntrenamiento(alumno?.training_day ?? null);
-  const bloqueado = alumno?.access_status === "blocked";
+  // Los alumnos becados nunca quedan bloqueados por pagos.
+  const becado = alumno?.is_scholarship === true;
+  const bloqueado = alumno?.access_status === "blocked" && !becado;
   const respuesta = data?.asistencia.find(
     (a) => a.player_id === alumno?.id && a.session_date === proximo.iso,
   );

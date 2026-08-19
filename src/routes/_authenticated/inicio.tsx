@@ -78,15 +78,24 @@ function InicioAdmin() {
     queryKey: ["resumen-admin", proximo.iso],
     queryFn: async () => {
       const [pagos, alumnos, asistencia] = await Promise.all([
-        supabase.from("payments").select("id, status, due_date, amount, players(access_status)"),
-        supabase.from("players").select("id, access_status").neq("access_status", "inactive"),
+        supabase
+          .from("payments")
+          .select("id, status, due_date, amount, players(access_status, is_scholarship)"),
+        supabase
+          .from("players")
+          .select("id, access_status, is_scholarship")
+          .neq("access_status", "inactive"),
         supabase.from("attendance").select("id, status").eq("session_date", proximo.iso),
       ]);
       const fallida = [pagos, alumnos, asistencia].find((r) => r.error);
       if (fallida?.error) throw fallida.error;
-      const activos = (pagos.data ?? []).filter(
-        (p) => (p.players as { access_status?: string } | null)?.access_status !== "inactive",
-      );
+      const activos = (pagos.data ?? []).filter((p) => {
+        const alumno = p.players as
+          | { access_status?: string; is_scholarship?: boolean | null }
+          | null;
+        // Los becados están exentos de cobro: no cuentan como pendientes.
+        return alumno?.access_status !== "inactive" && !alumno?.is_scholarship;
+      });
       const pendientes = activos.filter((p) => p.status === "pending");
       const aprobados = (pagos.data ?? []).filter((p) => p.status === "approved");
       const atrasados = pendientes.filter(
@@ -98,7 +107,9 @@ function InicioAdmin() {
         aprobados: aprobados.length,
         atrasados: atrasados.length,
         total: alumnos.data?.length ?? 0,
-        bloqueados: (alumnos.data ?? []).filter((a) => a.access_status === "blocked").length,
+        bloqueados: (alumnos.data ?? []).filter(
+          (a) => a.access_status === "blocked" && !a.is_scholarship,
+        ).length,
         confirmados: (asistencia.data ?? []).filter((a) => a.status === "confirmed").length,
       };
     },

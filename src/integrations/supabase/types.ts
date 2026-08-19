@@ -322,6 +322,7 @@ export type Database = {
           emergency_contact_phone: string | null
           emergency_relationship: string | null
           id: string
+          is_scholarship: boolean
           jersey_size: string | null
           medical_conditions: string | null
           name: string
@@ -345,6 +346,7 @@ export type Database = {
           emergency_contact_phone?: string | null
           emergency_relationship?: string | null
           id?: string
+          is_scholarship?: boolean
           jersey_size?: string | null
           medical_conditions?: string | null
           name: string
@@ -368,6 +370,7 @@ export type Database = {
           emergency_contact_phone?: string | null
           emergency_relationship?: string | null
           id?: string
+          is_scholarship?: boolean
           jersey_size?: string | null
           medical_conditions?: string | null
           name?: string
