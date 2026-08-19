@@ -140,7 +140,8 @@ function MiHijo() {
   const asistenciaAlumno = (data?.asistencia ?? []).filter((a) => a.player_id === alumno?.id);
   const pendiente = pagosAlumno.find((p) => p.status === "pending");
   const rechazado = pagosAlumno.find((p) => p.status === "rejected");
-  const bloqueado = alumno?.access_status === "blocked";
+  const becado = alumno?.is_scholarship === true;
+  const bloqueado = alumno?.access_status === "blocked" && !becado;
 
   const hoy = new Date();
   const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1).toISOString().slice(0, 10);
