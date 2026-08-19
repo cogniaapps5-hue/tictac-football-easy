@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useSesion } from "@/lib/session";
@@ -69,6 +70,7 @@ export function leerVistoAvisos(userId: string) {
 export function marcarAvisosVistos(userId: string) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(CLAVE + userId, String(Date.now()));
+  window.dispatchEvent(new Event("tictac:avisos-vistos"));
 }
 
 export function useAvisos() {
@@ -90,7 +92,17 @@ export function useAvisos() {
 export function useAvisosNoLeidos() {
   const { data: sesion } = useSesion();
   const { data: avisos } = useAvisos();
-  if (!sesion || !avisos) return 0;
-  const visto = leerVistoAvisos(sesion.userId);
+  const [visto, setVisto] = useState<number | null>(null);
+  const userId = sesion?.userId;
+
+  useEffect(() => {
+    if (!userId) return;
+    const sincronizar = () => setVisto(leerVistoAvisos(userId));
+    sincronizar();
+    window.addEventListener("tictac:avisos-vistos", sincronizar);
+    return () => window.removeEventListener("tictac:avisos-vistos", sincronizar);
+  }, [userId]);
+
+  if (visto === null || !avisos) return 0;
   return avisos.filter((a) => new Date(a.created_at).getTime() > visto).length;
 }
