@@ -45,7 +45,12 @@ type Pago = {
   due_date: string;
   receipt_url: string | null;
   rejection_reason: string | null;
-  players: { name: string; age_group: string; access_status: string } | null;
+  players: {
+    name: string;
+    age_group: string;
+    access_status: string;
+    is_scholarship?: boolean | null;
+  } | null;
 };
 
 /**
@@ -155,7 +160,7 @@ function Pagos() {
       const { data, error } = await supabase
         .from("payments")
         .select(
-          "id, status, amount, concept, due_date, receipt_url, rejection_reason, players(name, age_group, access_status)",
+          "id, status, amount, concept, due_date, receipt_url, rejection_reason, players(name, age_group, access_status, is_scholarship)",
         )
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -255,7 +260,9 @@ function Pagos() {
       (grupo === "todos" || p.players?.age_group === grupo) &&
       // Los alumnos archivados salen de la bandeja activa; su historial sigue
       // disponible en el Reporte de Pagos.
-      p.players?.access_status !== "inactive",
+      p.players?.access_status !== "inactive" &&
+      // Los becados están exentos: no entran a la bandeja de cobro.
+      !p.players?.is_scholarship,
   );
   const lista = porGrupo.filter((p) => p.status === filtro);
   const pendientes = porGrupo.filter((p) => p.status === "pending").length;
