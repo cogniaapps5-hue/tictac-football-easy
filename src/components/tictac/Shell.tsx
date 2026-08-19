@@ -17,11 +17,12 @@ import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { limpiarBorradores } from "@/lib/almacenamiento";
 import { limpiarSesion } from "@/lib/sesion";
+import { useAvisosNoLeidos } from "@/lib/avisos";
 import logoAsset from "@/assets/tictac-logo.jpg.asset.json";
 import { cn } from "@/lib/utils";
 import type { Rol } from "@/lib/session";
 
-type Item = { to: string; label: string; icon: LucideIcon };
+type Item = { to: string; label: string; icon: LucideIcon; avisos?: boolean };
 
 const NAV_ADMIN: Item[] = [
   { to: "/inicio", label: "Inicio", icon: Home },
@@ -35,7 +36,7 @@ const NAV_PADRE: Item[] = [
   { to: "/inicio", label: "Inicio", icon: Home },
   { to: "/mi-hijo", label: "Mi Hijo", icon: User },
   { to: "/contrato", label: "Contrato", icon: FileText },
-  { to: "/info", label: "Info", icon: BookOpen },
+  { to: "/info", label: "Info", icon: BookOpen, avisos: true },
   { to: "/cambiar-clave", label: "Clave", icon: KeyRound },
 ];
 
@@ -53,6 +54,7 @@ export function Shell({
   const items = rol === "admin" ? NAV_ADMIN : NAV_PADRE;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const noLeidos = useAvisosNoLeidos();
 
   async function salir() {
     await queryClient.cancelQueries();
@@ -90,14 +92,24 @@ export function Shell({
 
       <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-card">
         <div className="mx-auto flex max-w-lg gap-2 px-3 py-2">
-          {items.map(({ to, label, icon: Icon }) => (
+          {items.map(({ to, label, icon: Icon, avisos }) => (
             <Link
               key={to}
               to={to}
               className="flex min-h-[64px] flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-sm font-semibold text-muted-foreground"
               activeProps={{ className: "text-cyan-brand" }}
             >
-              <Icon className="size-6" />
+              <span className="relative">
+                <Icon className="size-6" />
+                {avisos && rol === "parent" && noLeidos > 0 ? (
+                  <span
+                    aria-label={`${noLeidos} avisos nuevos`}
+                    className="absolute -right-2.5 -top-1.5 flex min-w-[20px] items-center justify-center rounded-full bg-danger px-1 text-[11px] font-bold leading-[18px] text-danger-foreground"
+                  >
+                    {noLeidos > 9 ? "9+" : noLeidos}
+                  </span>
+                ) : null}
+              </span>
               {label}
             </Link>
           ))}

@@ -2,13 +2,14 @@ import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/ticta
 import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { CalendarDays, Check, Megaphone, User, X } from "lucide-react";
+import { CalendarDays, Check, User, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tarjeta, Estado } from "@/components/tictac/Shell";
-import { SEDES, categoriaAviso, grupoCorto, grupoEtiqueta, proximoEntrenamiento } from "@/lib/session";
+import { SEDES, grupoCorto, proximoEntrenamiento } from "@/lib/session";
+import { estiloAviso, ordenarAvisos } from "@/lib/avisos";
 
 function edadDe(fecha?: string | null) {
   if (!fecha) return null;
@@ -33,7 +34,6 @@ export function InicioPadre({
   const fechasPosibles = SEDES.map((s) => proximoEntrenamiento(s.valor).iso);
   const queryClient = useQueryClient();
   const [hijoId, setHijoId] = useState<string | null>(null);
-  const [verTodos, setVerTodos] = useState(false);
 
   const {
     data,
@@ -75,6 +75,10 @@ export function InicioPadre({
   });
 
   const hijos = data?.alumnos ?? [];
+  const avisosOrdenados = ordenarAvisos(
+    (data?.avisos ?? []) as { category: string; created_at: string; id: string; title: string; content: string }[],
+  );
+  const avisosVisibles = avisosOrdenados.slice(0, 2);
   const alumno = hijos.find((a) => a.id === hijoId) ?? hijos[0];
   const proximo = proximoEntrenamiento(alumno?.training_day ?? null);
   const bloqueado = alumno?.access_status === "blocked";
@@ -157,6 +161,42 @@ export function InicioPadre({
           “Todos jugamos, todos aprendemos y todos pertenecemos”
         </p>
       </section>
+
+      {avisosVisibles.length ? (
+        <section className="space-y-4">
+          {avisosVisibles.map((aviso) => {
+            const estilo = estiloAviso(aviso.category);
+            return (
+              <article
+                key={aviso.id}
+                className={`flex gap-4 rounded-2xl border-[3px] p-6 ${estilo.clase}`}
+              >
+                <span className="text-4xl leading-none" aria-hidden>
+                  {estilo.emoji}
+                </span>
+                <div className="min-w-0">
+                  <p className={`text-sm font-bold uppercase tracking-wide ${estilo.texto}`}>
+                    {estilo.etiqueta}
+                  </p>
+                  <p className="mt-1 text-xl font-black leading-tight">{aviso.title}</p>
+                  <p className="mt-1 text-base text-muted-foreground">{aviso.content}</p>
+                  <p className="mt-2 text-sm font-semibold text-muted-foreground">
+                    {new Date(aviso.created_at).toLocaleDateString("es-CL", {
+                      day: "numeric",
+                      month: "long",
+                    })}
+                  </p>
+                </div>
+              </article>
+            );
+          })}
+          {avisosOrdenados.length > 2 ? (
+            <Button asChild variant="contorno" size="grande">
+              <Link to="/info">Ver todos los avisos</Link>
+            </Button>
+          ) : null}
+        </section>
+      ) : null}
 
       {cumpleaneros.map((c) => (
         <div
@@ -270,37 +310,6 @@ export function InicioPadre({
         </Tarjeta>
       ) : null}
 
-      {data?.avisos.length ? (
-        <Tarjeta className="p-6">
-          <div className="flex items-center gap-3">
-            <Megaphone className="size-7 text-gold-brand" />
-            <h2 className="text-xl font-bold">Avisos de la Escuela</h2>
-          </div>
-          <ul className="mt-4 space-y-4">
-            {data.avisos.slice(0, verTodos ? 10 : 3).map((aviso) => (
-              <li key={aviso.id} className="rounded-xl bg-secondary p-4">
-                <span
-                  className={`mb-2 inline-block rounded-full px-3 py-1 text-sm font-bold ${categoriaAviso(aviso.category).clase}`}
-                >
-                  {categoriaAviso(aviso.category).emoji} {categoriaAviso(aviso.category).etiqueta}
-                </span>
-                <p className="text-base font-bold">{aviso.title}</p>
-                <p className="text-base text-muted-foreground">{aviso.content}</p>
-              </li>
-            ))}
-          </ul>
-          {data.avisos.length > 3 ? (
-            <Button
-              variant="contorno"
-              size="grande"
-              className="mt-5"
-              onClick={() => setVerTodos(!verTodos)}
-            >
-              {verTodos ? "Ver menos avisos" : "Ver todos los avisos"}
-            </Button>
-          ) : null}
-        </Tarjeta>
-      ) : null}
     </div>
   );
 }
