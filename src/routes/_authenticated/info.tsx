@@ -1,7 +1,7 @@
 import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Target, Users, Images, Phone, ShieldCheck } from "lucide-react";
 
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Shell, Tarjeta } from "@/components/tictac/Shell";
 import { supabase } from "@/integrations/supabase/client";
 import { useSesion } from "@/lib/session";
+import { estiloAviso, marcarAvisosVistos, ordenarAvisos, useAvisos } from "@/lib/avisos";
 
 export const Route = createFileRoute("/_authenticated/info")({
   beforeLoad: exigirRol("parent"),
@@ -29,6 +30,13 @@ export const Route = createFileRoute("/_authenticated/info")({
 function Info() {
   const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
   const [abierto, setAbierto] = useState<string | null>(null);
+  const { data: avisos } = useAvisos();
+  const userId = sesion?.userId;
+
+  useEffect(() => {
+    if (userId) marcarAvisosVistos(userId);
+  }, [userId, avisos]);
+
   if (cargandoSesion) return <PantallaCargando />;
   if (errorSesion || !sesion)
     return (
@@ -42,6 +50,42 @@ function Info() {
 
   return (
     <Shell rol={sesion.rol} titulo="Información" subtitulo="Todo sobre la escuela">
+      <Tarjeta className="p-6">
+        <h2 className="text-xl font-bold">📢 Avisos de la escuela</h2>
+        {(avisos ?? []).length ? (
+          <ul className="mt-4 space-y-4">
+            {ordenarAvisos(avisos ?? []).map((aviso) => {
+              const estilo = estiloAviso(aviso.category);
+              return (
+                <li
+                  key={aviso.id}
+                  className={`flex gap-4 rounded-2xl border-[3px] p-5 ${estilo.clase}`}
+                >
+                  <span className="text-3xl leading-none" aria-hidden>
+                    {estilo.emoji}
+                  </span>
+                  <div className="min-w-0">
+                    <p className={`text-sm font-bold uppercase tracking-wide ${estilo.texto}`}>
+                      {estilo.etiqueta}
+                    </p>
+                    <p className="mt-1 text-lg font-black leading-tight">{aviso.title}</p>
+                    <p className="mt-1 text-base text-muted-foreground">{aviso.content}</p>
+                    <p className="mt-2 text-sm font-semibold text-muted-foreground">
+                      {new Date(aviso.created_at).toLocaleDateString("es-CL", {
+                        day: "numeric",
+                        month: "long",
+                      })}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="mt-3 text-base text-muted-foreground">No hay avisos por ahora.</p>
+        )}
+      </Tarjeta>
+
       <Tarjeta>
         <div className="flex items-center gap-3">
           <Target className="size-6 text-gold-brand" />
