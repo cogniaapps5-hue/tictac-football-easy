@@ -333,7 +333,7 @@ function MiHijo() {
             ) : null}
 
             <div className="mt-4">
-              {pagoAprobado ? (
+              {becado ? null : pagoAprobado ? (
                 <Button
                   disabled
                   size="grande"
