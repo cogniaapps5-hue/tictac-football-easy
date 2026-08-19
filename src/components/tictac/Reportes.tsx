@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { pesos, grupoEtiqueta } from "@/lib/session";
+import { pesos, grupoEtiqueta, grupoCorto } from "@/lib/session";
 import logoAsset from "@/assets/tictac-logo.jpg.asset.json";
 
 type Periodo = "semana" | "mes" | "personalizado";
@@ -309,7 +309,7 @@ export function ReportesAdmin() {
                 className="capitalize"
                 onClick={() => setFiltroGrupo(f)}
               >
-                {f}
+                {f === "todos" ? "Todos" : grupoCorto(f)}
               </Button>
             ))}
           </div>
