@@ -40,6 +40,13 @@ function Inicio() {
     );
   return sesion.rol === "admin" ? (
     <Shell rol="admin" titulo={`${saludoActual}, ${sesion.nombre}`} subtitulo="Escuela TIC TAC">
+      {esSuperAdmin(sesion.email) ? (
+        <Button asChild variant="accion" size="grande">
+          <Link to="/suscripciones">
+            <ShieldCheck /> Panel de suscripciones
+          </Link>
+        </Button>
+      ) : null}
       <InicioAdmin />
     </Shell>
   ) : (

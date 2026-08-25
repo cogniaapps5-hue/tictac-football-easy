@@ -23,6 +23,7 @@ import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedMiHijoRouteImport } from './routes/_authenticated/mi-hijo'
 import { Route as AuthenticatedPagosRouteImport } from './routes/_authenticated/pagos'
 import { Route as AuthenticatedSuscripcionesRouteImport } from './routes/_authenticated/suscripciones'
+import { Route as ApiPublicRevisarSuscripcionesRouteImport } from './routes/api/public/revisar-suscripciones'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -95,6 +96,12 @@ const AuthenticatedSuscripcionesRoute =
     path: '/suscripciones',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicRevisarSuscripcionesRoute =
+  ApiPublicRevisarSuscripcionesRouteImport.update({
+    id: '/api/public/revisar-suscripciones',
+    path: '/api/public/revisar-suscripciones',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/mi-hijo': typeof AuthenticatedMiHijoRoute
   '/pagos': typeof AuthenticatedPagosRoute
   '/suscripciones': typeof AuthenticatedSuscripcionesRoute
+  '/api/public/revisar-suscripciones': typeof ApiPublicRevisarSuscripcionesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -125,6 +133,7 @@ export interface FileRoutesByTo {
   '/mi-hijo': typeof AuthenticatedMiHijoRoute
   '/pagos': typeof AuthenticatedPagosRoute
   '/suscripciones': typeof AuthenticatedSuscripcionesRoute
+  '/api/public/revisar-suscripciones': typeof ApiPublicRevisarSuscripcionesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -142,6 +151,7 @@ export interface FileRoutesById {
   '/_authenticated/mi-hijo': typeof AuthenticatedMiHijoRoute
   '/_authenticated/pagos': typeof AuthenticatedPagosRoute
   '/_authenticated/suscripciones': typeof AuthenticatedSuscripcionesRoute
+  '/api/public/revisar-suscripciones': typeof ApiPublicRevisarSuscripcionesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/mi-hijo'
     | '/pagos'
     | '/suscripciones'
+    | '/api/public/revisar-suscripciones'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/mi-hijo'
     | '/pagos'
     | '/suscripciones'
+    | '/api/public/revisar-suscripciones'
   id:
     | '__root__'
     | '/'
@@ -190,6 +202,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mi-hijo'
     | '/_authenticated/pagos'
     | '/_authenticated/suscripciones'
+    | '/api/public/revisar-suscripciones'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -198,6 +211,7 @@ export interface RootRouteChildren {
   CambiarClaveRoute: typeof CambiarClaveRoute
   ErrorAccesoRoute: typeof ErrorAccesoRoute
   ServicioSuspendidoRoute: typeof ServicioSuspendidoRoute
+  ApiPublicRevisarSuscripcionesRoute: typeof ApiPublicRevisarSuscripcionesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -300,6 +314,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSuscripcionesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/revisar-suscripciones': {
+      id: '/api/public/revisar-suscripciones'
+      path: '/api/public/revisar-suscripciones'
+      fullPath: '/api/public/revisar-suscripciones'
+      preLoaderRoute: typeof ApiPublicRevisarSuscripcionesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -336,6 +357,7 @@ const rootRouteChildren: RootRouteChildren = {
   CambiarClaveRoute: CambiarClaveRoute,
   ErrorAccesoRoute: ErrorAccesoRoute,
   ServicioSuspendidoRoute: ServicioSuspendidoRoute,
+  ApiPublicRevisarSuscripcionesRoute: ApiPublicRevisarSuscripcionesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
