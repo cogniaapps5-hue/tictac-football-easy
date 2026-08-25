@@ -88,7 +88,7 @@ function Panel() {
   });
 
   const actualizar = useMutation({
-    mutationFn: async ({ id, cambios }: { id: string; cambios: Record<string, string> }) => {
+    mutationFn: async ({ id, cambios }: { id: string; cambios: { status?: string; next_payment_date?: string; last_payment_date?: string } }) => {
       const { error } = await supabase.from("subscriptions").update(cambios).eq("id", id);
       if (error) throw error;
     },
@@ -103,7 +103,7 @@ function Panel() {
   if (isError)
     return <PantallaError titulo="No pudimos cargar las suscripciones" onReintentar={() => void refetch()} />;
   if (!data?.length)
-    return <EstadoVacio titulo="Aún no hay escuelas suscritas" />;
+    return <EstadoVacio texto="Aún no hay escuelas suscritas" />;
 
   return (
     <>

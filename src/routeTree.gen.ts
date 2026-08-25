@@ -22,6 +22,7 @@ import { Route as AuthenticatedInfoRouteImport } from './routes/_authenticated/i
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
 import { Route as AuthenticatedMiHijoRouteImport } from './routes/_authenticated/mi-hijo'
 import { Route as AuthenticatedPagosRouteImport } from './routes/_authenticated/pagos'
+import { Route as AuthenticatedSuscripcionesRouteImport } from './routes/_authenticated/suscripciones'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -88,6 +89,12 @@ const AuthenticatedPagosRoute = AuthenticatedPagosRouteImport.update({
   path: '/pagos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSuscripcionesRoute =
+  AuthenticatedSuscripcionesRouteImport.update({
+    id: '/suscripciones',
+    path: '/suscripciones',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/inicio': typeof AuthenticatedInicioRoute
   '/mi-hijo': typeof AuthenticatedMiHijoRoute
   '/pagos': typeof AuthenticatedPagosRoute
+  '/suscripciones': typeof AuthenticatedSuscripcionesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -116,6 +124,7 @@ export interface FileRoutesByTo {
   '/inicio': typeof AuthenticatedInicioRoute
   '/mi-hijo': typeof AuthenticatedMiHijoRoute
   '/pagos': typeof AuthenticatedPagosRoute
+  '/suscripciones': typeof AuthenticatedSuscripcionesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -132,6 +141,7 @@ export interface FileRoutesById {
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
   '/_authenticated/mi-hijo': typeof AuthenticatedMiHijoRoute
   '/_authenticated/pagos': typeof AuthenticatedPagosRoute
+  '/_authenticated/suscripciones': typeof AuthenticatedSuscripcionesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/inicio'
     | '/mi-hijo'
     | '/pagos'
+    | '/suscripciones'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/inicio'
     | '/mi-hijo'
     | '/pagos'
+    | '/suscripciones'
   id:
     | '__root__'
     | '/'
@@ -177,6 +189,7 @@ export interface FileRouteTypes {
     | '/_authenticated/inicio'
     | '/_authenticated/mi-hijo'
     | '/_authenticated/pagos'
+    | '/_authenticated/suscripciones'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -280,6 +293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPagosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/suscripciones': {
+      id: '/_authenticated/suscripciones'
+      path: '/suscripciones'
+      fullPath: '/suscripciones'
+      preLoaderRoute: typeof AuthenticatedSuscripcionesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -292,6 +312,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
   AuthenticatedMiHijoRoute: typeof AuthenticatedMiHijoRoute
   AuthenticatedPagosRoute: typeof AuthenticatedPagosRoute
+  AuthenticatedSuscripcionesRoute: typeof AuthenticatedSuscripcionesRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -303,6 +324,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedInicioRoute: AuthenticatedInicioRoute,
   AuthenticatedMiHijoRoute: AuthenticatedMiHijoRoute,
   AuthenticatedPagosRoute: AuthenticatedPagosRoute,
+  AuthenticatedSuscripcionesRoute: AuthenticatedSuscripcionesRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
