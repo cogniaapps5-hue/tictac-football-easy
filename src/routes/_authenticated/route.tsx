@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { limpiarSesion, sesionValida } from "@/lib/sesion";
 import { PantallaCargando, PantallaError } from "@/components/tictac/Estados";
+import { accesoSuspendido } from "@/lib/suscripcion";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -22,6 +23,9 @@ export const Route = createFileRoute("/_authenticated")({
       throw redirect({ to: "/" });
     }
     if (!rolesRes.data?.length) throw redirect({ to: "/error-acceso" });
+    // Suscripción suspendida: la escuela no entra a la app hasta reactivarla.
+    if (await accesoSuspendido(user.id, user.email))
+      throw redirect({ to: "/servicio-suspendido" });
     // Sin redirección forzada a "/cambiar-clave": el cambio de clave es opcional.
     return { user };
   },

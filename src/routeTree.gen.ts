@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as CambiarClaveRouteImport } from './routes/cambiar-clave'
 import { Route as ErrorAccesoRouteImport } from './routes/error-acceso'
+import { Route as ServicioSuspendidoRouteImport } from './routes/servicio-suspendido'
 import { Route as AuthenticatedAlumnosRouteImport } from './routes/_authenticated/alumnos'
 import { Route as AuthenticatedAvisosRouteImport } from './routes/_authenticated/avisos'
 import { Route as AuthenticatedContratoRouteImport } from './routes/_authenticated/contrato'
@@ -21,6 +22,8 @@ import { Route as AuthenticatedInfoRouteImport } from './routes/_authenticated/i
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
 import { Route as AuthenticatedMiHijoRouteImport } from './routes/_authenticated/mi-hijo'
 import { Route as AuthenticatedPagosRouteImport } from './routes/_authenticated/pagos'
+import { Route as AuthenticatedSuscripcionesRouteImport } from './routes/_authenticated/suscripciones'
+import { Route as ApiPublicRevisarSuscripcionesRouteImport } from './routes/api/public/revisar-suscripciones'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -39,6 +42,11 @@ const CambiarClaveRoute = CambiarClaveRouteImport.update({
 const ErrorAccesoRoute = ErrorAccesoRouteImport.update({
   id: '/error-acceso',
   path: '/error-acceso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicioSuspendidoRoute = ServicioSuspendidoRouteImport.update({
+  id: '/servicio-suspendido',
+  path: '/servicio-suspendido',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAlumnosRoute = AuthenticatedAlumnosRouteImport.update({
@@ -82,11 +90,24 @@ const AuthenticatedPagosRoute = AuthenticatedPagosRouteImport.update({
   path: '/pagos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSuscripcionesRoute =
+  AuthenticatedSuscripcionesRouteImport.update({
+    id: '/suscripciones',
+    path: '/suscripciones',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const ApiPublicRevisarSuscripcionesRoute =
+  ApiPublicRevisarSuscripcionesRouteImport.update({
+    id: '/api/public/revisar-suscripciones',
+    path: '/api/public/revisar-suscripciones',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cambiar-clave': typeof CambiarClaveRoute
   '/error-acceso': typeof ErrorAccesoRoute
+  '/servicio-suspendido': typeof ServicioSuspendidoRoute
   '/alumnos': typeof AuthenticatedAlumnosRoute
   '/avisos': typeof AuthenticatedAvisosRoute
   '/contrato': typeof AuthenticatedContratoRoute
@@ -95,11 +116,14 @@ export interface FileRoutesByFullPath {
   '/inicio': typeof AuthenticatedInicioRoute
   '/mi-hijo': typeof AuthenticatedMiHijoRoute
   '/pagos': typeof AuthenticatedPagosRoute
+  '/suscripciones': typeof AuthenticatedSuscripcionesRoute
+  '/api/public/revisar-suscripciones': typeof ApiPublicRevisarSuscripcionesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cambiar-clave': typeof CambiarClaveRoute
   '/error-acceso': typeof ErrorAccesoRoute
+  '/servicio-suspendido': typeof ServicioSuspendidoRoute
   '/alumnos': typeof AuthenticatedAlumnosRoute
   '/avisos': typeof AuthenticatedAvisosRoute
   '/contrato': typeof AuthenticatedContratoRoute
@@ -108,6 +132,8 @@ export interface FileRoutesByTo {
   '/inicio': typeof AuthenticatedInicioRoute
   '/mi-hijo': typeof AuthenticatedMiHijoRoute
   '/pagos': typeof AuthenticatedPagosRoute
+  '/suscripciones': typeof AuthenticatedSuscripcionesRoute
+  '/api/public/revisar-suscripciones': typeof ApiPublicRevisarSuscripcionesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,6 +141,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/cambiar-clave': typeof CambiarClaveRoute
   '/error-acceso': typeof ErrorAccesoRoute
+  '/servicio-suspendido': typeof ServicioSuspendidoRoute
   '/_authenticated/alumnos': typeof AuthenticatedAlumnosRoute
   '/_authenticated/avisos': typeof AuthenticatedAvisosRoute
   '/_authenticated/contrato': typeof AuthenticatedContratoRoute
@@ -123,6 +150,8 @@ export interface FileRoutesById {
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
   '/_authenticated/mi-hijo': typeof AuthenticatedMiHijoRoute
   '/_authenticated/pagos': typeof AuthenticatedPagosRoute
+  '/_authenticated/suscripciones': typeof AuthenticatedSuscripcionesRoute
+  '/api/public/revisar-suscripciones': typeof ApiPublicRevisarSuscripcionesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,6 +159,7 @@ export interface FileRouteTypes {
     | '/'
     | '/cambiar-clave'
     | '/error-acceso'
+    | '/servicio-suspendido'
     | '/alumnos'
     | '/avisos'
     | '/contrato'
@@ -138,11 +168,14 @@ export interface FileRouteTypes {
     | '/inicio'
     | '/mi-hijo'
     | '/pagos'
+    | '/suscripciones'
+    | '/api/public/revisar-suscripciones'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/cambiar-clave'
     | '/error-acceso'
+    | '/servicio-suspendido'
     | '/alumnos'
     | '/avisos'
     | '/contrato'
@@ -151,12 +184,15 @@ export interface FileRouteTypes {
     | '/inicio'
     | '/mi-hijo'
     | '/pagos'
+    | '/suscripciones'
+    | '/api/public/revisar-suscripciones'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/cambiar-clave'
     | '/error-acceso'
+    | '/servicio-suspendido'
     | '/_authenticated/alumnos'
     | '/_authenticated/avisos'
     | '/_authenticated/contrato'
@@ -165,6 +201,8 @@ export interface FileRouteTypes {
     | '/_authenticated/inicio'
     | '/_authenticated/mi-hijo'
     | '/_authenticated/pagos'
+    | '/_authenticated/suscripciones'
+    | '/api/public/revisar-suscripciones'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -172,6 +210,8 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   CambiarClaveRoute: typeof CambiarClaveRoute
   ErrorAccesoRoute: typeof ErrorAccesoRoute
+  ServicioSuspendidoRoute: typeof ServicioSuspendidoRoute
+  ApiPublicRevisarSuscripcionesRoute: typeof ApiPublicRevisarSuscripcionesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -202,6 +242,13 @@ declare module '@tanstack/react-router' {
       path: '/error-acceso'
       fullPath: '/error-acceso'
       preLoaderRoute: typeof ErrorAccesoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/servicio-suspendido': {
+      id: '/servicio-suspendido'
+      path: '/servicio-suspendido'
+      fullPath: '/servicio-suspendido'
+      preLoaderRoute: typeof ServicioSuspendidoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/alumnos': {
@@ -260,6 +307,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPagosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/suscripciones': {
+      id: '/_authenticated/suscripciones'
+      path: '/suscripciones'
+      fullPath: '/suscripciones'
+      preLoaderRoute: typeof AuthenticatedSuscripcionesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/revisar-suscripciones': {
+      id: '/api/public/revisar-suscripciones'
+      path: '/api/public/revisar-suscripciones'
+      fullPath: '/api/public/revisar-suscripciones'
+      preLoaderRoute: typeof ApiPublicRevisarSuscripcionesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -272,6 +333,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
   AuthenticatedMiHijoRoute: typeof AuthenticatedMiHijoRoute
   AuthenticatedPagosRoute: typeof AuthenticatedPagosRoute
+  AuthenticatedSuscripcionesRoute: typeof AuthenticatedSuscripcionesRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -283,6 +345,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedInicioRoute: AuthenticatedInicioRoute,
   AuthenticatedMiHijoRoute: AuthenticatedMiHijoRoute,
   AuthenticatedPagosRoute: AuthenticatedPagosRoute,
+  AuthenticatedSuscripcionesRoute: AuthenticatedSuscripcionesRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -293,6 +356,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   CambiarClaveRoute: CambiarClaveRoute,
   ErrorAccesoRoute: ErrorAccesoRoute,
+  ServicioSuspendidoRoute: ServicioSuspendidoRoute,
+  ApiPublicRevisarSuscripcionesRoute: ApiPublicRevisarSuscripcionesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

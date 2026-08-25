@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import logoAsset from "@/assets/tictac-logo.jpg.asset.json";
 import { limpiarSesion, sesionValida } from "@/lib/sesion";
+import { accesoSuspendido } from "@/lib/suscripcion";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -39,7 +40,7 @@ function Entrar() {
 
   useEffect(() => {
     void sesionValida().then((sesion) => {
-      if (sesion?.user) void irADestino(sesion.user.id);
+      if (sesion?.user) void irADestino(sesion.user.id, sesion.user.email);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
@@ -47,7 +48,7 @@ function Entrar() {
   const MENSAJE_INACTIVO =
     "Tu cuenta ha sido desactivada. Por favor, contacta a la administración de la escuela para regularizar tu situación.";
 
-  async function irADestino(userId: string) {
+  async function irADestino(userId: string, correo?: string | null) {
     const { data: perfil } = await supabase
       .from("profiles")
       .select("access_status")
@@ -56,6 +57,11 @@ function Entrar() {
     if (perfil?.access_status === "inactive") {
       await limpiarSesion();
       toast.error(MENSAJE_INACTIVO, { duration: 10000 });
+      return;
+    }
+    // Suscripción de la escuela vencida: pantalla de bloqueo, no dashboard.
+    if (await accesoSuspendido(userId, correo)) {
+      navigate({ to: "/servicio-suspendido", replace: true });
       return;
     }
     toast.success("¡Bienvenido!");
@@ -80,7 +86,7 @@ function Entrar() {
       return;
     }
     const { data: sesion } = await supabase.auth.getUser();
-    if (sesion.user) await irADestino(sesion.user.id);
+    if (sesion.user) await irADestino(sesion.user.id, sesion.user.email);
     else navigate({ to: "/inicio", replace: true });
   }
 

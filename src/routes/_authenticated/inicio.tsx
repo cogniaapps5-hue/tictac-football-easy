@@ -1,7 +1,7 @@
 import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Wallet, CalendarCheck, TriangleAlert, Lock, TrendingUp } from "lucide-react";
+import { Wallet, CalendarCheck, TriangleAlert, Lock, TrendingUp, ShieldCheck } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { ReportesAdmin } from "@/components/tictac/Reportes";
 import { ContratosAdmin } from "@/components/tictac/Contratos";
 import { InicioPadre } from "@/components/tictac/InicioPadre";
 import { useSesion, useSaludo, pesos, proximoEntrenamiento } from "@/lib/session";
+import { esSuperAdmin } from "@/lib/suscripcion";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
   head: () => ({
@@ -40,6 +41,13 @@ function Inicio() {
     );
   return sesion.rol === "admin" ? (
     <Shell rol="admin" titulo={`${saludoActual}, ${sesion.nombre}`} subtitulo="Escuela TIC TAC">
+      {esSuperAdmin(sesion.email) ? (
+        <Button asChild variant="accion" size="grande">
+          <Link to="/suscripciones">
+            <ShieldCheck /> Panel de suscripciones
+          </Link>
+        </Button>
+      ) : null}
       <InicioAdmin />
     </Shell>
   ) : (

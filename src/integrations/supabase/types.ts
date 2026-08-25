@@ -428,6 +428,50 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          last_payment_date: string | null
+          monthly_amount: number
+          next_payment_date: string
+          school_id: string
+          school_name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_payment_date?: string | null
+          monthly_amount?: number
+          next_payment_date?: string
+          school_id: string
+          school_name?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_payment_date?: string | null
+          monthly_amount?: number
+          next_payment_date?: string
+          school_id?: string
+          school_name?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       training_slots: {
         Row: {
           created_at: string
@@ -482,6 +526,7 @@ export type Database = {
     }
     Functions: {
       aplicar_bloqueos_morosidad: { Args: never; Returns: number }
+      es_super_admin: { Args: never; Returns: boolean }
       generar_recordatorios_pago: { Args: never; Returns: number }
       has_role: {
         Args: {
@@ -490,6 +535,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      revisar_suscripciones: { Args: never; Returns: Json }
     }
     Enums: {
       access_status:
@@ -499,7 +545,7 @@ export type Database = {
         | "exception"
         | "inactive"
       age_group: "iniciados" | "intermedios" | "avanzados"
-      app_role: "admin" | "parent"
+      app_role: "admin" | "parent" | "super_admin"
       training_day: "martes" | "jueves"
     }
     CompositeTypes: {
@@ -636,7 +682,7 @@ export const Constants = {
         "inactive",
       ],
       age_group: ["iniciados", "intermedios", "avanzados"],
-      app_role: ["admin", "parent"],
+      app_role: ["admin", "parent", "super_admin"],
       training_day: ["martes", "jueves"],
     },
   },
