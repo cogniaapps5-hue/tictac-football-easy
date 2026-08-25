@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as CambiarClaveRouteImport } from './routes/cambiar-clave'
 import { Route as ErrorAccesoRouteImport } from './routes/error-acceso'
+import { Route as ServicioSuspendidoRouteImport } from './routes/servicio-suspendido'
 import { Route as AuthenticatedAlumnosRouteImport } from './routes/_authenticated/alumnos'
 import { Route as AuthenticatedAvisosRouteImport } from './routes/_authenticated/avisos'
 import { Route as AuthenticatedContratoRouteImport } from './routes/_authenticated/contrato'
@@ -39,6 +40,11 @@ const CambiarClaveRoute = CambiarClaveRouteImport.update({
 const ErrorAccesoRoute = ErrorAccesoRouteImport.update({
   id: '/error-acceso',
   path: '/error-acceso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicioSuspendidoRoute = ServicioSuspendidoRouteImport.update({
+  id: '/servicio-suspendido',
+  path: '/servicio-suspendido',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAlumnosRoute = AuthenticatedAlumnosRouteImport.update({
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cambiar-clave': typeof CambiarClaveRoute
   '/error-acceso': typeof ErrorAccesoRoute
+  '/servicio-suspendido': typeof ServicioSuspendidoRoute
   '/alumnos': typeof AuthenticatedAlumnosRoute
   '/avisos': typeof AuthenticatedAvisosRoute
   '/contrato': typeof AuthenticatedContratoRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cambiar-clave': typeof CambiarClaveRoute
   '/error-acceso': typeof ErrorAccesoRoute
+  '/servicio-suspendido': typeof ServicioSuspendidoRoute
   '/alumnos': typeof AuthenticatedAlumnosRoute
   '/avisos': typeof AuthenticatedAvisosRoute
   '/contrato': typeof AuthenticatedContratoRoute
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/cambiar-clave': typeof CambiarClaveRoute
   '/error-acceso': typeof ErrorAccesoRoute
+  '/servicio-suspendido': typeof ServicioSuspendidoRoute
   '/_authenticated/alumnos': typeof AuthenticatedAlumnosRoute
   '/_authenticated/avisos': typeof AuthenticatedAvisosRoute
   '/_authenticated/contrato': typeof AuthenticatedContratoRoute
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/'
     | '/cambiar-clave'
     | '/error-acceso'
+    | '/servicio-suspendido'
     | '/alumnos'
     | '/avisos'
     | '/contrato'
@@ -143,6 +153,7 @@ export interface FileRouteTypes {
     | '/'
     | '/cambiar-clave'
     | '/error-acceso'
+    | '/servicio-suspendido'
     | '/alumnos'
     | '/avisos'
     | '/contrato'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/cambiar-clave'
     | '/error-acceso'
+    | '/servicio-suspendido'
     | '/_authenticated/alumnos'
     | '/_authenticated/avisos'
     | '/_authenticated/contrato'
@@ -172,6 +184,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   CambiarClaveRoute: typeof CambiarClaveRoute
   ErrorAccesoRoute: typeof ErrorAccesoRoute
+  ServicioSuspendidoRoute: typeof ServicioSuspendidoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -202,6 +215,13 @@ declare module '@tanstack/react-router' {
       path: '/error-acceso'
       fullPath: '/error-acceso'
       preLoaderRoute: typeof ErrorAccesoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/servicio-suspendido': {
+      id: '/servicio-suspendido'
+      path: '/servicio-suspendido'
+      fullPath: '/servicio-suspendido'
+      preLoaderRoute: typeof ServicioSuspendidoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/alumnos': {
@@ -293,6 +313,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   CambiarClaveRoute: CambiarClaveRoute,
   ErrorAccesoRoute: ErrorAccesoRoute,
+  ServicioSuspendidoRoute: ServicioSuspendidoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
