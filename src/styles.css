@@ -7,6 +7,8 @@
 @theme inline {
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --color-cyan-brand: var(--cyan-brand);
+  --color-blue-brand: var(--blue-brand);
+  --color-blue-brand-foreground: var(--blue-brand-foreground);
   --color-cyan-brand-foreground: var(--cyan-brand-foreground);
   --color-gold-brand: var(--gold-brand);
   --color-gold-brand-foreground: var(--gold-brand-foreground);
@@ -97,6 +99,8 @@
   --input: oklch(0.3 0 0);
   --ring: oklch(0.84 0.145 199);
   --cyan-brand: oklch(0.84 0.145 199);
+  --blue-brand: oklch(0.58 0.145 235);
+  --blue-brand-foreground: oklch(1 0 0);
   --cyan-brand-foreground: oklch(0.13 0 0);
   --gold-brand: oklch(0.83 0.169 84);
   --gold-brand-foreground: oklch(0.13 0 0);
