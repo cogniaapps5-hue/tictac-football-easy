@@ -47,7 +47,7 @@ function Entrar() {
   const MENSAJE_INACTIVO =
     "Tu cuenta ha sido desactivada. Por favor, contacta a la administración de la escuela para regularizar tu situación.";
 
-  async function irADestino(userId: string) {
+  async function irADestino(userId: string, correo?: string | null) {
     const { data: perfil } = await supabase
       .from("profiles")
       .select("access_status")
@@ -56,6 +56,11 @@ function Entrar() {
     if (perfil?.access_status === "inactive") {
       await limpiarSesion();
       toast.error(MENSAJE_INACTIVO, { duration: 10000 });
+      return;
+    }
+    // Suscripción de la escuela vencida: pantalla de bloqueo, no dashboard.
+    if (await accesoSuspendido(userId, correo)) {
+      navigate({ to: "/servicio-suspendido", replace: true });
       return;
     }
     toast.success("¡Bienvenido!");
