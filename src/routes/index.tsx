@@ -147,7 +147,13 @@ function Entrar() {
             </button>
           </div>
         </div>
-        <Button type="submit" variant="accion" size="grande" disabled={cargando}>
+        <Button
+          type="submit"
+          variant="accion"
+          size="grande"
+          disabled={cargando}
+          className="bg-blue-brand text-blue-brand-foreground"
+        >
           {cargando ? <Loader2 className="animate-spin" /> : <LogIn />}
           ENTRAR
         </Button>
