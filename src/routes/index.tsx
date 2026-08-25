@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import logoAsset from "@/assets/tictac-logo.jpg.asset.json";
 import { limpiarSesion, sesionValida } from "@/lib/sesion";
+import { accesoSuspendido } from "@/lib/suscripcion";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -39,7 +40,7 @@ function Entrar() {
 
   useEffect(() => {
     void sesionValida().then((sesion) => {
-      if (sesion?.user) void irADestino(sesion.user.id);
+      if (sesion?.user) void irADestino(sesion.user.id, sesion.user.email);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
@@ -85,7 +86,7 @@ function Entrar() {
       return;
     }
     const { data: sesion } = await supabase.auth.getUser();
-    if (sesion.user) await irADestino(sesion.user.id);
+    if (sesion.user) await irADestino(sesion.user.id, sesion.user.email);
     else navigate({ to: "/inicio", replace: true });
   }
 
