@@ -15,7 +15,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { pesos, grupoEtiqueta, grupoCorto } from "@/lib/session";
-import logoAsset from "@/assets/tictac-logo.jpg.asset.json";
 
 type Periodo = "semana" | "mes" | "personalizado";
 
@@ -70,7 +69,7 @@ function abrirVentana(titulo: string, subtitulo: string, encabezados: string[], 
     @page { size: A4; margin: 12mm; }
   }
 </style></head><body>
-<header><img src="${logoAsset.url}" alt="Escuela TIC TAC" /><strong>Escuela TIC TAC — Siempre Feliz</strong></header>
+<header><img src="/tictac-logo.jpg" alt="Escuela TIC TAC" /><strong>Escuela TIC TAC — Siempre Feliz</strong></header>
 <h1>${escapar(titulo)}</h1>
 <p class="fecha">${escapar(subtitulo)}</p>
 <table><thead><tr>${encabezados.map((h) => `<th>${escapar(h)}</th>`).join("")}</tr></thead>
