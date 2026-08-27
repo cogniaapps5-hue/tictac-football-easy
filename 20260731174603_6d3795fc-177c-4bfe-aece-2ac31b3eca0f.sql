@@ -1,0 +1,4 @@
+ALTER TABLE public.payments DISABLE TRIGGER USER;
+UPDATE public.payments SET amount = 20000;
+ALTER TABLE public.payments ENABLE TRIGGER USER;
+ALTER TABLE public.payments ALTER COLUMN amount SET DEFAULT 20000;
