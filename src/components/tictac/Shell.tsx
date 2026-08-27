@@ -18,7 +18,6 @@ import { Button } from "@/components/ui/button";
 import { limpiarBorradores } from "@/lib/almacenamiento";
 import { limpiarSesion } from "@/lib/sesion";
 import { useAvisosNoLeidos } from "@/lib/avisos";
-import logoAsset from "@/assets/tictac-logo.jpg.asset.json";
 import { cn } from "@/lib/utils";
 import type { Rol } from "@/lib/session";
 
