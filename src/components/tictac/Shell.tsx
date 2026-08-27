@@ -67,7 +67,7 @@ export function Shell({
     <div className="min-h-dvh bg-background pb-40">
       <header className="sticky top-0 z-20 border-b border-border bg-background/95 px-5 py-4 backdrop-blur">
         <div className="mx-auto flex max-w-lg items-center gap-4">
-          <img src={logoAsset.url} alt="Escuela de fútbol TIC TAC" width={56} height={56} className="h-14 w-14 rounded-full object-cover" />
+          <img src="/tictac-logo.jpg" alt="Escuela de fútbol TIC TAC" width={56} height={56} className="h-14 w-14 rounded-full object-cover" />
           <div className="min-w-0 flex-1">
             <h1 className="truncate text-2xl font-bold leading-tight">{titulo}</h1>
             {subtitulo ? (
