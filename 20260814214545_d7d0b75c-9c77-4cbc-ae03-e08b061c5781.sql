@@ -1,2 +1,0 @@
-CREATE POLICY "comprobantes_update" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'comprobantes') WITH CHECK (bucket_id = 'comprobantes');
-CREATE POLICY "comprobantes_delete_admin" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'comprobantes' AND public.has_role(auth.uid(), 'admin'));

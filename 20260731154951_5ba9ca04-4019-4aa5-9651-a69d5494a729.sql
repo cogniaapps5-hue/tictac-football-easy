@@ -1,1 +1,0 @@
-ALTER TABLE public.payments ADD COLUMN IF NOT EXISTS rejection_reason text;
