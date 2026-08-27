@@ -92,7 +92,7 @@ function Entrar() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-10">
       <img
-        src={logoAsset.url}
+        src="/tictac-logo.jpg"
         alt="Escuela de fútbol TIC TAC"
         width={160}
         height={160}
