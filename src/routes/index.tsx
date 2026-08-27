@@ -7,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import logoAsset from "@/assets/tictac-logo.jpg.asset.json";
 import { limpiarSesion, sesionValida } from "@/lib/sesion";
 import { accesoSuspendido } from "@/lib/suscripcion";
 
