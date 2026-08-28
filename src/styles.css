@@ -172,6 +172,18 @@
     font-size: 1.125rem;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  img,
+  video,
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  img {
+    display: block;
   }
 
   h1 {
