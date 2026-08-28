@@ -434,30 +434,30 @@ function Alumnos() {
 
       <Tarjeta>
         <p className="text-base font-semibold">Grupo etario</p>
-        <div className="mt-2 flex flex-wrap gap-4">
+        <div className="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[{ valor: "todos", etiqueta: "Todos", emoji: "" }, ...GRUPOS].map((g) => (
             <Button
               key={g.valor}
               variant={grupoFiltro === g.valor ? "accion" : "neutro"}
               size="medio"
-              className="h-auto min-h-[60px] flex-1 py-4 text-base"
+              className="h-auto min-h-[60px] w-full min-w-0 py-4 text-base"
               onClick={() => setGrupoFiltro(g.valor)}
             >
-              {g.emoji} {g.etiqueta}
+              <span className="truncate">{g.emoji} {g.etiqueta}</span>
             </Button>
           ))}
         </div>
         <p className="mt-4 text-base font-semibold">Día y sede</p>
-        <div className="mt-2 flex gap-4">
+        <div className="mt-2 grid grid-cols-1 gap-4 sm:grid-cols-3">
           {DIAS.map((d) => (
             <Button
               key={d.valor}
               variant={diaFiltro === d.valor ? "accion" : "neutro"}
               size="medio"
-              className="h-auto min-h-[60px] flex-1 py-4 text-base"
+              className="h-auto min-h-[60px] w-full min-w-0 py-4 text-base"
               onClick={() => setDiaFiltro(d.valor)}
             >
-              {d.largo} {d.hora}
+              <span className="truncate">{d.largo} {d.hora}</span>
             </Button>
           ))}
         </div>

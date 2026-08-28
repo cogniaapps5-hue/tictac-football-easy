@@ -64,7 +64,7 @@ export function Shell({
   }
 
   return (
-    <div className="min-h-dvh bg-background pb-40">
+    <div className="min-h-dvh w-full max-w-[100vw] overflow-x-hidden bg-background pb-40">
       <header className="sticky top-0 z-20 border-b border-border bg-background/95 px-5 py-4 backdrop-blur">
         <div className="mx-auto flex max-w-lg items-center gap-4">
           <img src="/tictac-logo.jpg" alt="Escuela de fútbol TIC TAC" width={56} height={56} className="h-14 w-14 rounded-full object-cover" />
@@ -130,7 +130,7 @@ export function Tarjeta({
   return (
     <section
       className={cn(
-        "rounded-2xl bg-card p-5 shadow-card",
+        "min-w-0 max-w-full overflow-hidden rounded-2xl bg-card p-5 shadow-card",
         destacada ? "border-2 border-cyan-brand" : "border border-border",
         className,
       )}
