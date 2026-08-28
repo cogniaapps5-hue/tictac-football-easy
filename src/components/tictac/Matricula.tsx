@@ -111,7 +111,7 @@ export function MatriculaManual() {
     onError: (e: unknown) => {
       const msg = e instanceof Error ? e.message : "";
       toast.error(
-        msg && msg.length < 120 ? msg : "No pudimos matricular al alumno. Intenta nuevamente.",
+        msg && msg.length < 200 ? msg : "No pudimos matricular al alumno. Intenta nuevamente.",
       );
     },
   });

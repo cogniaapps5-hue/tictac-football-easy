@@ -145,7 +145,7 @@ function Info() {
           <li className="rounded-xl bg-secondary p-4">
             <p className="text-base font-bold">Martes 19:00 a 20:00 hrs</p>
             <p className="text-base text-muted-foreground">
-              📍 Forza Training Club — Las Azucenas #505, Sindempart, Coquimbo
+              📍 Forza Training Club — Las Azucenas #505, SINDEPART, Coquimbo
             </p>
           </li>
           <li className="rounded-xl bg-secondary p-4">

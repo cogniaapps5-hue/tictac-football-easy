@@ -238,9 +238,15 @@ export function InicioPadre({
         </div>
         <p className="mt-4 break-words text-lg font-bold">📅 Día: Martes y Jueves</p>
         <p className="mt-1 break-words text-lg font-bold">⏰ Hora: 19:00 a 20:00 hrs</p>
-        <p className="mt-1 break-words text-lg font-bold">
-          📍 Sede: Rancho Rossi Peñuelas / Forza Club Simdempart
-        </p>
+        <div className="mt-1 flex w-full max-w-full flex-wrap items-start gap-x-2 gap-y-1 overflow-hidden">
+          <span className="shrink-0 text-base font-bold sm:text-lg">📍 Sedes:</span>
+          <span className="min-w-0 break-words text-base font-bold sm:text-lg">
+            Rancho Rossi Peñuelas
+          </span>
+          <span className="min-w-0 break-words text-base font-bold sm:text-lg">
+            Forza Club SINDEPART
+          </span>
+        </div>
         <p className="mt-3 break-words text-base capitalize text-muted-foreground">
           Tu próxima clase: {proximo.texto} — {proximo.sede}
         </p>
