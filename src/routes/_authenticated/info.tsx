@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Shell, Tarjeta } from "@/components/tictac/Shell";
 import { supabase } from "@/integrations/supabase/client";
 import { useSesion } from "@/lib/session";
+import { FotoProfesor } from "@/components/tictac/FotoProfesor";
 import { estiloAviso, marcarAvisosVistos, ordenarAvisos, useAvisos } from "@/lib/avisos";
 
 export const Route = createFileRoute("/_authenticated/info")({
@@ -281,50 +282,6 @@ function NuestrosProfesores() {
         </Button>
       </div>
     </Tarjeta>
-  );
-}
-
-function iniciales(nombre: string) {
-  return nombre
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0])
-    .join("")
-    .toUpperCase();
-}
-
-function FotoProfesor({
-  url,
-  nombre,
-  colorBorde,
-  colorTexto,
-}: {
-  url: string | null;
-  nombre: string;
-  colorBorde: string;
-  colorTexto: string;
-}) {
-  const [error, setError] = useState(false);
-
-  if (!url || error) {
-    return (
-      <div
-        className={`flex size-[200px] max-w-full items-center justify-center rounded-2xl border-2 bg-card text-6xl font-black ${colorBorde} ${colorTexto}`}
-      >
-        {iniciales(nombre)}
-      </div>
-    );
-  }
-
-  return (
-    <img
-      src={url}
-      alt={`Foto del profesor ${nombre}`}
-      loading="lazy"
-      onError={() => setError(true)}
-      className={`h-[280px] w-full rounded-2xl border-2 bg-card object-contain ${colorBorde}`}
-    />
   );
 }
 
