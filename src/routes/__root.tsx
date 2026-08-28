@@ -138,9 +138,37 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function registerServiceWorker() {
+  if (!import.meta.env.PROD) return;
+  if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
+  const host = window.location.hostname;
+  const isPreview =
+    window.self !== window.top ||
+    host.startsWith("id-preview--") ||
+    host.startsWith("preview--") ||
+    host === "lovableproject.com" ||
+    host.endsWith(".lovableproject.com") ||
+    host.endsWith(".lovableproject-dev.com") ||
+    host.endsWith(".beta.lovable.dev");
+  const swOff = new URLSearchParams(window.location.search).get("sw") === "off";
+  if (isPreview || swOff) {
+    navigator.serviceWorker.getRegistrations().then((regs) => {
+      regs.forEach((r) => r.unregister());
+    });
+    return;
+  }
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  });
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
