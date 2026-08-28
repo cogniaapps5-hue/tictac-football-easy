@@ -2,14 +2,13 @@ import { useState } from "react";
 
 /** Fotos locales en public/profes/ como respaldo cuando la base no trae photo_url. */
 const FOTOS_LOCALES: Record<string, string> = {
-  "felipe guerrero": "luis-felipe",
-  "luis felipe guerrero": "luis-felipe",
-  "luis felipe guerrero ossa": "luis-felipe",
-  "paola ugalde": "paola",
-  "paola monserrat ugalde": "paola",
-  "paola monserrat ugalde rojo": "paola",
+  "felipe guerrero": "felipe-guerrero",
+  "luis felipe guerrero": "felipe-guerrero",
+  "luis felipe guerrero ossa": "felipe-guerrero",
   "sebastian cerda": "sebastian-cerda",
+  "sebastian antonio cerda tapia": "sebastian-cerda",
   "cristopher hormazabal": "cristopher-hormazabal",
+  "cristopher alan hormazabal torres": "cristopher-hormazabal",
 };
 
 function normalizar(nombre: string) {
