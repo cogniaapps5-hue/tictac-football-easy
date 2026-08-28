@@ -280,24 +280,33 @@ function Pagos() {
         <EstadoVacio emoji="💳" texto="No hay pagos registrados todavía." />
       ) : null}
       <Tarjeta>
-        <div className="flex gap-4">
-          {(
-            [
-              ["pending", `Pendientes (${pendientes})`],
-              ["approved", "Aprobados"],
-              ["rejected", "Rechazados"],
-            ] as [Filtro, string][]
-          ).map(([valor, texto]) => (
-            <Button
-              key={valor}
-              variant={filtro === valor ? "accion" : "neutro"}
-              size="medio"
-              className="flex-1"
-              onClick={() => setFiltro(valor)}
-            >
-              {texto}
-            </Button>
-          ))}
+        <div className="flex flex-col gap-4">
+          <Button
+            variant={filtro === "pending" ? "accion" : "neutro"}
+            size="medio"
+            className="w-full"
+            onClick={() => setFiltro("pending")}
+          >
+            {`Pendientes (${pendientes})`}
+          </Button>
+          <div className="grid grid-cols-2 gap-4">
+            {(
+              [
+                ["approved", "Aprobados"],
+                ["rejected", "Rechazados"],
+              ] as [Filtro, string][]
+            ).map(([valor, texto]) => (
+              <Button
+                key={valor}
+                variant={filtro === valor ? "accion" : "neutro"}
+                size="medio"
+                className="w-full py-3 px-4"
+                onClick={() => setFiltro(valor)}
+              >
+                {texto}
+              </Button>
+            ))}
+          </div>
         </div>
       </Tarjeta>
 
