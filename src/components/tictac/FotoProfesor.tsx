@@ -2,11 +2,14 @@ import { useState } from "react";
 
 /** Fotos locales en public/profes/ como respaldo cuando la base no trae photo_url. */
 const FOTOS_LOCALES: Record<string, string> = {
-  "felipe guerrero": "/profes/felipe-guerrero.jpg",
-  "luis felipe guerrero": "/profes/felipe-guerrero.jpg",
-  "luis felipe guerrero ossa": "/profes/felipe-guerrero.jpg",
-  "sebastian cerda": "/profes/sebastian-cerda.jpg",
-  "cristopher hormazabal": "/profes/cristopher-hormazabal.jpg",
+  "felipe guerrero": "luis-felipe",
+  "luis felipe guerrero": "luis-felipe",
+  "luis felipe guerrero ossa": "luis-felipe",
+  "paola ugalde": "paola",
+  "paola monserrat ugalde": "paola",
+  "paola monserrat ugalde rojo": "paola",
+  "sebastian cerda": "sebastian-cerda",
+  "cristopher hormazabal": "cristopher-hormazabal",
 };
 
 function normalizar(nombre: string) {
@@ -29,7 +32,8 @@ export function iniciales(nombre: string) {
 }
 
 export function fotoLocal(nombre: string) {
-  return FOTOS_LOCALES[normalizar(nombre)] ?? null;
+  const clave = FOTOS_LOCALES[normalizar(nombre)];
+  return clave ? `/profes/${clave}.jpg` : null;
 }
 
 export function FotoProfesor({
@@ -48,10 +52,13 @@ export function FotoProfesor({
   const fuente = url?.trim() || fotoLocal(nombre);
   const [error, setError] = useState(false);
 
+  // Debug: ver en consola qué ruta intenta cargar cada profesor
+  console.log(`[FotoProfesor] ${nombre} →`, fuente ?? "(sin foto, mostrando iniciales)");
+
   if (!fuente || error) {
     return (
       <div
-        className={`flex size-[200px] max-w-full items-center justify-center rounded-full border-4 bg-card text-6xl font-black ${colorBorde} ${colorTexto} ${className}`}
+        className={`flex h-[120px] w-[120px] items-center justify-center rounded-full border-4 bg-card text-4xl font-black ${colorBorde} ${colorTexto} ${className}`}
         aria-label={`Sin foto de ${nombre}`}
       >
         {iniciales(nombre)}
@@ -65,8 +72,11 @@ export function FotoProfesor({
       alt={`Foto del profesor ${nombre}`}
       loading="lazy"
       decoding="async"
-      onError={() => setError(true)}
-      className={`h-[280px] w-full rounded-2xl border-2 bg-card object-contain ${colorBorde} ${className}`}
+      onError={() => {
+        console.warn(`[FotoProfesor] No se pudo cargar: ${fuente}`);
+        setError(true);
+      }}
+      className={`h-[120px] w-[120px] rounded-full border-4 bg-card object-cover ${colorBorde} ${className}`}
     />
   );
 }
