@@ -51,7 +51,7 @@ export const matricularAlumno = createServerFn({ method: "POST" })
       .select("id")
       .eq("rut", data.rut_alumno)
       .maybeSingle();
-    if (rutExiste) throw new Error("Este RUT ya está matriculado");
+    if (rutExiste) throw new Error("Este RUT ya está matriculado en la escuela");
 
     const { data: perfil } = await supabaseAdmin
       .from("profiles")
@@ -80,10 +80,19 @@ export const matricularAlumno = createServerFn({ method: "POST" })
         },
       });
       if (errorAuth || !creado.user) {
-        throw new Error("No pudimos crear la cuenta del apoderado. Intenta nuevamente.");
+        // Puede existir en Auth aunque no tenga perfil: reutilizamos esa cuenta.
+        const { data: lista } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+        const existente = lista?.users?.find((u) => (u.email ?? "").toLowerCase() === email);
+        if (!existente) {
+          throw new Error(
+            `No pudimos crear la cuenta del apoderado: ${errorAuth?.message ?? "error desconocido"}`,
+          );
+        }
+        parentId = existente.id;
+      } else {
+        parentId = creado.user.id;
+        nuevoUsuario = true;
       }
-      parentId = creado.user.id;
-      nuevoUsuario = true;
 
       await supabaseAdmin.from("profiles").upsert(
         {
@@ -121,7 +130,7 @@ export const matricularAlumno = createServerFn({ method: "POST" })
       parent_id: parentId,
       access_status: "active",
     });
-    if (error) throw new Error("No pudimos guardar al alumno. Intenta nuevamente.");
+    if (error) throw new Error(`No pudimos guardar al alumno: ${error.message}`);
 
     return {
       email,
