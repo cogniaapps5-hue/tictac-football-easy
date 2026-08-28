@@ -88,6 +88,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "Escuela TIC TAC" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "mobile-web-app-capable", content: "yes" },
+      { name: "application-name", content: "Escuela Tic Tac" },
+      { name: "msapplication-tap-highlight", content: "no" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "apple-mobile-web-app-title", content: "TIC TAC" },
       { name: "theme-color", content: "#00E5FF" },
