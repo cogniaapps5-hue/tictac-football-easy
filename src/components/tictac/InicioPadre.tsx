@@ -239,7 +239,7 @@ export function InicioPadre({
         <p className="mt-4 break-words text-lg font-bold">📅 Día: Martes y Jueves</p>
         <p className="mt-1 break-words text-lg font-bold">⏰ Hora: 19:00 a 20:00 hrs</p>
         <p className="mt-1 break-words text-lg font-bold">
-          📍 Sede: Rancho Rossi Peñuelas / Forza Club Simdempart
+          📍 Sede: Rancho Rossi Peñuelas / Forza Club SINDEPART
         </p>
         <p className="mt-3 break-words text-base capitalize text-muted-foreground">
           Tu próxima clase: {proximo.texto} — {proximo.sede}
