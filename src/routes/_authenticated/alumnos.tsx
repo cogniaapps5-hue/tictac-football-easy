@@ -383,7 +383,10 @@ function Alumnos() {
         <p className="mt-2 text-xl font-bold text-cyan-brand">
           {sedeActual.largo} {sedeActual.hora} hrs
         </p>
-        <p className="text-lg font-semibold">📍 {sedeActual.sede}</p>
+        <p className="flex w-full min-w-0 max-w-full items-center gap-1 overflow-hidden text-base font-semibold sm:text-lg">
+          <span className="shrink-0">📍</span>
+          <span className="min-w-0 flex-1 truncate">{sedeActual.sede}</span>
+        </p>
         <p className="mt-1 text-base capitalize text-muted-foreground">{proximo.texto}</p>
       </Tarjeta>
 
