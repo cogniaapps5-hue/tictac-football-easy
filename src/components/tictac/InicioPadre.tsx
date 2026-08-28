@@ -231,17 +231,17 @@ export function InicioPadre({
         </Tarjeta>
       ) : null}
 
-      <Tarjeta destacada className="border-[3px] p-6">
-        <div className="flex items-center gap-3">
-          <CalendarDays className="size-7 text-cyan-brand" />
-          <h2 className="text-2xl font-black">Próximo Entrenamiento</h2>
+      <Tarjeta destacada className="w-full overflow-hidden border-[3px] p-6 [box-sizing:border-box]">
+        <div className="flex min-w-0 items-center gap-3">
+          <CalendarDays className="size-7 shrink-0 text-cyan-brand" />
+          <h2 className="min-w-0 text-2xl font-black">Próximo Entrenamiento</h2>
         </div>
-        <p className="mt-4 text-lg font-bold">📅 Día: Martes y Jueves</p>
-        <p className="mt-1 text-lg font-bold">⏰ Hora: 19:00 a 20:00 hrs</p>
-        <p className="mt-1 text-lg font-bold">
+        <p className="mt-4 break-words text-lg font-bold">📅 Día: Martes y Jueves</p>
+        <p className="mt-1 break-words text-lg font-bold">⏰ Hora: 19:00 a 20:00 hrs</p>
+        <p className="mt-1 break-words text-lg font-bold">
           📍 Sede: Rancho Rossi Peñuelas / Forza Club Simdempart
         </p>
-        <p className="mt-3 text-base capitalize text-muted-foreground">
+        <p className="mt-3 break-words text-base capitalize text-muted-foreground">
           Tu próxima clase: {proximo.texto} — {proximo.sede}
         </p>
 
