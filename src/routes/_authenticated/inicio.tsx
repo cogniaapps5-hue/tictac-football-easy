@@ -93,7 +93,10 @@ function InicioAdmin() {
           .from("players")
           .select("id, access_status, is_scholarship")
           .neq("access_status", "inactive"),
-        supabase.from("attendance").select("id, status").eq("session_date", proximo.iso),
+        supabase
+          .from("attendance")
+          .select("id, status, players(name)")
+          .eq("session_date", proximo.iso),
       ]);
       const fallida = [pagos, alumnos, asistencia].find((r) => r.error);
       if (fallida?.error) throw fallida.error;
