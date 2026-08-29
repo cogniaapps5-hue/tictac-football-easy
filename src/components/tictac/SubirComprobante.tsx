@@ -59,6 +59,7 @@ export function SubirComprobante({
       return;
     }
     setError(null);
+    setConfirmado(false);
     setProgreso(0);
     setArchivo(file);
     setVista(urlVistaPrevia(file));
