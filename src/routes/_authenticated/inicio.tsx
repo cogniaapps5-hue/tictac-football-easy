@@ -187,7 +187,41 @@ function InicioAdmin() {
         <p className="text-lg font-bold text-cyan-brand">{proximo.titulo}</p>
         <p className="text-base font-semibold">📍 {proximo.sede}</p>
         <p className="text-base capitalize text-muted-foreground">{proximo.texto}</p>
-        <Button asChild variant="contorno" size="grande" className="mt-4">
+
+        <p className="mt-4 text-lg font-bold text-success">
+          {data?.confirmados ?? 0}{" "}
+          {data?.confirmados === 1
+            ? "alumno confirmó asistencia"
+            : "alumnos confirmaron asistencia"}
+        </p>
+        {data?.nombresConfirmados?.length ? (
+          <details className="mt-2 rounded-xl bg-secondary p-4">
+            <summary className="cursor-pointer text-base font-bold">
+              Ver nombres de quienes confirmaron
+            </summary>
+            <ul className="mt-3 space-y-2">
+              {data.nombresConfirmados.map((nombre, i) => (
+                <li key={`${nombre}-${i}`} className="text-base font-semibold break-words">
+                  ✅ {nombre}
+                </li>
+              ))}
+            </ul>
+          </details>
+        ) : (
+          <p className="mt-2 text-base text-muted-foreground">
+            Todavía nadie confirma para esta clase.
+          </p>
+        )}
+
+        <Button
+          variant="neutro"
+          size="grande"
+          className="mt-4 w-full"
+          onClick={() => void refetch()}
+        >
+          <RefreshCw /> Actualizar asistencia
+        </Button>
+        <Button asChild variant="contorno" size="grande" className="mt-3">
           <Link to="/alumnos">Ver Lista</Link>
         </Button>
       </Tarjeta>
