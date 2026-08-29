@@ -181,6 +181,16 @@ export function SubirComprobante({
         <Camera /> {etiqueta}
       </Button>
 
+      {confirmado ? (
+        <p
+          role="status"
+          className="mt-3 rounded-xl bg-success/15 p-4 text-base font-semibold text-success"
+        >
+          ✅ Comprobante recibido. Lo revisaremos y te notificaremos cuando sea aprobado.
+        </p>
+      ) : null}
+
+
       <Dialog open={Boolean(archivo)} onOpenChange={(v) => (v ? null : cerrar())}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
           <DialogHeader>
