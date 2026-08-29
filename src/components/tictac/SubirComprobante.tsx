@@ -139,7 +139,11 @@ export function SubirComprobante({
       queryClient.invalidateQueries({ queryKey: ["resumen-padre"] });
       queryClient.invalidateQueries({ queryKey: ["mi-hijo"] });
       queryClient.invalidateQueries({ queryKey: ["pagos"] });
-      toast.success("¡Comprobante enviado! La escuela lo revisará. 🙏");
+      toast.success("✅ Comprobante recibido", {
+        description: "Lo revisaremos y te notificaremos cuando sea aprobado.",
+        duration: 8000,
+      });
+      setConfirmado(true);
       cerrar();
     },
     onError: (e: unknown) => {
