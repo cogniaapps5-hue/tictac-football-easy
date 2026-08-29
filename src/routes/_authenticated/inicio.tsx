@@ -1,7 +1,15 @@
 import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Wallet, CalendarCheck, TriangleAlert, Lock, TrendingUp, ShieldCheck } from "lucide-react";
+import {
+  Wallet,
+  CalendarCheck,
+  TriangleAlert,
+  Lock,
+  TrendingUp,
+  ShieldCheck,
+  RefreshCw,
+} from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
