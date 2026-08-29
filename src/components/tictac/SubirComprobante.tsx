@@ -47,6 +47,7 @@ export function SubirComprobante({
   const [vista, setVista] = useState<string | null>(null);
   const [progreso, setProgreso] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [confirmado, setConfirmado] = useState(false);
 
   function elegir(file: File) {
     if (file.size > MAXIMO_MB * 1024 * 1024) {
@@ -58,6 +59,7 @@ export function SubirComprobante({
       return;
     }
     setError(null);
+    setConfirmado(false);
     setProgreso(0);
     setArchivo(file);
     setVista(urlVistaPrevia(file));
@@ -139,7 +141,11 @@ export function SubirComprobante({
       queryClient.invalidateQueries({ queryKey: ["resumen-padre"] });
       queryClient.invalidateQueries({ queryKey: ["mi-hijo"] });
       queryClient.invalidateQueries({ queryKey: ["pagos"] });
-      toast.success("¡Comprobante enviado! La escuela lo revisará. 🙏");
+      toast.success("✅ Comprobante recibido", {
+        description: "Lo revisaremos y te notificaremos cuando sea aprobado.",
+        duration: 8000,
+      });
+      setConfirmado(true);
       cerrar();
     },
     onError: (e: unknown) => {
@@ -174,6 +180,16 @@ export function SubirComprobante({
       >
         <Camera /> {etiqueta}
       </Button>
+
+      {confirmado ? (
+        <p
+          role="status"
+          className="mt-3 rounded-xl bg-success/15 p-4 text-base font-semibold text-success"
+        >
+          ✅ Comprobante recibido. Lo revisaremos y te notificaremos cuando sea aprobado.
+        </p>
+      ) : null}
+
 
       <Dialog open={Boolean(archivo)} onOpenChange={(v) => (v ? null : cerrar())}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">

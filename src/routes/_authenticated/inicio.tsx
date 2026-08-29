@@ -1,7 +1,15 @@
 import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Wallet, CalendarCheck, TriangleAlert, Lock, TrendingUp, ShieldCheck } from "lucide-react";
+import {
+  Wallet,
+  CalendarCheck,
+  TriangleAlert,
+  Lock,
+  TrendingUp,
+  ShieldCheck,
+  RefreshCw,
+} from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -93,7 +101,10 @@ function InicioAdmin() {
           .from("players")
           .select("id, access_status, is_scholarship")
           .neq("access_status", "inactive"),
-        supabase.from("attendance").select("id, status").eq("session_date", proximo.iso),
+        supabase
+          .from("attendance")
+          .select("id, status, players(name)")
+          .eq("session_date", proximo.iso),
       ]);
       const fallida = [pagos, alumnos, asistencia].find((r) => r.error);
       if (fallida?.error) throw fallida.error;
@@ -119,6 +130,10 @@ function InicioAdmin() {
           (a) => a.access_status === "blocked" && !a.is_scholarship,
         ).length,
         confirmados: (asistencia.data ?? []).filter((a) => a.status === "confirmed").length,
+        nombresConfirmados: (asistencia.data ?? [])
+          .filter((a) => a.status === "confirmed")
+          .map((a) => (a.players as { name?: string } | null)?.name ?? "Alumno")
+          .sort((x, y) => x.localeCompare(y, "es")),
       };
     },
   });
@@ -180,7 +195,41 @@ function InicioAdmin() {
         <p className="text-lg font-bold text-cyan-brand">{proximo.titulo}</p>
         <p className="text-base font-semibold">📍 {proximo.sede}</p>
         <p className="text-base capitalize text-muted-foreground">{proximo.texto}</p>
-        <Button asChild variant="contorno" size="grande" className="mt-4">
+
+        <p className="mt-4 text-lg font-bold text-success">
+          {data?.confirmados ?? 0}{" "}
+          {data?.confirmados === 1
+            ? "alumno confirmó asistencia"
+            : "alumnos confirmaron asistencia"}
+        </p>
+        {data?.nombresConfirmados?.length ? (
+          <details className="mt-2 rounded-xl bg-secondary p-4">
+            <summary className="cursor-pointer text-base font-bold">
+              Ver nombres de quienes confirmaron
+            </summary>
+            <ul className="mt-3 space-y-2">
+              {data.nombresConfirmados.map((nombre, i) => (
+                <li key={`${nombre}-${i}`} className="text-base font-semibold break-words">
+                  ✅ {nombre}
+                </li>
+              ))}
+            </ul>
+          </details>
+        ) : (
+          <p className="mt-2 text-base text-muted-foreground">
+            Todavía nadie confirma para esta clase.
+          </p>
+        )}
+
+        <Button
+          variant="neutro"
+          size="grande"
+          className="mt-4 w-full"
+          onClick={() => void refetch()}
+        >
+          <RefreshCw /> Actualizar asistencia
+        </Button>
+        <Button asChild variant="contorno" size="grande" className="mt-3">
           <Link to="/alumnos">Ver Lista</Link>
         </Button>
       </Tarjeta>
