@@ -122,6 +122,10 @@ function InicioAdmin() {
           (a) => a.access_status === "blocked" && !a.is_scholarship,
         ).length,
         confirmados: (asistencia.data ?? []).filter((a) => a.status === "confirmed").length,
+        nombresConfirmados: (asistencia.data ?? [])
+          .filter((a) => a.status === "confirmed")
+          .map((a) => (a.players as { name?: string } | null)?.name ?? "Alumno")
+          .sort((x, y) => x.localeCompare(y, "es")),
       };
     },
   });
