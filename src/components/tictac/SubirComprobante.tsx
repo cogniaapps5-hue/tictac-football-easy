@@ -47,6 +47,7 @@ export function SubirComprobante({
   const [vista, setVista] = useState<string | null>(null);
   const [progreso, setProgreso] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [confirmado, setConfirmado] = useState(false);
 
   function elegir(file: File) {
     if (file.size > MAXIMO_MB * 1024 * 1024) {
