@@ -244,7 +244,7 @@ export function InicioPadre({
             Rancho Rossi Peñuelas
           </span>
           <span className="min-w-0 break-words text-base font-bold sm:text-lg">
-            Forza Club SINDEPART
+            Forza Club Sindempart
           </span>
         </div>
         <p className="mt-3 break-words text-base capitalize text-muted-foreground">
