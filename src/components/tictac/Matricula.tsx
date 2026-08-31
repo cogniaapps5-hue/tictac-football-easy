@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Copy, Loader2, MessageCircle, UserPlus, X } from "lucide-react";
+import { Copy, Loader2, MessageCircle, TestTube2, UserPlus, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import { edadDesde, grupoPorEdad } from "@/lib/carga-masiva-utils";
 import { borrarBorrador, guardarBorrador, leerBorrador } from "@/lib/almacenamiento";
 import {
   matricularAlumno,
+  probarRegistroAlumno,
   type EntradaMatricula,
   type ResultadoMatricula,
 } from "@/lib/matricula.functions";
@@ -53,7 +54,7 @@ function Campo({
 }) {
   return (
     <div className="space-y-2">
-      <Label className="text-base">{etiqueta}</Label>
+      <Label className="text-base">{etiqueta} <span className="text-danger">*</span></Label>
       {children}
       {error ? <p className="text-base font-semibold text-danger">Este dato es obligatorio</p> : null}
     </div>
@@ -65,10 +66,12 @@ export function MatriculaManual() {
   const [abierto, setAbierto] = useState(false);
   const [form, setForm] = useState({ ...VACIO });
   const [tocado, setTocado] = useState(false);
+  const [resultadoTest, setResultadoTest] = useState<string | null>(null);
   const [credenciales, setCredenciales] = useState<
     (ResultadoMatricula & { apoderado: string; alumno: string }) | null
   >(null);
   const enviar = useServerFn(matricularAlumno);
+  const ejecutarTest = useServerFn(probarRegistroAlumno);
 
   // Borrador local: si la administradora recarga la página, no pierde lo escrito.
   useEffect(() => {
@@ -98,7 +101,25 @@ export function MatriculaManual() {
   }, [sucio]);
 
   const guardar = useMutation({
-    mutationFn: async () => (await enviar({ data: form as EntradaMatricula })) as ResultadoMatricula,
+    mutationFn: async () => {
+      console.log("[REGISTRO] Paso 1: formulario validado", {
+        camposCompletos: !hayErrores,
+        tieneEmail: Boolean(form.email.trim()),
+        tieneRutAlumno: form.rut_alumno.replace(/\D/g, "").length >= 6,
+        dias: [form.training_tuesday && "martes", form.training_thursday && "jueves"].filter(Boolean),
+      });
+      console.log("[REGISTRO] Paso 2: enviando solicitud segura al backend");
+      try {
+        const respuesta = (await enviar({ data: form as EntradaMatricula })) as ResultadoMatricula;
+        console.log("[REGISTRO] Paso 3: respuesta exitosa", { nuevoUsuario: respuesta.nuevoUsuario });
+        return respuesta;
+      } catch (error) {
+        console.error("[REGISTRO] Paso 3: respuesta con error", {
+          message: error instanceof Error ? error.message : "Error desconocido",
+        });
+        throw error;
+      }
+    },
     onSuccess: (r) => {
       setCredenciales({ ...r, apoderado: form.nombre_apoderado, alumno: form.nombre_alumno });
       queryClient.invalidateQueries();
@@ -109,10 +130,28 @@ export function MatriculaManual() {
       setForm({ ...VACIO });
     },
     onError: (e: unknown) => {
-      const msg = e instanceof Error ? e.message : "";
-      toast.error(
-        msg && msg.length < 200 ? msg : "No pudimos matricular al alumno. Intenta nuevamente.",
-      );
+      const msg = e instanceof Error ? e.message : "Error desconocido durante la matrícula";
+      toast.error(`❌ ${msg}`, { duration: 12000 });
+    },
+  });
+
+  const probar = useMutation({
+    mutationFn: async () => {
+      console.log("[TEST REGISTRO] Paso 1: solicitando creación y eliminación aislada");
+      const respuesta = await ejecutarTest();
+      console.log("[TEST REGISTRO] Paso 2: respuesta", respuesta);
+      return respuesta;
+    },
+    onSuccess: (resultado) => {
+      setResultadoTest(`${resultado.mensaje}: ${resultado.etapas.join(" · ")}`);
+      toast.success(resultado.mensaje, { duration: 10000 });
+      void queryClient.invalidateQueries({ queryKey: ["alumnos"] });
+    },
+    onError: (error: unknown) => {
+      const mensaje = error instanceof Error ? error.message : "Error desconocido";
+      setResultadoTest(`❌ TEST FALLÓ: ${mensaje}`);
+      toast.error(`❌ TEST FALLÓ: ${mensaje}`, { duration: 15000 });
+      console.error("[TEST REGISTRO] Falló", { message: mensaje });
     },
   });
 
@@ -171,6 +210,7 @@ export function MatriculaManual() {
               <Input
                 value={form.nombre_apoderado}
                 onChange={(e) => setForm({ ...form, nombre_apoderado: e.target.value })}
+                aria-invalid={tocado && faltan.nombre_apoderado}
                 className={`h-14 rounded-xl text-lg ${tocado && faltan.nombre_apoderado ? "border-2 border-danger" : ""}`}
               />
             </Campo>
@@ -178,6 +218,7 @@ export function MatriculaManual() {
               <Input
                 value={form.rut_apoderado}
                 onChange={(e) => setForm({ ...form, rut_apoderado: e.target.value })}
+                aria-invalid={tocado && faltan.rut_apoderado}
                 className={`h-14 rounded-xl text-lg ${tocado && faltan.rut_apoderado ? "border-2 border-danger" : ""}`}
               />
             </Campo>
@@ -186,6 +227,7 @@ export function MatriculaManual() {
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
+                aria-invalid={tocado && faltan.email}
                 className={`h-14 rounded-xl text-lg ${tocado && faltan.email ? "border-2 border-danger" : ""}`}
               />
             </Campo>
@@ -193,6 +235,7 @@ export function MatriculaManual() {
               <Input
                 value={form.telefono}
                 onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+                aria-invalid={tocado && faltan.telefono}
                 className={`h-14 rounded-xl text-lg ${tocado && faltan.telefono ? "border-2 border-danger" : ""}`}
               />
             </Campo>
@@ -202,14 +245,16 @@ export function MatriculaManual() {
               <Input
                 value={form.nombre_alumno}
                 onChange={(e) => setForm({ ...form, nombre_alumno: e.target.value })}
+                aria-invalid={tocado && faltan.nombre_alumno}
                 className={`h-14 rounded-xl text-lg ${tocado && faltan.nombre_alumno ? "border-2 border-danger" : ""}`}
               />
             </Campo>
             <div className="space-y-2">
-              <Label className="text-base">RUT del alumno (12345678-9)</Label>
+              <Label className="text-base">RUT del alumno (12345678-9) <span className="text-danger">*</span></Label>
               <Input
                 value={form.rut_alumno}
                 onChange={(e) => setForm({ ...form, rut_alumno: e.target.value })}
+                aria-invalid={tocado && faltan.rut_alumno}
                 className={`h-14 rounded-xl text-lg ${tocado && faltan.rut_alumno ? "border-2 border-danger" : ""}`}
               />
               {tocado && faltan.rut_alumno ? (
@@ -223,12 +268,13 @@ export function MatriculaManual() {
               )}
             </div>
             <div className="space-y-2">
-              <Label className="text-base">Fecha de nacimiento</Label>
+              <Label className="text-base">Fecha de nacimiento <span className="text-danger">*</span></Label>
               <Input
                 type="date"
                 max={new Date().toISOString().slice(0, 10)}
                 value={form.fecha_nacimiento}
                 onChange={(e) => setForm({ ...form, fecha_nacimiento: e.target.value })}
+                aria-invalid={tocado && faltan.fecha_nacimiento}
                 className={`h-14 rounded-xl text-lg ${tocado && faltan.fecha_nacimiento ? "border-2 border-danger" : ""}`}
               />
               {tocado && faltan.fecha_nacimiento ? (
@@ -264,7 +310,7 @@ export function MatriculaManual() {
               />
             </div>
 
-            <p className="text-lg font-black text-cyan-brand">📅 Días de entrenamiento</p>
+            <p className="text-lg font-black text-cyan-brand">📅 Días de entrenamiento <span className="text-danger">*</span></p>
             <div className="flex gap-3">
               <Button
                 type="button"
@@ -291,7 +337,7 @@ export function MatriculaManual() {
             <Button
               variant="alerta"
               size="grande"
-              disabled={guardar.isPending}
+              disabled={guardar.isPending || probar.isPending}
               onClick={() => {
                 setTocado(true);
                 if (hayErrores) {
@@ -305,10 +351,26 @@ export function MatriculaManual() {
                 guardar.mutate();
               }}
             >
-              {guardar.isPending ? <Loader2 className="animate-spin" /> : <UserPlus />} Crear Cuenta y
-              Matricular
+              {guardar.isPending ? <Loader2 className="animate-spin" /> : <UserPlus />}
+              {guardar.isPending ? "Registrando..." : "Crear Cuenta y Matricular"}
             </Button>
-            <Button variant="neutro" size="medio" className="w-full" onClick={cerrar}>
+            <Button
+              type="button"
+              variant="neutro"
+              size="medio"
+              className="w-full"
+              disabled={guardar.isPending || probar.isPending}
+              onClick={() => probar.mutate()}
+            >
+              {probar.isPending ? <Loader2 className="animate-spin" /> : <TestTube2 />}
+              {probar.isPending ? "Probando registro..." : "Probar Registro"}
+            </Button>
+            {resultadoTest ? (
+              <p role="status" className={`rounded-xl border-2 p-3 text-base font-bold ${resultadoTest.startsWith("✅") ? "border-success text-success" : "border-danger text-danger"}`}>
+                {resultadoTest}
+              </p>
+            ) : null}
+            <Button variant="neutro" size="medio" className="w-full" disabled={guardar.isPending || probar.isPending} onClick={cerrar}>
               <X /> Cancelar
             </Button>
           </div>
