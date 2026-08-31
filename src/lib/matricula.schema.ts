@@ -28,8 +28,3 @@ export type ResultadoMatricula = {
   hermanos: string[];
 };
 
-export type ResultadoTestMatricula = {
-  ok: true;
-  mensaje: string;
-  etapas: string[];
-};

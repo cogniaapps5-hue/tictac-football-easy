@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Copy, Loader2, MessageCircle, TestTube2, UserPlus, X } from "lucide-react";
+import { Copy, Loader2, MessageCircle, UserPlus, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,6 @@ import { edadDesde, grupoPorEdad } from "@/lib/carga-masiva-utils";
 import { borrarBorrador, guardarBorrador, leerBorrador } from "@/lib/almacenamiento";
 import {
   matricularAlumno,
-  probarRegistroAlumno,
   type EntradaMatricula,
   type ResultadoMatricula,
 } from "@/lib/matricula.functions";
@@ -66,12 +65,10 @@ export function MatriculaManual() {
   const [abierto, setAbierto] = useState(false);
   const [form, setForm] = useState({ ...VACIO });
   const [tocado, setTocado] = useState(false);
-  const [resultadoTest, setResultadoTest] = useState<string | null>(null);
   const [credenciales, setCredenciales] = useState<
     (ResultadoMatricula & { apoderado: string; alumno: string }) | null
   >(null);
   const enviar = useServerFn(matricularAlumno);
-  const ejecutarTest = useServerFn(probarRegistroAlumno);
 
   // Borrador local: si la administradora recarga la página, no pierde lo escrito.
   useEffect(() => {
@@ -101,25 +98,8 @@ export function MatriculaManual() {
   }, [sucio]);
 
   const guardar = useMutation({
-    mutationFn: async () => {
-      console.log("[REGISTRO] Paso 1: formulario validado", {
-        camposCompletos: !hayErrores,
-        tieneEmail: Boolean(form.email.trim()),
-        tieneRutAlumno: form.rut_alumno.replace(/\D/g, "").length >= 6,
-        dias: [form.training_tuesday && "martes", form.training_thursday && "jueves"].filter(Boolean),
-      });
-      console.log("[REGISTRO] Paso 2: enviando solicitud segura al backend");
-      try {
-        const respuesta = (await enviar({ data: form as EntradaMatricula })) as ResultadoMatricula;
-        console.log("[REGISTRO] Paso 3: respuesta exitosa", { nuevoUsuario: respuesta.nuevoUsuario });
-        return respuesta;
-      } catch (error) {
-        console.error("[REGISTRO] Paso 3: respuesta con error", {
-          message: error instanceof Error ? error.message : "Error desconocido",
-        });
-        throw error;
-      }
-    },
+    mutationFn: async () =>
+      (await enviar({ data: form as EntradaMatricula })) as ResultadoMatricula,
     onSuccess: (r) => {
       setCredenciales({ ...r, apoderado: form.nombre_apoderado, alumno: form.nombre_alumno });
       queryClient.invalidateQueries();
@@ -135,25 +115,6 @@ export function MatriculaManual() {
     },
   });
 
-  const probar = useMutation({
-    mutationFn: async () => {
-      console.log("[TEST REGISTRO] Paso 1: solicitando matrícula real y eliminación segura");
-      const respuesta = await ejecutarTest();
-      console.log("[TEST REGISTRO] Paso 2: respuesta", respuesta);
-      return respuesta;
-    },
-    onSuccess: (resultado) => {
-      setResultadoTest(`${resultado.mensaje}: ${resultado.etapas.join(" · ")}`);
-      toast.success(resultado.mensaje, { duration: 10000 });
-      void queryClient.invalidateQueries({ queryKey: ["alumnos"] });
-    },
-    onError: (error: unknown) => {
-      const mensaje = error instanceof Error ? error.message : "Error desconocido";
-      setResultadoTest(`❌ TEST FALLÓ: ${mensaje}`);
-      toast.error(`❌ TEST FALLÓ: ${mensaje}`, { duration: 15000 });
-      console.error("[TEST REGISTRO] Falló", { message: mensaje });
-    },
-  });
 
   const faltan = {
     nombre_apoderado: !form.nombre_apoderado.trim(),
@@ -337,7 +298,7 @@ export function MatriculaManual() {
             <Button
               variant="alerta"
               size="grande"
-              disabled={guardar.isPending || probar.isPending}
+              disabled={guardar.isPending}
               onClick={() => {
                 setTocado(true);
                 if (hayErrores) {
@@ -354,23 +315,7 @@ export function MatriculaManual() {
               {guardar.isPending ? <Loader2 className="animate-spin" /> : <UserPlus />}
               {guardar.isPending ? "Registrando..." : "Crear Cuenta y Matricular"}
             </Button>
-            <Button
-              type="button"
-              variant="neutro"
-              size="medio"
-              className="w-full"
-              disabled={guardar.isPending || probar.isPending}
-              onClick={() => probar.mutate()}
-            >
-              {probar.isPending ? <Loader2 className="animate-spin" /> : <TestTube2 />}
-              {probar.isPending ? "Probando registro..." : "Probar Registro"}
-            </Button>
-            {resultadoTest ? (
-              <p role="status" className={`rounded-xl border-2 p-3 text-base font-bold ${resultadoTest.startsWith("✅") ? "border-success text-success" : "border-danger text-danger"}`}>
-                {resultadoTest}
-              </p>
-            ) : null}
-            <Button variant="neutro" size="medio" className="w-full" disabled={guardar.isPending || probar.isPending} onClick={cerrar}>
+            <Button variant="neutro" size="medio" className="w-full" disabled={guardar.isPending} onClick={cerrar}>
               <X /> Cancelar
             </Button>
           </div>

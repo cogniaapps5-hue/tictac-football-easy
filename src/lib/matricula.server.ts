@@ -2,11 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/integrations/supabase/types";
 import { edadDesde, grupoPorEdad, rutClaveTemporal } from "@/lib/carga-masiva-utils";
-import type {
-  EntradaMatricula,
-  ResultadoMatricula,
-  ResultadoTestMatricula,
-} from "@/lib/matricula.schema";
+import type { EntradaMatricula, ResultadoMatricula } from "@/lib/matricula.schema";
 
 type AdminClient = SupabaseClient<Database>;
 
@@ -65,10 +61,7 @@ export async function ejecutarMatricula(
   supabase: SupabaseClient<Database>,
   userId: string,
 ): Promise<ResultadoMatricula> {
-  const registroId = crypto.randomUUID();
-  console.info(`[REGISTRO ${registroId}] Paso 1/7: solicitud recibida y validada`);
   await asegurarAdministrador(supabase, userId);
-  console.info(`[REGISTRO ${registroId}] Paso 2/7: rol administrador verificado`);
 
   const clave = rutClaveTemporal(data.rut_alumno);
   if (clave.length < 6) throw new Error("El RUT del alumno debe tener al menos 6 dígitos");
@@ -83,7 +76,6 @@ export async function ejecutarMatricula(
   if ((ruts ?? []).some((fila) => rutComparable(fila.rut) === rutAlumno)) {
     throw new Error("Ya existe un alumno con ese RUT");
   }
-  console.info(`[REGISTRO ${registroId}] Paso 3/7: RUT disponible`);
 
   const { data: perfil, error: errorPerfil } = await supabaseAdmin
     .from("profiles")
@@ -101,7 +93,6 @@ export async function ejecutarMatricula(
       const existente = await buscarUsuarioPorEmail(supabaseAdmin, email);
       if (existente) {
         parentId = existente.id;
-        console.info(`[REGISTRO ${registroId}] Paso 4/7: cuenta existente recuperada`);
       } else {
         const { data: creado, error } = await supabaseAdmin.auth.admin.createUser({
           email,
@@ -119,10 +110,8 @@ export async function ejecutarMatricula(
         parentId = creado.user.id;
         usuarioCreadoId = creado.user.id;
         nuevoUsuario = true;
-        console.info(`[REGISTRO ${registroId}] Paso 4/7: cuenta del apoderado creada`);
       }
     } else {
-      console.info(`[REGISTRO ${registroId}] Paso 4/7: perfil existente reutilizado`);
     }
 
     if (!parentId) throw new Error("No fue posible determinar la cuenta del apoderado");
@@ -145,7 +134,6 @@ export async function ejecutarMatricula(
       .from("user_roles")
       .upsert({ user_id: parentId, role: "parent" }, { onConflict: "user_id,role" });
     if (errorRol) throw errorDetallado(errorRol, "No pudimos asignar el rol de apoderado");
-    console.info(`[REGISTRO ${registroId}] Paso 5/7: perfil y rol vinculados`);
 
     const { data: hermanosPrevios, error: errorHermanos } = await supabaseAdmin
       .from("players")
@@ -173,8 +161,6 @@ export async function ejecutarMatricula(
     });
     if (errorAlumno) throw errorDetallado(errorAlumno, "No pudimos guardar al alumno");
 
-    console.info(`[REGISTRO ${registroId}] Paso 6/7: alumno guardado`);
-    console.info(`[REGISTRO ${registroId}] Paso 7/7: matrícula completada`);
     return {
       email,
       clave,
@@ -182,106 +168,10 @@ export async function ejecutarMatricula(
       hermanos: (hermanosPrevios ?? []).map((hermano) => hermano.name),
     };
   } catch (error) {
-    console.error(`[REGISTRO ${registroId}] Falló el proceso`, {
-      message: error instanceof Error ? error.message : "Error desconocido",
-      code: (error as ErrorConCodigo | null)?.code,
-    });
     if (usuarioCreadoId) {
       const { error: errorLimpieza } = await supabaseAdmin.auth.admin.deleteUser(usuarioCreadoId);
-      console.info(
-        `[REGISTRO ${registroId}] Limpieza de cuenta parcial: ${errorLimpieza ? "falló" : "completada"}`,
-      );
     }
     throw error;
   }
 }
 
-export async function ejecutarTestMatricula(
-  supabase: SupabaseClient<Database>,
-  userId: string,
-): Promise<ResultadoTestMatricula> {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const marca = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
-  const email = `test-registro-${marca}@tictac.test`;
-  const rut = `99${marca.slice(-6)}-${Math.floor(Math.random() * 9)}`;
-  let usuarioId: string | null = null;
-  let alumnoId: string | null = null;
-  const etapas: string[] = [];
-
-  console.info("[TEST REGISTRO] Paso 1/4: iniciando flujo real de matrícula");
-  try {
-    const resultado = await ejecutarMatricula(
-      {
-        nombre_apoderado: "Apoderado Test Registro",
-        rut_apoderado: rut,
-        email,
-        telefono: "+56900000000",
-        nombre_alumno: `TEST ALUMNO ${marca}`,
-        rut_alumno: rut,
-        fecha_nacimiento: "2018-01-01",
-        talla_polera: "M",
-        condiciones_medicas: "Ninguna",
-        training_tuesday: true,
-        training_thursday: false,
-      },
-      supabase,
-      userId,
-    );
-    if (!resultado.nuevoUsuario) {
-      throw new Error("Test: el flujo no creó la cuenta temporal esperada");
-    }
-    etapas.push("Flujo real completado");
-
-    const { data: usuario, error: errorUsuario } = await supabaseAdmin.auth.admin.listUsers({
-      page: 1,
-      perPage: 1000,
-    });
-    if (errorUsuario) throw errorDetallado(errorUsuario, "Test: verificación de cuenta");
-    usuarioId = usuario.users.find((item) => (item.email ?? "").toLowerCase() === email)?.id ?? null;
-    if (!usuarioId) throw new Error("Test: la cuenta creada no pudo verificarse");
-    etapas.push("Cuenta verificada");
-
-    const { data: alumno, error: errorAlumno } = await supabaseAdmin
-      .from("players")
-      .select("id")
-      .eq("rut", rut)
-      .single();
-    if (errorAlumno || !alumno) throw errorDetallado(errorAlumno, "Test: verificación de alumno");
-    alumnoId = alumno.id;
-    etapas.push("Alumno verificado");
-    console.info("[TEST REGISTRO] Paso 2/4: cuenta, perfil, rol y alumno verificados");
-
-    const { error: errorBorrarAlumno } = await supabaseAdmin.from("players").delete().eq("id", alumnoId);
-    if (errorBorrarAlumno) throw errorDetallado(errorBorrarAlumno, "Test: eliminación de alumno");
-    alumnoId = null;
-    etapas.push("Alumno eliminado");
-
-    const { error: errorBorrarUsuario } = await supabaseAdmin.auth.admin.deleteUser(usuarioId);
-    if (errorBorrarUsuario) throw errorDetallado(errorBorrarUsuario, "Test: eliminación de cuenta");
-    usuarioId = null;
-    etapas.push("Cuenta de prueba eliminada");
-    console.info("[TEST REGISTRO] Paso 3/4: datos de prueba eliminados");
-    console.info("[TEST REGISTRO] Paso 4/4: prueba del flujo real completada");
-    return { ok: true, mensaje: "✅ TEST EXITOSO", etapas };
-  } catch (error) {
-    console.error("[TEST REGISTRO] Falló", {
-      message: error instanceof Error ? error.message : "Error desconocido",
-      code: (error as ErrorConCodigo | null)?.code,
-    });
-    if (!usuarioId) {
-      const { data: usuarios } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 });
-      usuarioId = usuarios?.users.find((item) => (item.email ?? "").toLowerCase() === email)?.id ?? null;
-    }
-    if (!alumnoId) {
-      const { data: alumno } = await supabaseAdmin
-        .from("players")
-        .select("id")
-        .eq("rut", rut)
-        .maybeSingle();
-      alumnoId = alumno?.id ?? null;
-    }
-    if (alumnoId) await supabaseAdmin.from("players").delete().eq("id", alumnoId);
-    if (usuarioId) await supabaseAdmin.auth.admin.deleteUser(usuarioId);
-    throw error;
-  }
-}

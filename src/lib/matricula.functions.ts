@@ -1,14 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { ejecutarMatricula, ejecutarTestMatricula } from "@/lib/matricula.server";
+import { ejecutarMatricula } from "@/lib/matricula.server";
 import { matriculaSchema } from "@/lib/matricula.schema";
-import type {
-  EntradaMatricula,
-  ResultadoMatricula,
-  ResultadoTestMatricula,
-} from "@/lib/matricula.schema";
+import type { EntradaMatricula, ResultadoMatricula } from "@/lib/matricula.schema";
 
-export type { EntradaMatricula, ResultadoMatricula, ResultadoTestMatricula };
+export type { EntradaMatricula, ResultadoMatricula };
 
 export const matricularAlumno = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -17,8 +13,3 @@ export const matricularAlumno = createServerFn({ method: "POST" })
     ejecutarMatricula(data, context.supabase, context.userId),
   );
 
-export const probarRegistroAlumno = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .handler(({ context }): Promise<ResultadoTestMatricula> =>
-    ejecutarTestMatricula(context.supabase, context.userId),
-  );
