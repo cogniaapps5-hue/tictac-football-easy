@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Search, UserPlus, Check, X, Trash2 } from "lucide-react";
+import { Search, Check, X, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -62,7 +62,6 @@ function Alumnos() {
   const { data: sesion, isLoading: cargandoSesion, isError: errorSesion, refetch: recargarSesion } = useSesion();
   const queryClient = useQueryClient();
   const [busqueda, setBusqueda] = useState("");
-  const [agregando, setAgregando] = useState(false);
   const [grupoFiltro, setGrupoFiltro] = useState<string>("todos");
   const [soloAlDia, setSoloAlDia] = useState(false);
   const [vista, setVista] = useState<"activos" | "archivados">("activos");
@@ -70,13 +69,6 @@ function Alumnos() {
   const [diaFiltro, setDiaFiltro] = useState<DiaEntrenamiento>(proximoEntrenamiento().dia);
   const proximo = proximoEntrenamiento(diaFiltro);
   const sedeActual = sedeDe(diaFiltro);
-  const [nuevo, setNuevo] = useState({
-    name: "",
-    rut: "",
-    birth_year: "2018",
-    training_day: "martes" as DiaEntrenamiento,
-    parent_email: "",
-  });
 
   const {
     data,
@@ -115,32 +107,6 @@ function Alumnos() {
     onError: () => toast.error("No pudimos guardar la asistencia"),
   });
 
-  const crear = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.from("players").insert({
-        name: nuevo.name.trim(),
-        rut: nuevo.rut.trim() || null,
-        birth_year: Number(nuevo.birth_year),
-        age_group: grupoPorAnio(Number(nuevo.birth_year)),
-        training_day: nuevo.training_day,
-        parent_email: nuevo.parent_email.trim() || null,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["alumnos"] });
-      setNuevo({
-        name: "",
-        rut: "",
-        birth_year: "2018",
-        training_day: "martes",
-        parent_email: "",
-      });
-      setAgregando(false);
-      toast.success("Alumno agregado");
-    },
-    onError: () => toast.error("No pudimos agregar al alumno"),
-  });
 
   const cambiarAcceso = useMutation({
     mutationFn: async ({ playerId, estado }: { playerId: string; estado: "exception" | "blocked" }) => {
@@ -504,85 +470,6 @@ function Alumnos() {
           </p>
         </Tarjeta>
       ) : null}
-
-      {agregando ? (
-        <Tarjeta destacada>
-          <h2 className="text-xl font-bold">Nuevo alumno</h2>
-          <div className="mt-4 space-y-4">
-            <div className="space-y-2">
-              <Label className="text-base">Nombre completo</Label>
-              <Input
-                value={nuevo.name}
-                onChange={(e) => setNuevo({ ...nuevo, name: e.target.value })}
-                className="h-14 rounded-xl text-lg"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-base">RUT</Label>
-              <Input
-                value={nuevo.rut}
-                onChange={(e) => setNuevo({ ...nuevo, rut: e.target.value })}
-                className="h-14 rounded-xl text-lg"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-base">Correo del apoderado</Label>
-              <Input
-                type="email"
-                value={nuevo.parent_email}
-                onChange={(e) => setNuevo({ ...nuevo, parent_email: e.target.value })}
-                className="h-14 rounded-xl text-lg"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-base">Año de nacimiento</Label>
-              <Input
-                type="number"
-                inputMode="numeric"
-                value={nuevo.birth_year}
-                onChange={(e) => setNuevo({ ...nuevo, birth_year: e.target.value })}
-                className="h-14 rounded-xl text-lg"
-              />
-              <p className="text-base text-muted-foreground">
-                Grupo automático:{" "}
-                {GRUPOS.find((g) => g.valor === grupoPorAnio(Number(nuevo.birth_year) || 2018))
-                  ?.etiqueta}
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Label className="text-base">Día de entrenamiento</Label>
-              <div className="flex gap-3">
-                {DIAS.map((d) => (
-                  <Button
-                    key={d.valor}
-                    variant={nuevo.training_day === d.valor ? "accion" : "neutro"}
-                    size="medio"
-                    className="flex-1"
-                    onClick={() => setNuevo({ ...nuevo, training_day: d.valor })}
-                  >
-                    {d.corto}
-                  </Button>
-                ))}
-              </div>
-            </div>
-            <Button
-              variant="accion"
-              size="grande"
-              disabled={!nuevo.name.trim() || crear.isPending}
-              onClick={() => crear.mutate()}
-            >
-              Guardar Alumno
-            </Button>
-            <Button variant="neutro" size="medio" className="w-full" onClick={() => setAgregando(false)}>
-              Cancelar
-            </Button>
-          </div>
-        </Tarjeta>
-      ) : (
-        <Button variant="accion" size="grande" onClick={() => setAgregando(true)}>
-          <UserPlus /> Agregar Alumno
-        </Button>
-      )}
 
       <AlertDialog
         open={Boolean(porArchivar)}
