@@ -65,12 +65,10 @@ export function MatriculaManual() {
   const [abierto, setAbierto] = useState(false);
   const [form, setForm] = useState({ ...VACIO });
   const [tocado, setTocado] = useState(false);
-  const [resultadoTest, setResultadoTest] = useState<string | null>(null);
   const [credenciales, setCredenciales] = useState<
     (ResultadoMatricula & { apoderado: string; alumno: string }) | null
   >(null);
   const enviar = useServerFn(matricularAlumno);
-  const ejecutarTest = useServerFn(probarRegistroAlumno);
 
   // Borrador local: si la administradora recarga la página, no pierde lo escrito.
   useEffect(() => {
