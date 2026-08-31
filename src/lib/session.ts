@@ -77,7 +77,7 @@ export const SEDES: {
   sede: string;
 }[] = [
   { valor: "martes", corto: "Mar", largo: "Martes", diaSemana: 2, hora: "19:00", sede: "Rancho Rossi Peñuelas" },
-  { valor: "jueves", corto: "Jue", largo: "Jueves", diaSemana: 4, hora: "19:00", sede: "Forza Club SINDEPART" },
+  { valor: "jueves", corto: "Jue", largo: "Jueves", diaSemana: 4, hora: "19:00", sede: "Forza Club Sindempart" },
 ];
 
 export function sedeDe(dia: string | null | undefined) {

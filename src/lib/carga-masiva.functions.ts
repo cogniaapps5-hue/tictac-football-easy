@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { exigirAuthSupabase } from "@/lib/auth-middleware.server";
 import {
   parseFechaNacimiento,
   edadDesde,
@@ -39,7 +39,7 @@ export const MENSAJE_WHATSAPP =
   "Hola apoderados 🌟. Sus cuentas en la App TIC TAC están listas. Usuario: su correo. Contraseña temporal: El RUT de su hijo (sin puntos ni guión). Al entrar, deberán crear su propia clave.";
 
 export const cargaMasiva = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([exigirAuthSupabase])
   .inputValidator((data: unknown) => entrada.parse(data))
   .handler(async ({ data, context }): Promise<ResultadoCarga> => {
     const { supabase, userId } = context;

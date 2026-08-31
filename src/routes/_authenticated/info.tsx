@@ -122,7 +122,7 @@ function Info() {
           <li>✉️ Correo oficial: centrodeportivotictac@gmail.com</li>
           <li>👤 Director: Luis Felipe Guerrero Ossa</li>
           <li>💬 WhatsApp: grupo oficial de apoderados</li>
-          <li>📸 Instagram: @tictac.siemprefeliz</li>
+          <li>📸 Instagram: @tictac_serfeliz2024</li>
         </ul>
         <div className="mt-4 rounded-xl bg-secondary p-4 text-base">
           <p className="font-bold text-gold-brand">Datos para transferencia</p>
@@ -145,7 +145,7 @@ function Info() {
           <li className="rounded-xl bg-secondary p-4">
             <p className="text-base font-bold">Martes 19:00 a 20:00 hrs</p>
             <p className="text-base text-muted-foreground">
-              📍 Forza Training Club — Las Azucenas #505, SINDEPART, Coquimbo
+              📍 Forza Training Club — Las Azucenas #505, Sindempart, Coquimbo
             </p>
           </li>
           <li className="rounded-xl bg-secondary p-4">
