@@ -137,7 +137,7 @@ export function MatriculaManual() {
 
   const probar = useMutation({
     mutationFn: async () => {
-      console.log("[TEST REGISTRO] Paso 1: solicitando creación y eliminación aislada");
+      console.log("[TEST REGISTRO] Paso 1: solicitando matrícula real y eliminación segura");
       const respuesta = await ejecutarTest();
       console.log("[TEST REGISTRO] Paso 2: respuesta", respuesta);
       return respuesta;

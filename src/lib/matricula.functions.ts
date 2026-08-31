@@ -12,7 +12,7 @@ export type { EntradaMatricula, ResultadoMatricula, ResultadoTestMatricula };
 
 export const matricularAlumno = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => matriculaSchema.parse(data))
+  .validator((data: unknown) => matriculaSchema.parse(data))
   .handler(({ data, context }): Promise<ResultadoMatricula> =>
     ejecutarMatricula(data, context.supabase, context.userId),
   );
