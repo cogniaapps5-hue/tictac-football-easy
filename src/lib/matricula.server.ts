@@ -61,7 +61,6 @@ export async function ejecutarMatricula(
   supabase: SupabaseClient<Database>,
   userId: string,
 ): Promise<ResultadoMatricula> {
-  const registroId = crypto.randomUUID();
   await asegurarAdministrador(supabase, userId);
 
   const clave = rutClaveTemporal(data.rut_alumno);
