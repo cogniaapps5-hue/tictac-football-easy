@@ -156,7 +156,6 @@ export async function ejecutarMatricula(
         usuarioCreadoId = creado.user.id;
         nuevoUsuario = true;
       }
-    } else {
     }
 
     if (!parentId) throw new Error("No fue posible determinar la cuenta del apoderado");
