@@ -131,8 +131,11 @@ function InicioAdmin() {
       );
       return {
         pendientes: pendientes.length,
-        ingresos: aprobados.reduce((suma, p) => suma + (p.amount ?? 0), 0),
-        aprobados: aprobados.length,
+        ingresos: aprobadosMes.reduce(
+          (suma: number, p: { amount: number | null }) => suma + (p.amount ?? 0),
+          0,
+        ),
+        aprobados: aprobadosMes.length,
         atrasados: atrasados.length,
         total: alumnos.data?.length ?? 0,
         bloqueados: (alumnos.data ?? []).filter(
