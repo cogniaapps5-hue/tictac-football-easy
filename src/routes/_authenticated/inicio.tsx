@@ -172,7 +172,7 @@ function InicioAdmin() {
           </div>
           <div className="min-w-0">
             <h2 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-              Ingresos
+              Ingresos de {new Date().toLocaleDateString("es-CL", { month: "long" })}
             </h2>
             <p className="text-[28px] font-extrabold leading-tight">{pesos(data?.ingresos ?? 0)}</p>
             <p className="text-xs font-semibold text-success">
