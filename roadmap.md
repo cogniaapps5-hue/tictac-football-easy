@@ -6,3 +6,4 @@
 - [x] Verify live database grants and RLS for enrollment tables
 - [x] Run the real create/delete test and browser-console verification
 - [x] Present results before publishing
+- [x] Fix and verify the manual enrollment admin credential flow
