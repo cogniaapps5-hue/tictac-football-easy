@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { edadDesde, grupoPorEdad, rutClaveTemporal } from "@/lib/carga-masiva-utils";
 import type { EntradaMatricula, ResultadoMatricula } from "@/lib/matricula.schema";
-import { clavePublicableSupabase, urlSupabase } from "@/lib/supabase-config";
+import { urlSupabase } from "@/lib/supabase-config";
 
 type AdminClient = SupabaseClient<Database>;
 
@@ -43,9 +43,6 @@ function clienteAdmin(): AdminClient {
   });
   return _admin;
 }
-
-// Mantener referencia al módulo de config para que el bundler incluya el respaldo público.
-void clavePublicableSupabase;
 
 type ErrorConCodigo = Error & { code?: string; details?: string; hint?: string };
 
