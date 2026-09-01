@@ -108,8 +108,14 @@ function InicioAdmin() {
           .from("attendance")
           .select("id, status, players(name)")
           .eq("session_date", proximo.iso),
+        supabase
+          .from("payments")
+          .select("id, amount")
+          .eq("status", "approved")
+          .gte("due_date", inicioMes)
+          .lte("due_date", finMes),
       ]);
-      const fallida = [pagos, alumnos, asistencia].find((r) => r.error);
+      const fallida = [pagos, alumnos, asistencia, pagosMes].find((r) => r.error);
       if (fallida?.error) throw fallida.error;
       const activos = (pagos.data ?? []).filter((p) => {
         const alumno = p.players as
@@ -119,7 +125,7 @@ function InicioAdmin() {
         return alumno?.access_status !== "inactive" && !alumno?.is_scholarship;
       });
       const pendientes = activos.filter((p) => p.status === "pending");
-      const aprobados = (pagos.data ?? []).filter((p) => p.status === "approved");
+      const aprobadosMes = pagosMes.data ?? [];
       const atrasados = pendientes.filter(
         (p) => new Date(p.due_date).getTime() < Date.now() - 1000 * 60 * 60 * 24 * 60,
       );
