@@ -12,7 +12,7 @@ type AdminClient = SupabaseClient<Database>;
 // respaldo, lo que provoca "This endpoint requires a valid Bearer token"
 // en auth.admin.*. Aquí leemos la service role de verdad.
 let _admin: AdminClient | null = null;
-function clienteAdmin(): AdminClient {
+export function clienteAdmin(): AdminClient {
   if (_admin) return _admin;
   const clave =
     process.env["SUPABASE_SERVICE_ROLE_KEY"] ||
