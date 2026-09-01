@@ -106,7 +106,7 @@ export async function ejecutarMatricula(
   const hoy = new Date().toISOString().slice(0, 10);
   if (data.fecha_nacimiento > hoy) throw new Error("La fecha de nacimiento no puede ser futura");
 
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const supabaseAdmin = clienteAdmin();
   const email = data.email.trim().toLowerCase();
   const rutAlumno = rutComparable(data.rut_alumno);
   const { data: ruts, error: errorRuts } = await supabaseAdmin.from("players").select("id,rut");
