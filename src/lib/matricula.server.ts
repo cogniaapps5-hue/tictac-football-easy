@@ -213,7 +213,7 @@ export async function ejecutarMatricula(
     };
   } catch (error) {
     if (usuarioCreadoId) {
-      const { error: errorLimpieza } = await supabaseAdmin.auth.admin.deleteUser(usuarioCreadoId);
+      await supabaseAdmin.auth.admin.deleteUser(usuarioCreadoId);
     }
     throw error;
   }
