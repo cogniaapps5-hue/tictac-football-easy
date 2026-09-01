@@ -93,7 +93,10 @@ function InicioAdmin() {
   } = useQuery({
     queryKey: ["resumen-admin", proximo.iso],
     queryFn: async () => {
-      const [pagos, alumnos, asistencia] = await Promise.all([
+      const ahora = new Date();
+      const inicioMes = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, "0")}-01`;
+      const finMes = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, "0")}-${String(new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0).getDate()).padStart(2, "0")}`;
+      const [pagos, alumnos, asistencia, pagosMes] = await Promise.all([
         supabase
           .from("payments")
           .select("id, status, due_date, amount, players(access_status, is_scholarship)"),
