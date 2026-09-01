@@ -93,7 +93,10 @@ function InicioAdmin() {
   } = useQuery({
     queryKey: ["resumen-admin", proximo.iso],
     queryFn: async () => {
-      const [pagos, alumnos, asistencia] = await Promise.all([
+      const ahora = new Date();
+      const inicioMes = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, "0")}-01`;
+      const finMes = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, "0")}-${String(new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0).getDate()).padStart(2, "0")}`;
+      const [pagos, alumnos, asistencia, pagosMes] = await Promise.all([
         supabase
           .from("payments")
           .select("id, status, due_date, amount, players(access_status, is_scholarship)"),
@@ -105,8 +108,14 @@ function InicioAdmin() {
           .from("attendance")
           .select("id, status, players(name)")
           .eq("session_date", proximo.iso),
+        supabase
+          .from("payments")
+          .select("id, amount")
+          .eq("status", "approved")
+          .gte("due_date", inicioMes)
+          .lte("due_date", finMes),
       ]);
-      const fallida = [pagos, alumnos, asistencia].find((r) => r.error);
+      const fallida = [pagos, alumnos, asistencia, pagosMes].find((r) => r.error);
       if (fallida?.error) throw fallida.error;
       const activos = (pagos.data ?? []).filter((p) => {
         const alumno = p.players as
@@ -116,14 +125,17 @@ function InicioAdmin() {
         return alumno?.access_status !== "inactive" && !alumno?.is_scholarship;
       });
       const pendientes = activos.filter((p) => p.status === "pending");
-      const aprobados = (pagos.data ?? []).filter((p) => p.status === "approved");
+      const aprobadosMes = pagosMes.data ?? [];
       const atrasados = pendientes.filter(
         (p) => new Date(p.due_date).getTime() < Date.now() - 1000 * 60 * 60 * 24 * 60,
       );
       return {
         pendientes: pendientes.length,
-        ingresos: aprobados.reduce((suma, p) => suma + (p.amount ?? 0), 0),
-        aprobados: aprobados.length,
+        ingresos: aprobadosMes.reduce(
+          (suma: number, p: { amount: number | null }) => suma + (p.amount ?? 0),
+          0,
+        ),
+        aprobados: aprobadosMes.length,
         atrasados: atrasados.length,
         total: alumnos.data?.length ?? 0,
         bloqueados: (alumnos.data ?? []).filter(
@@ -160,7 +172,7 @@ function InicioAdmin() {
           </div>
           <div className="min-w-0">
             <h2 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-              Ingresos
+              Ingresos de {new Date().toLocaleDateString("es-CL", { month: "long" })}
             </h2>
             <p className="text-[28px] font-extrabold leading-tight">{pesos(data?.ingresos ?? 0)}</p>
             <p className="text-xs font-semibold text-success">
