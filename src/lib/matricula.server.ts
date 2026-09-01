@@ -24,13 +24,20 @@ export function clienteAdmin(): AdminClient {
     );
   }
   const fetchConApikey: typeof fetch = (input, init) => {
+    const requestUrl =
+      typeof input === "string"
+        ? input
+        : input instanceof URL
+          ? input.toString()
+          : input.url;
     const headers = new Headers(
       typeof Request !== "undefined" && input instanceof Request ? input.headers : undefined,
     );
     if (init?.headers) new Headers(init.headers).forEach((v, k) => headers.set(k, v));
     if (
       (clave.startsWith("sb_secret_") || clave.startsWith("sb_publishable_")) &&
-      headers.get("Authorization") === `Bearer ${clave}`
+      headers.get("Authorization") === `Bearer ${clave}` &&
+      !requestUrl.includes("/auth/v1/")
     ) {
       headers.delete("Authorization");
     }
