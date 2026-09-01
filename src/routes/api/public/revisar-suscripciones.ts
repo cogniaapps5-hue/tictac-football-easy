@@ -13,8 +13,8 @@ export const Route = createFileRoute("/api/public/revisar-suscripciones")({
         if (!clave || enviada.length !== clave.length || enviada !== clave) {
           return new Response("No autorizado", { status: 401 });
         }
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data, error } = await supabaseAdmin.rpc("revisar_suscripciones");
+        const { clienteAdmin } = await import("@/lib/matricula.server");
+        const { data, error } = await clienteAdmin().rpc("revisar_suscripciones");
         if (error) return new Response(error.message, { status: 500 });
         return Response.json({ ok: true, resultado: data });
       },

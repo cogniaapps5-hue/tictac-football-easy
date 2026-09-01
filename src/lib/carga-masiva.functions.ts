@@ -50,7 +50,8 @@ export const cargaMasiva = createServerFn({ method: "POST" })
       .eq("role", "admin");
     if (!roles?.length) throw new Error("Solo la administradora puede cargar datos");
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { clienteAdmin } = await import("@/lib/matricula.server");
+    const supabaseAdmin = clienteAdmin();
     const errores: string[] = [];
     let creadosApoderados = 0;
     let creadosAlumnos = 0;
