@@ -8,7 +8,7 @@ export const SUPABASE_PUBLISHABLE_KEY_PUBLICO =
 
 export function urlSupabase(): string {
   return (
-    (typeof process !== "undefined" ? process.env?.["SUPABASE_URL"] : undefined) ||
+    (typeof process !== "undefined" ? process.env?.["NEXT_PUBLIC_SUPABASE_URL"] : undefined) ||
     SUPABASE_URL_PUBLICO
   );
 }
@@ -16,7 +16,7 @@ export function urlSupabase(): string {
 export function clavePublicableSupabase(): string {
   return (
     (typeof process !== "undefined"
-      ? process.env?.["SUPABASE_PUBLISHABLE_KEY"]
+      ? process.env?.["NEXT_PUBLIC_SUPABASE_ANON_KEY"]
       : undefined) || SUPABASE_PUBLISHABLE_KEY_PUBLICO
   );
 }
