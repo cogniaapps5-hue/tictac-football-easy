@@ -156,7 +156,6 @@ export async function ejecutarMatricula(
         usuarioCreadoId = creado.user.id;
         nuevoUsuario = true;
       }
-    } else {
     }
 
     if (!parentId) throw new Error("No fue posible determinar la cuenta del apoderado");
@@ -214,7 +213,7 @@ export async function ejecutarMatricula(
     };
   } catch (error) {
     if (usuarioCreadoId) {
-      const { error: errorLimpieza } = await supabaseAdmin.auth.admin.deleteUser(usuarioCreadoId);
+      await supabaseAdmin.auth.admin.deleteUser(usuarioCreadoId);
     }
     throw error;
   }
