@@ -50,14 +50,11 @@ export const cargaMasiva = createServerFn({ method: "POST" })
       .eq("role", "admin");
     if (!roles?.length) throw new Error("Solo la administradora puede cargar datos");
 
-    const runtimeGlobal = globalThis as typeof globalThis & {
-      __env__?: Record<string, unknown>;
-    };
-    const binding = runtimeGlobal.__env__?.["SUPABASE_SERVICE_ROLE_KEY"];
-    const clavePrivilegiada =
-      typeof binding === "string" && binding.length > 0
-        ? binding
-        : process.env["SUPABASE_SERVICE_ROLE_KEY"];
+    let clavePrivilegiada = process.env["SUPABASE_SERVICE_ROLE_KEY"];
+    if (!clavePrivilegiada) {
+      const { leerBindingCloudflare } = await import("@/lib/cloudflare-env.server");
+      clavePrivilegiada = leerBindingCloudflare("SUPABASE_SERVICE_ROLE_KEY");
+    }
     if (!clavePrivilegiada) {
       throw new Error("El servicio de carga masiva no está disponible temporalmente");
     }
