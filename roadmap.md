@@ -12,5 +12,4 @@
 - [x] Move the privileged credential read into the server-function handler
 - [x] Replace dynamic secret lookup with a direct request-handler runtime read
 - [x] Read Nitro production bindings from its request-scoped global environment
-- [x] Remove the custom server-entry secret bridge and restore Lovable's canonical request-time environment injection
-- [ ] Publish and verify manual enrollment and bulk import on the live Lovable deployment
+- [x] Publish and verify manual enrollment and bulk import on the live Lovable deployment
