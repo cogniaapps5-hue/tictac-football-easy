@@ -50,8 +50,12 @@ export const cargaMasiva = createServerFn({ method: "POST" })
       .eq("role", "admin");
     if (!roles?.length) throw new Error("Solo la administradora puede cargar datos");
 
+    const clavePrivilegiada = process.env["SUPABASE_SERVICE_ROLE_KEY"];
+    if (!clavePrivilegiada) {
+      throw new Error("El servicio de carga masiva no está disponible temporalmente");
+    }
     const { clienteAdmin } = await import("@/lib/matricula.server");
-    const supabaseAdmin = clienteAdmin();
+    const supabaseAdmin = clienteAdmin(clavePrivilegiada);
     const errores: string[] = [];
     let creadosApoderados = 0;
     let creadosAlumnos = 0;

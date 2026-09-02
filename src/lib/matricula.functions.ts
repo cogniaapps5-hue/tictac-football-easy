@@ -9,7 +9,16 @@ export type { EntradaMatricula, ResultadoMatricula };
 export const matricularAlumno = createServerFn({ method: "POST" })
   .middleware([exigirAuthSupabase])
   .validator((data: unknown) => matriculaSchema.parse(data))
-  .handler(({ data, context }): Promise<ResultadoMatricula> =>
-    ejecutarMatricula(data, context.supabase, context.userId),
-  );
+  .handler(({ data, context }): Promise<ResultadoMatricula> => {
+    // Las variables privadas del runtime se garantizan dentro del handler.
+    // Leerlas aquí evita depender del momento en que se cargan los módulos.
+    const clavePrivilegiada = process.env["SUPABASE_SERVICE_ROLE_KEY"];
+    if (!clavePrivilegiada) {
+      throw new Error(
+        "El servicio de matrícula no está disponible temporalmente. Intenta nuevamente en unos minutos.",
+      );
+    }
+
+    return ejecutarMatricula(data, context.supabase, context.userId, clavePrivilegiada);
+  });
 

@@ -14,7 +14,7 @@ export const Route = createFileRoute("/api/public/revisar-suscripciones")({
           return new Response("No autorizado", { status: 401 });
         }
         const { clienteAdmin } = await import("@/lib/matricula.server");
-        const { data, error } = await clienteAdmin().rpc("revisar_suscripciones");
+        const { data, error } = await clienteAdmin(clave).rpc("revisar_suscripciones");
         if (error) return new Response(error.message, { status: 500 });
         return Response.json({ ok: true, resultado: data });
       },
