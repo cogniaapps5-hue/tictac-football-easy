@@ -9,3 +9,5 @@
 - [x] Fix and verify the manual enrollment admin credential flow
 - [x] Read privileged keys from the production server runtime bindings
 - [x] Verify a real admin enrollment and remove the temporary test account
+- [x] Move the privileged credential read into the server-function handler
+- [ ] Publish and verify the definitive production enrollment fix

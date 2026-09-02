@@ -3,27 +3,13 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { edadDesde, grupoPorEdad, rutClaveTemporal } from "@/lib/carga-masiva-utils";
 import type { EntradaMatricula, ResultadoMatricula } from "@/lib/matricula.schema";
-import { leerSecretoServidor } from "@/lib/runtime-env.server";
 import { urlSupabase } from "@/lib/supabase-config";
 
 type AdminClient = SupabaseClient<Database>;
 
-// Cliente privilegiado con la SERVICE ROLE KEY real del servidor.
-// El cliente generado (client.server.ts) usa la clave publicable como
-// respaldo, lo que provoca "This endpoint requires a valid Bearer token"
-// en auth.admin.*. Aquí leemos la service role de verdad.
-let _admin: AdminClient | null = null;
-export function clienteAdmin(): AdminClient {
-  if (_admin) return _admin;
-  const clave =
-    leerSecretoServidor("SUPABASE_SERVICE_ROLE_KEY") ||
-    leerSecretoServidor("SUPABASE_SECRET_KEY") ||
-    leerSecretoServidor("SUPABASE_SERVICE_KEY");
-  if (!clave) {
-    throw new Error(
-      "El servidor no tiene configurada la clave privilegiada (SUPABASE_SERVICE_ROLE_KEY).",
-    );
-  }
+// La clave se lee dentro del handler de createServerFn y se entrega aquí sin
+// exponerla al cliente. Esto funciona tanto en preview como en producción.
+export function clienteAdmin(clave: string): AdminClient {
   const fetchConApikey: typeof fetch = (input, init) => {
     const requestUrl =
       typeof input === "string"
@@ -45,11 +31,10 @@ export function clienteAdmin(): AdminClient {
     headers.set("apikey", clave);
     return fetch(input, { ...init, headers });
   };
-  _admin = createClient<Database>(urlSupabase(), clave, {
+  return createClient<Database>(urlSupabase(), clave, {
     global: { fetch: fetchConApikey },
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
-  return _admin;
 }
 
 type ErrorConCodigo = Error & { code?: string; details?: string; hint?: string };
@@ -106,6 +91,7 @@ export async function ejecutarMatricula(
   data: EntradaMatricula,
   supabase: SupabaseClient<Database>,
   userId: string,
+  clavePrivilegiada: string,
 ): Promise<ResultadoMatricula> {
   await asegurarAdministrador(supabase, userId);
 
@@ -114,7 +100,7 @@ export async function ejecutarMatricula(
   const hoy = new Date().toISOString().slice(0, 10);
   if (data.fecha_nacimiento > hoy) throw new Error("La fecha de nacimiento no puede ser futura");
 
-  const supabaseAdmin = clienteAdmin();
+  const supabaseAdmin = clienteAdmin(clavePrivilegiada);
   const email = data.email.trim().toLowerCase();
   const rutAlumno = rutComparable(data.rut_alumno);
   const { data: ruts, error: errorRuts } = await supabaseAdmin.from("players").select("id,rut");
