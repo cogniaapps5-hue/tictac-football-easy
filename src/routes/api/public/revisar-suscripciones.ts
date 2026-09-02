@@ -8,8 +8,7 @@ export const Route = createFileRoute("/api/public/revisar-suscripciones")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const { leerSecretoServidor } = await import("@/lib/runtime-env.server");
-        const clave = leerSecretoServidor("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+        const clave = process.env["SUPABASE_SERVICE_ROLE_KEY"] ?? "";
         const enviada = request.headers.get("x-cron-key") ?? "";
         if (!clave || enviada.length !== clave.length || enviada !== clave) {
           return new Response("No autorizado", { status: 401 });
