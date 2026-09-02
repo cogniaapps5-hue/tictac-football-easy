@@ -10,4 +10,5 @@
 - [x] Read privileged keys from the production server runtime bindings
 - [x] Verify a real admin enrollment and remove the temporary test account
 - [x] Move the privileged credential read into the server-function handler
-- [ ] Publish and verify the corrected production server entry and enrollment secret binding
+- [x] Replace dynamic secret lookup with a direct request-handler runtime read
+- [ ] Publish and verify the corrected production enrollment secret binding
