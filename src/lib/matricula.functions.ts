@@ -10,10 +10,14 @@ export const matricularAlumno = createServerFn({ method: "POST" })
   .middleware([exigirAuthSupabase])
   .validator((data: unknown) => matriculaSchema.parse(data))
   .handler(({ data, context }): Promise<ResultadoMatricula> => {
-    // La plataforma inyecta secretos por solicitud. Esta lectura debe ser
-    // directa y literal dentro del handler; un helper dinámico no se enlaza
-    // correctamente en el despliegue de producción.
-    const clavePrivilegiada = process.env["SUPABASE_SERVICE_ROLE_KEY"];
+    const runtimeGlobal = globalThis as typeof globalThis & {
+      __env__?: Record<string, unknown>;
+    };
+    const binding = runtimeGlobal.__env__?.["SUPABASE_SERVICE_ROLE_KEY"];
+    const clavePrivilegiada =
+      typeof binding === "string" && binding.length > 0
+        ? binding
+        : process.env["SUPABASE_SERVICE_ROLE_KEY"];
     if (!clavePrivilegiada) {
       throw new Error(
         "El servicio de matrícula no está disponible temporalmente. Intenta nuevamente en unos minutos.",

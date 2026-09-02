@@ -11,4 +11,5 @@
 - [x] Verify a real admin enrollment and remove the temporary test account
 - [x] Move the privileged credential read into the server-function handler
 - [x] Replace dynamic secret lookup with a direct request-handler runtime read
+- [x] Read Nitro production bindings from its request-scoped global environment
 - [ ] Publish and verify the corrected production enrollment secret binding

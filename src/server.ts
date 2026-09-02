@@ -49,9 +49,10 @@ export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       // En producción, las claves privadas llegan como bindings del runtime,
-      // no necesariamente dentro de process.env. Guárdalas antes de cargar
-      // cualquier server function para que solo el código del servidor acceda.
-      guardarRuntimeBindings(env);
+      // y Nitro las expone en globalThis.__env__ antes de delegar al SSR.
+      // El argumento `env` no atraviesa su wrapper lazy en producción.
+      const runtimeGlobal = globalThis as typeof globalThis & { __env__?: unknown };
+      guardarRuntimeBindings(runtimeGlobal.__env__ ?? env);
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);
