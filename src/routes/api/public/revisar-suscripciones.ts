@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { leerSecretoServidor } from "@/lib/runtime-env.server";
 
 /**
  * Revisión diaria de suscripciones (para un cron externo).
@@ -9,7 +8,7 @@ export const Route = createFileRoute("/api/public/revisar-suscripciones")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const clave = leerSecretoServidor("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+        const clave = process.env["SUPABASE_SERVICE_ROLE_KEY"] ?? "";
         const enviada = request.headers.get("x-cron-key") ?? "";
         if (!clave || enviada.length !== clave.length || enviada !== clave) {
           return new Response("No autorizado", { status: 401 });
