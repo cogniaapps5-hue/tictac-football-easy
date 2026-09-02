@@ -8,14 +8,11 @@ export const Route = createFileRoute("/api/public/revisar-suscripciones")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const runtimeGlobal = globalThis as typeof globalThis & {
-          __env__?: Record<string, unknown>;
-        };
-        const binding = runtimeGlobal.__env__?.["SUPABASE_SERVICE_ROLE_KEY"];
-        const clave =
-          typeof binding === "string" && binding.length > 0
-            ? binding
-            : (process.env["SUPABASE_SERVICE_ROLE_KEY"] ?? "");
+        let clave = process.env["SUPABASE_SERVICE_ROLE_KEY"];
+        if (!clave) {
+          const { leerBindingCloudflare } = await import("@/lib/cloudflare-env.server");
+          clave = leerBindingCloudflare("SUPABASE_SERVICE_ROLE_KEY");
+        }
         const enviada = request.headers.get("x-cron-key") ?? "";
         if (!clave || enviada.length !== clave.length || enviada !== clave) {
           return new Response("No autorizado", { status: 401 });
