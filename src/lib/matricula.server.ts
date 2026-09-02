@@ -3,6 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { edadDesde, grupoPorEdad, rutClaveTemporal } from "@/lib/carga-masiva-utils";
 import type { EntradaMatricula, ResultadoMatricula } from "@/lib/matricula.schema";
+import { leerSecretoServidor } from "@/lib/runtime-env.server";
 import { urlSupabase } from "@/lib/supabase-config";
 
 type AdminClient = SupabaseClient<Database>;
@@ -15,9 +16,9 @@ let _admin: AdminClient | null = null;
 export function clienteAdmin(): AdminClient {
   if (_admin) return _admin;
   const clave =
-    process.env["SUPABASE_SERVICE_ROLE_KEY"] ||
-    process.env["SUPABASE_SECRET_KEY"] ||
-    process.env["SUPABASE_SERVICE_KEY"];
+    leerSecretoServidor("SUPABASE_SERVICE_ROLE_KEY") ||
+    leerSecretoServidor("SUPABASE_SECRET_KEY") ||
+    leerSecretoServidor("SUPABASE_SERVICE_KEY");
   if (!clave) {
     throw new Error(
       "El servidor no tiene configurada la clave privilegiada (SUPABASE_SERVICE_ROLE_KEY).",
