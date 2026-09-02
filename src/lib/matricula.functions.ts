@@ -10,7 +10,8 @@ export const matricularAlumno = createServerFn({ method: "POST" })
   .middleware([exigirAuthSupabase])
   .validator((data: unknown) => matriculaSchema.parse(data))
   .handler(async ({ data, context }): Promise<ResultadoMatricula> => {
-    const clavePrivilegiada = process.env["SUPABASE_SERVICE_ROLE_KEY"];
+    const { leerSecretoServidor } = await import("@/lib/runtime-env.server");
+    const clavePrivilegiada = leerSecretoServidor("SUPABASE_SERVICE_ROLE_KEY");
     if (!clavePrivilegiada) {
       console.error("[matricula] SUPABASE_SERVICE_ROLE_KEY ausente en los bindings de la solicitud");
       throw new Error(

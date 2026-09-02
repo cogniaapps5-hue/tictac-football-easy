@@ -50,7 +50,8 @@ export const cargaMasiva = createServerFn({ method: "POST" })
       .eq("role", "admin");
     if (!roles?.length) throw new Error("Solo la administradora puede cargar datos");
 
-    const clavePrivilegiada = process.env["SUPABASE_SERVICE_ROLE_KEY"];
+    const { leerSecretoServidor } = await import("@/lib/runtime-env.server");
+    const clavePrivilegiada = leerSecretoServidor("SUPABASE_SERVICE_ROLE_KEY");
     if (!clavePrivilegiada) {
       throw new Error("El servicio de carga masiva no está disponible temporalmente");
     }
