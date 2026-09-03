@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { CargaMasiva } from "@/components/tictac/CargaMasiva";
 import { MatriculaManual } from "@/components/tictac/Matricula";
+import { MatriculaEmergencia } from "@/components/tictac/MatriculaEmergencia";
 import { archivarAlumno, restablecerAlumno } from "@/lib/archivar";
 import {
   AlertDialog,
@@ -382,6 +383,7 @@ function Alumnos() {
         <>
           <CargaMasiva />
           <MatriculaManual />
+          <MatriculaEmergencia />
         </>
       ) : null}
 
