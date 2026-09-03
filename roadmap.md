@@ -13,3 +13,5 @@
 - [x] Replace dynamic secret lookup with a direct request-handler runtime read
 - [x] Read Nitro production bindings from its request-scoped global environment
 - [x] Publish and verify manual enrollment and bulk import on the live Lovable deployment
+- [x] Rebind the missing privileged production credential after the real enrollment failure at 11:50
+- [ ] Confirm one real enrollment succeeds after the credential rebind
