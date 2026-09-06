@@ -16,6 +16,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { edadDesde, grupoPorEdad } from "@/lib/carga-masiva-utils";
+import { SelectorFecha } from "@/components/tictac/SelectorFecha";
 import { borrarBorrador, guardarBorrador, leerBorrador } from "@/lib/almacenamiento";
 import {
   matricularAlumno,
@@ -230,13 +231,11 @@ export function MatriculaManual() {
             </div>
             <div className="space-y-2">
               <Label className="text-base">Fecha de nacimiento <span className="text-danger">*</span></Label>
-              <Input
-                type="date"
-                max={new Date().toISOString().slice(0, 10)}
-                value={form.fecha_nacimiento}
-                onChange={(e) => setForm({ ...form, fecha_nacimiento: e.target.value })}
-                aria-invalid={tocado && faltan.fecha_nacimiento}
-                className={`h-14 rounded-xl text-lg ${tocado && faltan.fecha_nacimiento ? "border-2 border-danger" : ""}`}
+              <SelectorFecha
+                id="fecha_nacimiento"
+                valor={form.fecha_nacimiento}
+                onChange={(v) => setForm({ ...form, fecha_nacimiento: v })}
+                invalido={tocado && faltan.fecha_nacimiento}
               />
               {tocado && faltan.fecha_nacimiento ? (
                 <p className="text-base font-semibold text-danger">Fecha de nacimiento obligatoria</p>
