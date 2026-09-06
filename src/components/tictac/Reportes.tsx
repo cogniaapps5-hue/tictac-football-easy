@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CalendarCheck, FileText, Loader2, Printer, X } from "lucide-react";
+import { CalendarCheck, Download, FileText, Loader2, Printer, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -39,13 +39,16 @@ function escapar(texto: string) {
   );
 }
 
-function abrirVentana(titulo: string, subtitulo: string, encabezados: string[], filas: string[][], pie?: string) {
-  const ventana = window.open("", "_blank", "width=1000,height=800");
-  if (!ventana) {
-    toast.error("Tu navegador bloqueó la ventana. Permite las ventanas emergentes e intenta de nuevo.");
-    return;
-  }
-  const html = `<!doctype html><html lang="es"><head><meta charset="utf-8" />
+type Modo = "ver" | "descargar";
+
+function construirHtml(
+  titulo: string,
+  subtitulo: string,
+  encabezados: string[],
+  filas: string[][],
+  pie?: string,
+) {
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8" />
 <title>${escapar(titulo)} — TIC TAC</title>
 <style>
   body { font-family: Arial, Helvetica, sans-serif; background:#fff; color:#000; font-size:14px; margin:24px; }
@@ -69,7 +72,7 @@ function abrirVentana(titulo: string, subtitulo: string, encabezados: string[], 
     @page { size: A4; margin: 12mm; }
   }
 </style></head><body>
-<header><img src="/tictac-logo.jpg" alt="Escuela TIC TAC" /><strong>Escuela TIC TAC — Siempre Feliz</strong></header>
+<header><strong>Escuela TIC TAC — Siempre Feliz</strong></header>
 <h1>${escapar(titulo)}</h1>
 <p class="fecha">${escapar(subtitulo)}</p>
 <table><thead><tr>${encabezados.map((h) => `<th>${escapar(h)}</th>`).join("")}</tr></thead>
@@ -83,10 +86,46 @@ ${filas.length ? "" : '<p class="pie">No hay datos en este período.</p>'}
   <button class="sec" onclick="window.close()">Cerrar</button>
 </div>
 </body></html>`;
+}
+
+function descargarHtml(titulo: string, html: string) {
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const enlace = document.createElement("a");
+  enlace.href = url;
+  enlace.download = `${titulo.replace(/\s+/g, "-").toLowerCase()}-${iso(new Date())}.html`;
+  document.body.appendChild(enlace);
+  enlace.click();
+  enlace.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  toast.success("Reporte descargado. Ábrelo y presiona Imprimir.");
+}
+
+function entregarReporte(
+  modo: Modo,
+  titulo: string,
+  subtitulo: string,
+  encabezados: string[],
+  filas: string[][],
+  pie?: string,
+) {
+  const html = construirHtml(titulo, subtitulo, encabezados, filas, pie);
+  if (modo === "descargar") {
+    descargarHtml(titulo, html);
+    return;
+  }
+  const ventana = window.open("", "_blank");
+  if (!ventana) {
+    // El navegador del celular bloquea las ventanas nuevas: descargamos el
+    // reporte para que igual se pueda ver e imprimir.
+    descargarHtml(titulo, html);
+    return;
+  }
   ventana.document.open();
   ventana.document.write(html);
   ventana.document.close();
 }
+
 
 function OpcionesPeriodo({
   periodo,
@@ -153,7 +192,7 @@ export function ReportesAdmin() {
   const [filtroGrupo, setFiltroGrupo] = useState("todos");
   const [cargando, setCargando] = useState(false);
 
-  async function generarPagos() {
+  async function generarPagos(modo: Modo = "ver") {
     const r = rango(periodo, desde, hasta);
     setCargando(true);
     try {
@@ -190,7 +229,8 @@ export function ReportesAdmin() {
       const total = filtrados
         .filter((p) => p.status === "approved")
         .reduce((s, p) => s + p.amount, 0);
-      abrirVentana(
+      entregarReporte(
+        modo,
         "Reporte de Pagos",
         `Período ${new Date(`${r.desde}T12:00:00`).toLocaleDateString("es-CL")} al ${new Date(`${r.hasta}T12:00:00`).toLocaleDateString("es-CL")} · Generado el ${new Date().toLocaleDateString("es-CL")}`,
         ["Nombre Alumno", "Apoderado", "Monto", "Concepto", "Fecha", "Estado"],
@@ -205,7 +245,7 @@ export function ReportesAdmin() {
     }
   }
 
-  async function generarAsistencia() {
+  async function generarAsistencia(modo: Modo = "ver") {
     const r = rango(periodo, desde, hasta);
     setCargando(true);
     try {
@@ -233,7 +273,8 @@ export function ReportesAdmin() {
           totales ? `${Math.round((asistidas / totales) * 100)}%` : "—",
         ];
       });
-      abrirVentana(
+      entregarReporte(
+        modo,
         "Reporte de Asistencia",
         `Período ${new Date(`${r.desde}T12:00:00`).toLocaleDateString("es-CL")} al ${new Date(`${r.hasta}T12:00:00`).toLocaleDateString("es-CL")} · Generado el ${new Date().toLocaleDateString("es-CL")}`,
         ["Nombre Alumno", "Grupo Etario", "Clases Asistidas", "Clases Totales", "% Asistencia"],
@@ -282,8 +323,16 @@ export function ReportesAdmin() {
               </Button>
             ))}
           </div>
-          <Button variant="alerta" size="grande" disabled={cargando} onClick={() => void generarPagos()}>
-            {cargando ? <Loader2 className="animate-spin" /> : <Printer />} Generar Reporte
+          <Button variant="alerta" size="grande" disabled={cargando} onClick={() => void generarPagos("ver")}>
+            {cargando ? <Loader2 className="animate-spin" /> : <Printer />} Ver e Imprimir
+          </Button>
+          <Button
+            variant="contorno"
+            size="grande"
+            disabled={cargando}
+            onClick={() => void generarPagos("descargar")}
+          >
+            <Download /> Descargar Reporte
           </Button>
           <Button variant="neutro" size="medio" className="w-full" onClick={() => setAbierto(null)}>
             <X /> Cerrar
@@ -316,9 +365,17 @@ export function ReportesAdmin() {
             variant="accion"
             size="grande"
             disabled={cargando}
-            onClick={() => void generarAsistencia()}
+            onClick={() => void generarAsistencia("ver")}
           >
-            {cargando ? <Loader2 className="animate-spin" /> : <Printer />} Generar Reporte
+            {cargando ? <Loader2 className="animate-spin" /> : <Printer />} Ver e Imprimir
+          </Button>
+          <Button
+            variant="contorno"
+            size="grande"
+            disabled={cargando}
+            onClick={() => void generarAsistencia("descargar")}
+          >
+            <Download /> Descargar Reporte
           </Button>
           <Button variant="neutro" size="medio" className="w-full" onClick={() => setAbierto(null)}>
             <X /> Cerrar
