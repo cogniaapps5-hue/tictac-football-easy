@@ -152,7 +152,7 @@ export function RecordatoriosAdmin() {
   );
 }
 
-const NOTA_OMITIR = "Si usted ya realizó el pago, por favor omita este mensaje 🙏";
+const NOTA_OMITIR = "Si ud ya canceló por favor omita este mensaje, lindo día";
 
 /** Permite volver a enviar un recordatorio ya enviado, agregando la nota
  *  "si usted pagó, omita este mensaje" para no incomodar a quien ya pagó. */
