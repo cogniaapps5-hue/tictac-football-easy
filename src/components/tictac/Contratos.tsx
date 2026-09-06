@@ -37,30 +37,38 @@ export function ContratosAdmin() {
         {aceptados} de {filas.length} apoderados han aceptado el contrato
       </p>
 
-      <div className="mt-4 space-y-3">
-        {filas.length === 0 ? (
-          <p className="text-base text-muted-foreground">Aún no hay apoderados registrados.</p>
-        ) : (
-          filas.map((f) => (
-            <div key={f.id} className="rounded-xl border border-border bg-secondary p-4">
-              <p className="text-lg font-bold">{f.full_name || f.email}</p>
-              <p className="text-base text-muted-foreground">👦 {f.hijos.join(", ")}</p>
-              {f.contract_accepted_at ? (
-                <p className="mt-2 text-base font-bold text-success">
-                  ✅ Aceptado el{" "}
-                  {new Date(f.contract_accepted_at).toLocaleDateString("es-CL", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </p>
-              ) : (
-                <p className="mt-2 text-base font-bold text-gold-brand">⏳ Pendiente de aceptación</p>
-              )}
-            </div>
-          ))
-        )}
-      </div>
+      <details className="mt-4 rounded-xl bg-secondary p-4">
+        <summary className="cursor-pointer text-base font-bold">
+          Ver la lista de apoderados ({filas.length})
+        </summary>
+        <div className="mt-4 space-y-3">
+          {filas.length === 0 ? (
+            <p className="text-base text-muted-foreground">Aún no hay apoderados registrados.</p>
+          ) : (
+            filas.map((f) => (
+              <div key={f.id} className="rounded-xl border border-border bg-card p-4">
+                <p className="text-lg font-bold">{f.full_name || f.email}</p>
+                <p className="text-base text-muted-foreground">👦 {f.hijos.join(", ")}</p>
+                {f.contract_accepted_at ? (
+                  <p className="mt-2 text-base font-bold text-success">
+                    ✅ Aceptado el{" "}
+                    {new Date(f.contract_accepted_at).toLocaleDateString("es-CL", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </p>
+                ) : (
+                  <p className="mt-2 text-base font-bold text-gold-brand">
+                    ⏳ Pendiente de aceptación
+                  </p>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      </details>
+
     </Tarjeta>
   );
 }
