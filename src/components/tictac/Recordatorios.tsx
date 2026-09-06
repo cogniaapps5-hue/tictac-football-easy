@@ -115,31 +115,37 @@ export function RecordatoriosAdmin() {
           <Send /> Enviar a Todos los Pendientes
         </Button>
 
-        <ul className="mt-6 space-y-6">
-          {pendientes.map((r) => (
-            <li key={r.id} className="rounded-xl bg-secondary p-4">
-              <p className="text-base font-bold">
-                {r.players?.name ?? "Alumno"} ·{" "}
-                {r.kind === "overdue" ? "Pago atrasado" : "Por vencer el día 6"}
-              </p>
-              <Textarea
-                aria-label={`Mensaje para ${r.players?.name ?? "el apoderado"}`}
-                className="mt-3 min-h-[180px] text-base"
-                value={borradores[r.id] ?? r.message}
-                onChange={(e) => setBorradores((prev) => ({ ...prev, [r.id]: e.target.value }))}
-              />
-              <Button
-                variant="exito"
-                size="grande"
-                className="mt-4"
-                disabled={enviar.isPending}
-                onClick={() => enviar.mutate([r.id])}
-              >
-                <Send /> Enviar Ahora
-              </Button>
-            </li>
-          ))}
-        </ul>
+        <details className="mt-4 rounded-xl bg-secondary p-4">
+          <summary className="cursor-pointer text-base font-bold">
+            Ver los {pendientes.length} mensajes uno por uno
+          </summary>
+          <ul className="mt-4 space-y-6">
+            {pendientes.map((r) => (
+              <li key={r.id} className="rounded-xl bg-card p-4">
+                <p className="text-base font-bold">
+                  {r.players?.name ?? "Alumno"} ·{" "}
+                  {r.kind === "overdue" ? "Pago atrasado" : "Por vencer el día 6"}
+                </p>
+                <Textarea
+                  aria-label={`Mensaje para ${r.players?.name ?? "el apoderado"}`}
+                  className="mt-3 min-h-[180px] text-base"
+                  value={borradores[r.id] ?? r.message}
+                  onChange={(e) => setBorradores((prev) => ({ ...prev, [r.id]: e.target.value }))}
+                />
+                <Button
+                  variant="exito"
+                  size="grande"
+                  className="mt-4"
+                  disabled={enviar.isPending}
+                  onClick={() => enviar.mutate([r.id])}
+                >
+                  <Send /> Enviar Ahora
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </details>
+
       </Tarjeta>
       <ReenviarRecordatorios />
     </>
@@ -208,22 +214,28 @@ function ReenviarRecordatorios() {
       >
         <RefreshCw /> Reenviar a Todos ({enviados.length})
       </Button>
-      <ul className="mt-6 space-y-4">
-        {enviados.map((r) => (
-          <li key={r.id} className="rounded-xl bg-secondary p-4">
-            <p className="text-base font-bold">{r.players?.name ?? "Alumno"}</p>
-            <Button
-              variant="contorno"
-              size="grande"
-              className="mt-3"
-              disabled={reenviar.isPending}
-              onClick={() => reenviar.mutate([r.id])}
-            >
-              <RefreshCw /> Reenviar
-            </Button>
-          </li>
-        ))}
-      </ul>
+      <details className="mt-4 rounded-xl bg-secondary p-4">
+        <summary className="cursor-pointer text-base font-bold">
+          Ver la lista de {enviados.length} apoderados
+        </summary>
+        <ul className="mt-4 space-y-4">
+          {enviados.map((r) => (
+            <li key={r.id} className="rounded-xl bg-card p-4">
+              <p className="text-base font-bold">{r.players?.name ?? "Alumno"}</p>
+              <Button
+                variant="contorno"
+                size="grande"
+                className="mt-3"
+                disabled={reenviar.isPending}
+                onClick={() => reenviar.mutate([r.id])}
+              >
+                <RefreshCw /> Reenviar
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </details>
+
     </Tarjeta>
   );
 }
