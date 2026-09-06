@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CalendarCheck, FileText, Loader2, Printer, X } from "lucide-react";
+import { CalendarCheck, Download, FileText, Loader2, Printer, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -323,8 +323,16 @@ export function ReportesAdmin() {
               </Button>
             ))}
           </div>
-          <Button variant="alerta" size="grande" disabled={cargando} onClick={() => void generarPagos()}>
-            {cargando ? <Loader2 className="animate-spin" /> : <Printer />} Generar Reporte
+          <Button variant="alerta" size="grande" disabled={cargando} onClick={() => void generarPagos("ver")}>
+            {cargando ? <Loader2 className="animate-spin" /> : <Printer />} Ver e Imprimir
+          </Button>
+          <Button
+            variant="contorno"
+            size="grande"
+            disabled={cargando}
+            onClick={() => void generarPagos("descargar")}
+          >
+            <Download /> Descargar Reporte
           </Button>
           <Button variant="neutro" size="medio" className="w-full" onClick={() => setAbierto(null)}>
             <X /> Cerrar
@@ -357,9 +365,17 @@ export function ReportesAdmin() {
             variant="accion"
             size="grande"
             disabled={cargando}
-            onClick={() => void generarAsistencia()}
+            onClick={() => void generarAsistencia("ver")}
           >
-            {cargando ? <Loader2 className="animate-spin" /> : <Printer />} Generar Reporte
+            {cargando ? <Loader2 className="animate-spin" /> : <Printer />} Ver e Imprimir
+          </Button>
+          <Button
+            variant="contorno"
+            size="grande"
+            disabled={cargando}
+            onClick={() => void generarAsistencia("descargar")}
+          >
+            <Download /> Descargar Reporte
           </Button>
           <Button variant="neutro" size="medio" className="w-full" onClick={() => setAbierto(null)}>
             <X /> Cerrar
