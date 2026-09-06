@@ -192,7 +192,7 @@ export function ReportesAdmin() {
   const [filtroGrupo, setFiltroGrupo] = useState("todos");
   const [cargando, setCargando] = useState(false);
 
-  async function generarPagos() {
+  async function generarPagos(modo: Modo = "ver") {
     const r = rango(periodo, desde, hasta);
     setCargando(true);
     try {
@@ -229,7 +229,8 @@ export function ReportesAdmin() {
       const total = filtrados
         .filter((p) => p.status === "approved")
         .reduce((s, p) => s + p.amount, 0);
-      abrirVentana(
+      entregarReporte(
+        modo,
         "Reporte de Pagos",
         `Período ${new Date(`${r.desde}T12:00:00`).toLocaleDateString("es-CL")} al ${new Date(`${r.hasta}T12:00:00`).toLocaleDateString("es-CL")} · Generado el ${new Date().toLocaleDateString("es-CL")}`,
         ["Nombre Alumno", "Apoderado", "Monto", "Concepto", "Fecha", "Estado"],
@@ -244,7 +245,7 @@ export function ReportesAdmin() {
     }
   }
 
-  async function generarAsistencia() {
+  async function generarAsistencia(modo: Modo = "ver") {
     const r = rango(periodo, desde, hasta);
     setCargando(true);
     try {
@@ -272,7 +273,8 @@ export function ReportesAdmin() {
           totales ? `${Math.round((asistidas / totales) * 100)}%` : "—",
         ];
       });
-      abrirVentana(
+      entregarReporte(
+        modo,
         "Reporte de Asistencia",
         `Período ${new Date(`${r.desde}T12:00:00`).toLocaleDateString("es-CL")} al ${new Date(`${r.hasta}T12:00:00`).toLocaleDateString("es-CL")} · Generado el ${new Date().toLocaleDateString("es-CL")}`,
         ["Nombre Alumno", "Grupo Etario", "Clases Asistidas", "Clases Totales", "% Asistencia"],
