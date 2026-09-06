@@ -23,6 +23,7 @@ import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedMiHijoRouteImport } from './routes/_authenticated/mi-hijo'
 import { Route as AuthenticatedPagosRouteImport } from './routes/_authenticated/pagos'
 import { Route as AuthenticatedSuscripcionesRouteImport } from './routes/_authenticated/suscripciones'
+import { Route as ApiPublicDiagEnvRouteImport } from './routes/api/public/diag-env'
 import { Route as ApiPublicRevisarSuscripcionesRouteImport } from './routes/api/public/revisar-suscripciones'
 
 const IndexRoute = IndexRouteImport.update({
@@ -96,6 +97,11 @@ const AuthenticatedSuscripcionesRoute =
     path: '/suscripciones',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicDiagEnvRoute = ApiPublicDiagEnvRouteImport.update({
+  id: '/api/public/diag-env',
+  path: '/api/public/diag-env',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicRevisarSuscripcionesRoute =
   ApiPublicRevisarSuscripcionesRouteImport.update({
     id: '/api/public/revisar-suscripciones',
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/mi-hijo': typeof AuthenticatedMiHijoRoute
   '/pagos': typeof AuthenticatedPagosRoute
   '/suscripciones': typeof AuthenticatedSuscripcionesRoute
+  '/api/public/diag-env': typeof ApiPublicDiagEnvRoute
   '/api/public/revisar-suscripciones': typeof ApiPublicRevisarSuscripcionesRoute
 }
 export interface FileRoutesByTo {
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/mi-hijo': typeof AuthenticatedMiHijoRoute
   '/pagos': typeof AuthenticatedPagosRoute
   '/suscripciones': typeof AuthenticatedSuscripcionesRoute
+  '/api/public/diag-env': typeof ApiPublicDiagEnvRoute
   '/api/public/revisar-suscripciones': typeof ApiPublicRevisarSuscripcionesRoute
 }
 export interface FileRoutesById {
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/_authenticated/mi-hijo': typeof AuthenticatedMiHijoRoute
   '/_authenticated/pagos': typeof AuthenticatedPagosRoute
   '/_authenticated/suscripciones': typeof AuthenticatedSuscripcionesRoute
+  '/api/public/diag-env': typeof ApiPublicDiagEnvRoute
   '/api/public/revisar-suscripciones': typeof ApiPublicRevisarSuscripcionesRoute
 }
 export interface FileRouteTypes {
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/mi-hijo'
     | '/pagos'
     | '/suscripciones'
+    | '/api/public/diag-env'
     | '/api/public/revisar-suscripciones'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/mi-hijo'
     | '/pagos'
     | '/suscripciones'
+    | '/api/public/diag-env'
     | '/api/public/revisar-suscripciones'
   id:
     | '__root__'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mi-hijo'
     | '/_authenticated/pagos'
     | '/_authenticated/suscripciones'
+    | '/api/public/diag-env'
     | '/api/public/revisar-suscripciones'
   fileRoutesById: FileRoutesById
 }
@@ -211,6 +223,7 @@ export interface RootRouteChildren {
   CambiarClaveRoute: typeof CambiarClaveRoute
   ErrorAccesoRoute: typeof ErrorAccesoRoute
   ServicioSuspendidoRoute: typeof ServicioSuspendidoRoute
+  ApiPublicDiagEnvRoute: typeof ApiPublicDiagEnvRoute
   ApiPublicRevisarSuscripcionesRoute: typeof ApiPublicRevisarSuscripcionesRoute
 }
 
@@ -314,6 +327,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSuscripcionesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/diag-env': {
+      id: '/api/public/diag-env'
+      path: '/api/public/diag-env'
+      fullPath: '/api/public/diag-env'
+      preLoaderRoute: typeof ApiPublicDiagEnvRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/revisar-suscripciones': {
       id: '/api/public/revisar-suscripciones'
       path: '/api/public/revisar-suscripciones'
@@ -357,6 +377,7 @@ const rootRouteChildren: RootRouteChildren = {
   CambiarClaveRoute: CambiarClaveRoute,
   ErrorAccesoRoute: ErrorAccesoRoute,
   ServicioSuspendidoRoute: ServicioSuspendidoRoute,
+  ApiPublicDiagEnvRoute: ApiPublicDiagEnvRoute,
   ApiPublicRevisarSuscripcionesRoute: ApiPublicRevisarSuscripcionesRoute,
 }
 export const routeTree = rootRouteImport
