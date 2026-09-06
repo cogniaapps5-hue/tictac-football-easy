@@ -39,13 +39,16 @@ function escapar(texto: string) {
   );
 }
 
-function abrirVentana(titulo: string, subtitulo: string, encabezados: string[], filas: string[][], pie?: string) {
-  const ventana = window.open("", "_blank", "width=1000,height=800");
-  if (!ventana) {
-    toast.error("Tu navegador bloqueó la ventana. Permite las ventanas emergentes e intenta de nuevo.");
-    return;
-  }
-  const html = `<!doctype html><html lang="es"><head><meta charset="utf-8" />
+type Modo = "ver" | "descargar";
+
+function construirHtml(
+  titulo: string,
+  subtitulo: string,
+  encabezados: string[],
+  filas: string[][],
+  pie?: string,
+) {
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8" />
 <title>${escapar(titulo)} — TIC TAC</title>
 <style>
   body { font-family: Arial, Helvetica, sans-serif; background:#fff; color:#000; font-size:14px; margin:24px; }
@@ -69,7 +72,7 @@ function abrirVentana(titulo: string, subtitulo: string, encabezados: string[], 
     @page { size: A4; margin: 12mm; }
   }
 </style></head><body>
-<header><img src="/tictac-logo.jpg" alt="Escuela TIC TAC" /><strong>Escuela TIC TAC — Siempre Feliz</strong></header>
+<header><strong>Escuela TIC TAC — Siempre Feliz</strong></header>
 <h1>${escapar(titulo)}</h1>
 <p class="fecha">${escapar(subtitulo)}</p>
 <table><thead><tr>${encabezados.map((h) => `<th>${escapar(h)}</th>`).join("")}</tr></thead>
@@ -83,10 +86,46 @@ ${filas.length ? "" : '<p class="pie">No hay datos en este período.</p>'}
   <button class="sec" onclick="window.close()">Cerrar</button>
 </div>
 </body></html>`;
+}
+
+function descargarHtml(titulo: string, html: string) {
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const enlace = document.createElement("a");
+  enlace.href = url;
+  enlace.download = `${titulo.replace(/\s+/g, "-").toLowerCase()}-${iso(new Date())}.html`;
+  document.body.appendChild(enlace);
+  enlace.click();
+  enlace.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  toast.success("Reporte descargado. Ábrelo y presiona Imprimir.");
+}
+
+function entregarReporte(
+  modo: Modo,
+  titulo: string,
+  subtitulo: string,
+  encabezados: string[],
+  filas: string[][],
+  pie?: string,
+) {
+  const html = construirHtml(titulo, subtitulo, encabezados, filas, pie);
+  if (modo === "descargar") {
+    descargarHtml(titulo, html);
+    return;
+  }
+  const ventana = window.open("", "_blank");
+  if (!ventana) {
+    // El navegador del celular bloquea las ventanas nuevas: descargamos el
+    // reporte para que igual se pueda ver e imprimir.
+    descargarHtml(titulo, html);
+    return;
+  }
   ventana.document.open();
   ventana.document.write(html);
   ventana.document.close();
 }
+
 
 function OpcionesPeriodo({
   periodo,
