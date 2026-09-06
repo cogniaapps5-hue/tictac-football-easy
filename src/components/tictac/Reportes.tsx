@@ -48,37 +48,55 @@ function construirHtml(
   filas: string[][],
   pie?: string,
 ) {
+  const logo =
+    typeof window !== "undefined" ? `${window.location.origin}/tictac-logo.jpg` : "/tictac-logo.jpg";
   return `<!doctype html><html lang="es"><head><meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${escapar(titulo)} — TIC TAC</title>
 <style>
-  body { font-family: Arial, Helvetica, sans-serif; background:#fff; color:#000; font-size:14px; margin:24px; }
-  header { display:flex; align-items:center; gap:16px; margin-bottom:8px; }
-  header img { height:50px; }
-  h1 { text-align:center; font-size:20px; font-weight:bold; margin:8px 0 4px; }
-  .fecha { text-align:center; color:#6B7280; font-size:12px; margin-bottom:20px; }
+  * { box-sizing:border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; background:#fff; color:#111; font-size:14px; margin:20px; }
+  header { display:flex; align-items:center; justify-content:center; gap:14px; border-bottom:3px solid #00E5FF; padding-bottom:12px; }
+  header img { height:64px; width:64px; object-fit:cover; border-radius:8px; }
+  header .marca { font-size:18px; font-weight:bold; line-height:1.2; }
+  header .marca span { display:block; font-size:12px; font-weight:normal; color:#6B7280; }
+  h1 { text-align:center; font-size:20px; font-weight:bold; margin:16px 0 4px; }
+  .fecha { text-align:center; color:#6B7280; font-size:12px; margin-bottom:18px; }
+  .envoltura { width:100%; overflow-x:auto; }
   table { width:100%; border-collapse:collapse; }
   thead { display:table-header-group; }
-  th, td { border:1px solid #E5E7EB; padding:8px 10px; text-align:left; font-size:14px; }
-  th { background:#F3F4F6; font-weight:bold; }
-  tbody tr:nth-child(even) { background:#FAFAFA; }
+  th, td { border:1px solid #E5E7EB; padding:8px 10px; text-align:left; font-size:14px; vertical-align:top; }
+  th { background:#0A0A0A; color:#fff; font-weight:bold; white-space:nowrap; }
+  td:nth-child(n+3) { white-space:nowrap; }
+  tbody tr:nth-child(even) { background:#F7F9FA; }
   tr { page-break-inside:avoid; }
-  .pie { margin-top:16px; font-weight:bold; font-size:15px; }
-  .acciones { margin-top:24px; display:flex; gap:12px; }
-  .acciones button { font-size:15px; padding:12px 20px; border:1px solid #111; background:#111; color:#fff; border-radius:8px; cursor:pointer; }
+  .pie { margin-top:16px; font-weight:bold; font-size:15px; border-top:2px solid #FFC107; padding-top:10px; }
+  .acciones { margin-top:24px; display:flex; gap:12px; flex-wrap:wrap; }
+  .acciones button { font-size:16px; padding:14px 22px; border:1px solid #111; background:#111; color:#fff; border-radius:10px; cursor:pointer; }
   .acciones button.sec { background:#fff; color:#111; }
+  @media (max-width: 640px) {
+    body { margin:12px; font-size:13px; }
+    th, td { padding:6px 8px; font-size:12px; }
+  }
   @media print {
     .acciones { display:none !important; }
-    body { margin:12mm; }
+    body { margin:0; }
+    th { background:#E5E7EB !important; color:#000 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
     @page { size: A4; margin: 12mm; }
   }
 </style></head><body>
-<header><strong>Escuela TIC TAC — Siempre Feliz</strong></header>
+<header>
+  <img src="${logo}" alt="Escuela TIC TAC" />
+  <div class="marca">Escuela TIC TAC<span>Siempre Feliz</span></div>
+</header>
 <h1>${escapar(titulo)}</h1>
 <p class="fecha">${escapar(subtitulo)}</p>
+<div class="envoltura">
 <table><thead><tr>${encabezados.map((h) => `<th>${escapar(h)}</th>`).join("")}</tr></thead>
 <tbody>${filas
     .map((f) => `<tr>${f.map((c) => `<td>${escapar(c)}</td>`).join("")}</tr>`)
     .join("")}</tbody></table>
+</div>
 ${pie ? `<p class="pie">${escapar(pie)}</p>` : ""}
 ${filas.length ? "" : '<p class="pie">No hay datos en este período.</p>'}
 <div class="acciones">
@@ -86,6 +104,7 @@ ${filas.length ? "" : '<p class="pie">No hay datos en este período.</p>'}
   <button class="sec" onclick="window.close()">Cerrar</button>
 </div>
 </body></html>`;
+
 }
 
 function descargarHtml(titulo: string, html: string) {
