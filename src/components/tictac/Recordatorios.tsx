@@ -214,22 +214,28 @@ function ReenviarRecordatorios() {
       >
         <RefreshCw /> Reenviar a Todos ({enviados.length})
       </Button>
-      <ul className="mt-6 space-y-4">
-        {enviados.map((r) => (
-          <li key={r.id} className="rounded-xl bg-secondary p-4">
-            <p className="text-base font-bold">{r.players?.name ?? "Alumno"}</p>
-            <Button
-              variant="contorno"
-              size="grande"
-              className="mt-3"
-              disabled={reenviar.isPending}
-              onClick={() => reenviar.mutate([r.id])}
-            >
-              <RefreshCw /> Reenviar
-            </Button>
-          </li>
-        ))}
-      </ul>
+      <details className="mt-4 rounded-xl bg-secondary p-4">
+        <summary className="cursor-pointer text-base font-bold">
+          Ver la lista de {enviados.length} apoderados
+        </summary>
+        <ul className="mt-4 space-y-4">
+          {enviados.map((r) => (
+            <li key={r.id} className="rounded-xl bg-card p-4">
+              <p className="text-base font-bold">{r.players?.name ?? "Alumno"}</p>
+              <Button
+                variant="contorno"
+                size="grande"
+                className="mt-3"
+                disabled={reenviar.isPending}
+                onClick={() => reenviar.mutate([r.id])}
+              >
+                <RefreshCw /> Reenviar
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </details>
+
     </Tarjeta>
   );
 }
