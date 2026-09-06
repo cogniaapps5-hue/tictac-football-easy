@@ -16,6 +16,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { edadDesde, grupoPorEdad } from "@/lib/carga-masiva-utils";
+import { SelectorFecha } from "@/components/tictac/SelectorFecha";
 import { borrarBorrador, guardarBorrador, leerBorrador } from "@/lib/almacenamiento";
 import {
   matricularAlumno,

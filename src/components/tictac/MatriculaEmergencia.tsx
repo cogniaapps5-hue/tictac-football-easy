@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tarjeta } from "@/components/tictac/Shell";
+import { SelectorFecha } from "@/components/tictac/SelectorFecha";
 import {
   Dialog,
   DialogContent,
@@ -120,7 +121,16 @@ export function MatriculaEmergencia() {
               {campo("telefono", "Teléfono", "tel", "+56 9 ...")}
               {campo("nombre_alumno", "Nombre del alumno")}
               {campo("rut_alumno", "RUT del alumno", "text", "25.123.456-7")}
-              {campo("fecha_nacimiento", "Fecha de nacimiento", "date")}
+              <div>
+                <Label className="text-base">Fecha de nacimiento</Label>
+                <div className="mt-1">
+                  <SelectorFecha
+                    id="em-fecha_nacimiento"
+                    valor={form.fecha_nacimiento}
+                    onChange={(v) => setForm((f) => ({ ...f, fecha_nacimiento: v }))}
+                  />
+                </div>
+              </div>
               {campo("talla_polera", "Talla de polera (opcional)", "text", "S / M / L ...")}
               <div>
                 <Label htmlFor="em-condiciones" className="text-base">
