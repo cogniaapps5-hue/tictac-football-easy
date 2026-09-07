@@ -78,18 +78,15 @@ export function RecordatoriosAdmin() {
 
   if (!pendientes?.length) {
     return (
-      <>
-        <Tarjeta>
-          <div className="flex items-center gap-3">
-            <BellRing className="size-7 text-gold-brand" />
-            <h2 className="text-xl font-bold">Recordatorios pendientes de envío</h2>
-          </div>
-          <p className="mt-3 text-base text-muted-foreground">
-            No hay recordatorios por enviar. Todo al día 🌟
-          </p>
-        </Tarjeta>
-        <ReenviarRecordatorios />
-      </>
+      <Tarjeta>
+        <div className="flex items-center gap-3">
+          <BellRing className="size-7 text-gold-brand" />
+          <h2 className="text-xl font-bold">Recordatorios pendientes de envío</h2>
+        </div>
+        <p className="mt-3 text-base text-muted-foreground">
+          No hay recordatorios por enviar. Todo al día 🌟
+        </p>
+      </Tarjeta>
     );
   }
 
