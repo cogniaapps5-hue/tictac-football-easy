@@ -91,7 +91,6 @@ export function RecordatoriosAdmin() {
   }
 
   return (
-    <>
       <Tarjeta>
         <div className="flex items-center gap-3">
           <BellRing className="size-7 text-gold-brand" />
@@ -144,8 +143,6 @@ export function RecordatoriosAdmin() {
         </details>
 
       </Tarjeta>
-      <ReenviarRecordatorios />
-    </>
   );
 }
 
