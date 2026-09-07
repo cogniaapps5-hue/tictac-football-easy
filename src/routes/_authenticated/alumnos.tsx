@@ -14,6 +14,7 @@ import { Shell, Tarjeta, Estado } from "@/components/tictac/Shell";
 import { CargaMasiva } from "@/components/tictac/CargaMasiva";
 import { MatriculaManual } from "@/components/tictac/Matricula";
 import { MatriculaEmergencia } from "@/components/tictac/MatriculaEmergencia";
+import { EditarAlumno } from "@/components/tictac/EditarAlumno";
 import { archivarAlumno, restablecerAlumno } from "@/lib/archivar";
 import {
   AlertDialog,
@@ -281,6 +282,20 @@ function Alumnos() {
         <div className="mt-3">
           <Estado estado={marca?.status ?? "no_response"} />
         </div>
+        <EditarAlumno
+          alumno={{
+            id: alumno.id,
+            name: alumno.name,
+            rut: alumno.rut,
+            birth_date: alumno.birth_date,
+            jersey_size: alumno.jersey_size,
+            medical_conditions: alumno.medical_conditions,
+            emergency_contact_name: alumno.emergency_contact_name,
+            emergency_contact_phone: alumno.emergency_contact_phone,
+            emergency_relationship: alumno.emergency_relationship,
+            training_day: alumno.training_day,
+          }}
+        />
         {alumno.access_status === "blocked" || alumno.access_status === "exception" ? (
           <Button
             variant={alumno.access_status === "exception" ? "alerta" : "contorno"}
