@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { BellRing, RefreshCw, Send } from "lucide-react";
+import { BellRing, Send } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -60,7 +60,7 @@ export function RecordatoriosAdmin() {
         const { error } = await supabase
           .from("payment_reminders")
           .update({
-            message: borradores[id] ?? "",
+            message: conNota(borradores[id] ?? ""),
             status: "sent",
             sent_at: new Date().toISOString(),
           })
