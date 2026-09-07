@@ -152,90 +152,10 @@ export function RecordatoriosAdmin() {
   );
 }
 
-const NOTA_OMITIR = "Si ud ya canceló por favor omita este mensaje, lindo día";
+const NOTA_OMITIR = "Si usted pagó omita este mensaje, lindo día";
 
-/** Permite volver a enviar un recordatorio ya enviado, agregando la nota
- *  "si usted pagó, omita este mensaje" para no incomodar a quien ya pagó. */
-function ReenviarRecordatorios() {
-  const queryClient = useQueryClient();
-
-  const { data: enviados } = useQuery({
-    queryKey: ["recordatorios-enviados"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payment_reminders")
-        .select("id, message, kind, players(name)")
-        .eq("status", "sent")
-        .order("sent_at", { ascending: false })
-        .limit(30);
-      if (error) throw error;
-      return (data ?? []) as Recordatorio[];
-    },
-  });
-
-  const reenviar = useMutation({
-    mutationFn: async (ids: string[]) => {
-      for (const id of ids) {
-        const actual = enviados?.find((r) => r.id === id);
-        const base = (actual?.message ?? "").trim();
-        const mensaje = base.includes(NOTA_OMITIR) ? base : `${base}\n\n${NOTA_OMITIR}`;
-        const { error } = await supabase
-          .from("payment_reminders")
-          .update({ message: mensaje, sent_at: new Date().toISOString() })
-          .eq("id", id);
-        if (error) throw error;
-      }
-      return ids.length;
-    },
-    onSuccess: (cantidad) => {
-      queryClient.invalidateQueries({ queryKey: ["recordatorios-enviados"] });
-      toast.success(cantidad === 1 ? "Recordatorio reenviado" : `${cantidad} recordatorios reenviados`);
-    },
-    onError: () => toast.error("No pudimos reenviar el mensaje. Intenta otra vez."),
-  });
-
-  if (!enviados?.length) return null;
-
-  return (
-    <Tarjeta>
-      <div className="flex items-center gap-3">
-        <RefreshCw className="size-7 text-cyan-brand" />
-        <h2 className="text-xl font-bold">Reenviar recordatorios</h2>
-      </div>
-      <p className="mt-2 text-base text-muted-foreground">
-        Se agrega la nota “{NOTA_OMITIR}”.
-      </p>
-      <Button
-        variant="accion"
-        size="grande"
-        className="mt-4"
-        disabled={reenviar.isPending}
-        onClick={() => reenviar.mutate(enviados.map((r) => r.id))}
-      >
-        <RefreshCw /> Reenviar a Todos ({enviados.length})
-      </Button>
-      <details className="mt-4 rounded-xl bg-secondary p-4">
-        <summary className="cursor-pointer text-base font-bold">
-          Ver la lista de {enviados.length} apoderados
-        </summary>
-        <ul className="mt-4 space-y-4">
-          {enviados.map((r) => (
-            <li key={r.id} className="rounded-xl bg-card p-4">
-              <p className="text-base font-bold">{r.players?.name ?? "Alumno"}</p>
-              <Button
-                variant="contorno"
-                size="grande"
-                className="mt-3"
-                disabled={reenviar.isPending}
-                onClick={() => reenviar.mutate([r.id])}
-              >
-                <RefreshCw /> Reenviar
-              </Button>
-            </li>
-          ))}
-        </ul>
-      </details>
-
-    </Tarjeta>
-  );
+/** Todos los mensajes masivos salen siempre con la nota al final. */
+function conNota(texto: string) {
+  const base = (texto ?? "").trim();
+  return base.includes(NOTA_OMITIR) ? base : `${base}\n\n${NOTA_OMITIR}`;
 }
