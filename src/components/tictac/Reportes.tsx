@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { CalendarCheck, Download, FileText, Loader2, Printer, X } from "lucide-react";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -41,86 +43,82 @@ function escapar(texto: string) {
 
 type Modo = "ver" | "descargar";
 
-function construirHtml(
+async function cargarLogo(): Promise<string | null> {
+  try {
+    const res = await fetch("/tictac-logo.jpg");
+    const blob = await res.blob();
+    return await new Promise((resolve) => {
+      const r = new FileReader();
+      r.onload = () => resolve(typeof r.result === "string" ? r.result : null);
+      r.onerror = () => resolve(null);
+      r.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+}
+
+async function construirPdf(
   titulo: string,
   subtitulo: string,
   encabezados: string[],
   filas: string[][],
   pie?: string,
-) {
-  const logo =
-    typeof window !== "undefined" ? `${window.location.origin}/tictac-logo.jpg` : "/tictac-logo.jpg";
-  return `<!doctype html><html lang="es"><head><meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>${escapar(titulo)} — TIC TAC</title>
-<style>
-  * { box-sizing:border-box; }
-  body { font-family: Arial, Helvetica, sans-serif; background:#fff; color:#111; font-size:14px; margin:20px; }
-  header { display:flex; align-items:center; justify-content:center; gap:14px; border-bottom:3px solid #00E5FF; padding-bottom:12px; }
-  header img { height:64px; width:64px; object-fit:cover; border-radius:8px; }
-  header .marca { font-size:18px; font-weight:bold; line-height:1.2; }
-  header .marca span { display:block; font-size:12px; font-weight:normal; color:#6B7280; }
-  h1 { text-align:center; font-size:20px; font-weight:bold; margin:16px 0 4px; }
-  .fecha { text-align:center; color:#6B7280; font-size:12px; margin-bottom:18px; }
-  .envoltura { width:100%; overflow-x:auto; }
-  table { width:100%; border-collapse:collapse; }
-  thead { display:table-header-group; }
-  th, td { border:1px solid #E5E7EB; padding:8px 10px; text-align:left; font-size:14px; vertical-align:top; }
-  th { background:#0A0A0A; color:#fff; font-weight:bold; white-space:nowrap; }
-  td:nth-child(n+3) { white-space:nowrap; }
-  tbody tr:nth-child(even) { background:#F7F9FA; }
-  tr { page-break-inside:avoid; }
-  .pie { margin-top:16px; font-weight:bold; font-size:15px; border-top:2px solid #FFC107; padding-top:10px; }
-  .acciones { margin-top:24px; display:flex; gap:12px; flex-wrap:wrap; }
-  .acciones button { font-size:16px; padding:14px 22px; border:1px solid #111; background:#111; color:#fff; border-radius:10px; cursor:pointer; }
-  .acciones button.sec { background:#fff; color:#111; }
-  @media (max-width: 640px) {
-    body { margin:12px; font-size:13px; }
-    th, td { padding:6px 8px; font-size:12px; }
+): Promise<jsPDF> {
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const ancho = doc.internal.pageSize.getWidth();
+  const logo = await cargarLogo();
+  if (logo) {
+    try {
+      doc.addImage(logo, "JPEG", 40, 30, 48, 48);
+    } catch {
+      /* ignora si el formato falla */
+    }
   }
-  @media print {
-    .acciones { display:none !important; }
-    body { margin:0; }
-    th { background:#E5E7EB !important; color:#000 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-    @page { size: A4; margin: 12mm; }
-  }
-</style></head><body>
-<header>
-  <img src="${logo}" alt="Escuela TIC TAC" />
-  <div class="marca">Escuela TIC TAC<span>Siempre Feliz</span></div>
-</header>
-<h1>${escapar(titulo)}</h1>
-<p class="fecha">${escapar(subtitulo)}</p>
-<div class="envoltura">
-<table><thead><tr>${encabezados.map((h) => `<th>${escapar(h)}</th>`).join("")}</tr></thead>
-<tbody>${filas
-    .map((f) => `<tr>${f.map((c) => `<td>${escapar(c)}</td>`).join("")}</tr>`)
-    .join("")}</tbody></table>
-</div>
-${pie ? `<p class="pie">${escapar(pie)}</p>` : ""}
-${filas.length ? "" : '<p class="pie">No hay datos en este período.</p>'}
-<div class="acciones">
-  <button onclick="window.print()">Imprimir</button>
-  <button class="sec" onclick="window.close()">Cerrar</button>
-</div>
-</body></html>`;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.text("Escuela TIC TAC", 100, 52);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(107, 114, 128);
+  doc.text("Siempre Feliz", 100, 68);
+  doc.setDrawColor(0, 229, 255);
+  doc.setLineWidth(2);
+  doc.line(40, 90, ancho - 40, 90);
 
+  doc.setTextColor(17, 17, 17);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.text(titulo, ancho / 2, 115, { align: "center" });
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(107, 114, 128);
+  doc.text(subtitulo, ancho / 2, 132, { align: "center" });
+
+  autoTable(doc, {
+    startY: 150,
+    head: [encabezados],
+    body: filas.length ? filas : [["", "Sin datos en este período", "", "", "", ""].slice(0, encabezados.length)],
+    styles: { fontSize: 10, cellPadding: 6, textColor: [17, 17, 17] },
+    headStyles: { fillColor: [10, 10, 10], textColor: [255, 255, 255], fontStyle: "bold" },
+    alternateRowStyles: { fillColor: [247, 249, 250] },
+    margin: { left: 40, right: 40 },
+  });
+
+  if (pie) {
+    const y = (doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 150;
+    doc.setDrawColor(255, 193, 7);
+    doc.setLineWidth(2);
+    doc.line(40, y + 16, ancho - 40, y + 16);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(17, 17, 17);
+    doc.text(pie, 40, y + 34);
+  }
+  return doc;
 }
 
-function descargarHtml(titulo: string, html: string) {
-  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const enlace = document.createElement("a");
-  enlace.href = url;
-  enlace.download = `${titulo.replace(/\s+/g, "-").toLowerCase()}-${iso(new Date())}.html`;
-  document.body.appendChild(enlace);
-  enlace.click();
-  enlace.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 4000);
-  toast.success("Reporte descargado. Ábrelo y presiona Imprimir.");
-}
-
-function entregarReporte(
+async function entregarReporte(
   modo: Modo,
   titulo: string,
   subtitulo: string,
@@ -128,21 +126,22 @@ function entregarReporte(
   filas: string[][],
   pie?: string,
 ) {
-  const html = construirHtml(titulo, subtitulo, encabezados, filas, pie);
+  const doc = await construirPdf(titulo, subtitulo, encabezados, filas, pie);
+  const nombre = `${titulo.replace(/\s+/g, "-").toLowerCase()}-${iso(new Date())}.pdf`;
   if (modo === "descargar") {
-    descargarHtml(titulo, html);
+    doc.save(nombre);
+    toast.success("Reporte PDF descargado.");
     return;
   }
-  const ventana = window.open("", "_blank");
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const ventana = window.open(url, "_blank");
   if (!ventana) {
-    // El navegador del celular bloquea las ventanas nuevas: descargamos el
-    // reporte para que igual se pueda ver e imprimir.
-    descargarHtml(titulo, html);
-    return;
+    // El navegador bloqueó la ventana: forzamos la descarga del PDF.
+    doc.save(nombre);
+    toast.success("Reporte PDF descargado. Ábrelo para imprimir.");
   }
-  ventana.document.open();
-  ventana.document.write(html);
-  ventana.document.close();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
 
@@ -248,7 +247,7 @@ export function ReportesAdmin() {
       const total = filtrados
         .filter((p) => p.status === "approved")
         .reduce((s, p) => s + p.amount, 0);
-      entregarReporte(
+      await entregarReporte(
         modo,
         "Reporte de Pagos",
         `Período ${new Date(`${r.desde}T12:00:00`).toLocaleDateString("es-CL")} al ${new Date(`${r.hasta}T12:00:00`).toLocaleDateString("es-CL")} · Generado el ${new Date().toLocaleDateString("es-CL")}`,
@@ -292,7 +291,7 @@ export function ReportesAdmin() {
           totales ? `${Math.round((asistidas / totales) * 100)}%` : "—",
         ];
       });
-      entregarReporte(
+      await entregarReporte(
         modo,
         "Reporte de Asistencia",
         `Período ${new Date(`${r.desde}T12:00:00`).toLocaleDateString("es-CL")} al ${new Date(`${r.hasta}T12:00:00`).toLocaleDateString("es-CL")} · Generado el ${new Date().toLocaleDateString("es-CL")}`,
