@@ -526,6 +526,7 @@ export type Database = {
     }
     Functions: {
       aplicar_bloqueos_morosidad: { Args: never; Returns: number }
+      eliminar_alumno: { Args: { _player_id: string }; Returns: undefined }
       es_super_admin: { Args: never; Returns: boolean }
       generar_recordatorios_pago: { Args: never; Returns: number }
       has_role: {
