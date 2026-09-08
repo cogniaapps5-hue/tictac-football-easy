@@ -494,10 +494,10 @@ function Alumnos() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl">¿Archivar alumno?</AlertDialogTitle>
+            <AlertDialogTitle className="text-2xl">¿Eliminar alumno?</AlertDialogTitle>
             <AlertDialogDescription className="text-base">
-              Esta acción desactivará el acceso de {porArchivar?.nombre} y ocultará su ficha de la
-              lista activa. Los datos históricos (pagos, asistencia) se conservarán. ¿Continuar?
+              Esta acción borrará definitivamente a {porArchivar?.nombre} junto con sus pagos,
+              asistencia y avisos. No se puede deshacer. ¿Continuar?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -510,7 +510,7 @@ function Alumnos() {
                 if (porArchivar) archivar.mutate(porArchivar.id);
               }}
             >
-              Sí, archivar
+              Sí, eliminar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
