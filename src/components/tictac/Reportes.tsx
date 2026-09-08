@@ -247,7 +247,7 @@ export function ReportesAdmin() {
       const total = filtrados
         .filter((p) => p.status === "approved")
         .reduce((s, p) => s + p.amount, 0);
-      entregarReporte(
+      await entregarReporte(
         modo,
         "Reporte de Pagos",
         `Período ${new Date(`${r.desde}T12:00:00`).toLocaleDateString("es-CL")} al ${new Date(`${r.hasta}T12:00:00`).toLocaleDateString("es-CL")} · Generado el ${new Date().toLocaleDateString("es-CL")}`,
