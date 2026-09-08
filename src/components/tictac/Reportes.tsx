@@ -291,7 +291,7 @@ export function ReportesAdmin() {
           totales ? `${Math.round((asistidas / totales) * 100)}%` : "—",
         ];
       });
-      entregarReporte(
+      await entregarReporte(
         modo,
         "Reporte de Asistencia",
         `Período ${new Date(`${r.desde}T12:00:00`).toLocaleDateString("es-CL")} al ${new Date(`${r.hasta}T12:00:00`).toLocaleDateString("es-CL")} · Generado el ${new Date().toLocaleDateString("es-CL")}`,
