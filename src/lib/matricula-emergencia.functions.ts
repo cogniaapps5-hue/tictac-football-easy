@@ -51,7 +51,8 @@ export const matriculaEmergencia = createServerFn({ method: "POST" })
     });
 
     const email = data.email.trim().toLowerCase();
-    const claveTemporal = data.rut_alumno.replace(/\D/g, "").slice(-8) || "Tictac2026";
+    // Misma regla que la matrícula normal: todos los dígitos del RUT del alumno.
+    const claveTemporal = data.rut_alumno.replace(/\D/g, "") || "Tictac2026";
 
     try {
       // 1. Buscar o crear usuario en Auth
