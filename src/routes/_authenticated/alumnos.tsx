@@ -131,8 +131,8 @@ function Alumnos() {
       setPorArchivar(null);
       toast.success(
         resultado.apoderadoBloqueado
-          ? "Alumno archivado. El apoderado quedó sin acceso."
-          : "Alumno archivado. El apoderado mantiene acceso por sus otros hijos.",
+          ? "Alumno eliminado. También se borró la cuenta del apoderado."
+          : "Alumno eliminado. El apoderado mantiene su cuenta por sus otros hijos.",
       );
     },
     onError: () => toast.error("No pudimos archivar al alumno"),
