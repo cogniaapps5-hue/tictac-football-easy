@@ -41,6 +41,7 @@ export function InicioPadre({
   const fechasPosibles = SEDES.map((s) => proximoEntrenamiento(s.valor).iso);
   const queryClient = useQueryClient();
   const [hijoId, setHijoId] = useState<string | null>(null);
+  const [saludoAbierto, setSaludoAbierto] = useState(true);
 
   const {
     data,
