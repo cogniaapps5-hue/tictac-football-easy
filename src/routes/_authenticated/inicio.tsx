@@ -65,6 +65,54 @@ function Inicio() {
   );
 }
 
+function CumpleanosAdmin() {
+  const hoy = new Date();
+  const { data } = useQuery({
+    queryKey: ["cumpleanos-hoy", hoy.toISOString().slice(0, 10)],
+    staleTime: 1000 * 60 * 60,
+    retry: false,
+    queryFn: async () => {
+      const { data: alumnos, error } = await supabase
+        .from("players")
+        .select("id, name, birth_date")
+        .neq("access_status", "inactive");
+      if (error) throw error;
+      const mes = hoy.getMonth() + 1;
+      const dia = hoy.getDate();
+      return (alumnos ?? [])
+        .filter((a) => {
+          if (!a.birth_date) return false;
+          const [, m, d] = String(a.birth_date).split("-").map(Number);
+          return m === mes && d === dia;
+        })
+        .map((a) => ({
+          id: a.id,
+          name: a.name,
+          edad: hoy.getFullYear() - Number(String(a.birth_date).slice(0, 4)),
+        }));
+    },
+  });
+  if (!data?.length) return null;
+  return (
+    <Tarjeta destacada className="border-gold-brand">
+      <div className="flex items-center gap-3">
+        <span className="text-4xl" aria-hidden>
+          🎂
+        </span>
+        <h2 className="text-xl font-bold">Cumpleaños de hoy</h2>
+      </div>
+      <ul className="mt-4 space-y-2">
+        {data.map((c) => (
+          <li key={c.id} className="rounded-xl bg-gold-brand/20 p-3 text-lg font-bold">
+            🎉 {c.name}
+            {c.edad > 0 ? ` — cumple ${c.edad} años` : ""}
+          </li>
+        ))}
+      </ul>
+    </Tarjeta>
+  );
+}
+
 function InicioAdmin() {
   const proximo = proximoEntrenamiento();
   const queryClientAdmin = useQueryClient();
@@ -193,6 +241,8 @@ function InicioAdmin() {
           <Link to="/pagos">Ver y Aprobar</Link>
         </Button>
       </Tarjeta>
+
+      <CumpleanosAdmin />
 
       <RecordatoriosAdmin />
 
