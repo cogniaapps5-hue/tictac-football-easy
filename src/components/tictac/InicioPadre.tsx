@@ -7,6 +7,13 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Tarjeta, Estado } from "@/components/tictac/Shell";
 import { SEDES, grupoCorto, proximoEntrenamiento } from "@/lib/session";
 import { estiloAviso, ordenarAvisos } from "@/lib/avisos";
@@ -34,6 +41,7 @@ export function InicioPadre({
   const fechasPosibles = SEDES.map((s) => proximoEntrenamiento(s.valor).iso);
   const queryClient = useQueryClient();
   const [hijoId, setHijoId] = useState<string | null>(null);
+  const [saludoAbierto, setSaludoAbierto] = useState(true);
 
   const {
     data,
@@ -125,6 +133,33 @@ export function InicioPadre({
 
   return (
     <div className="animate-fade-in space-y-6">
+      <Dialog open={saludoAbierto && cumpleaneros.length > 0} onOpenChange={setSaludoAbierto}>
+        <DialogContent className="rounded-2xl border-gold-brand bg-card text-center sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-3xl font-black">
+              <span aria-hidden>🎉🎂</span> ¡Feliz Cumpleaños!
+            </DialogTitle>
+          </DialogHeader>
+          {cumpleaneros.map((c) => (
+            <p key={c.id} className="text-2xl font-black text-gold-brand">
+              {c.name}
+            </p>
+          ))}
+          <p className="text-lg font-semibold text-muted-foreground">
+            El equipo TIC TAC te desea un gran día 🎈
+          </p>
+          <DialogFooter className="sm:justify-center">
+            <Button
+              variant="accion"
+              size="grande"
+              className="w-full"
+              onClick={() => setSaludoAbierto(false)}
+            >
+              ¡Gracias! ⚽
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {!hijos.length ? (
         <EstadoVacio
           emoji="👦"
