@@ -7,6 +7,13 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Tarjeta, Estado } from "@/components/tictac/Shell";
 import { SEDES, grupoCorto, proximoEntrenamiento } from "@/lib/session";
 import { estiloAviso, ordenarAvisos } from "@/lib/avisos";
