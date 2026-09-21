@@ -134,10 +134,10 @@ export function InicioPadre({
   return (
     <div className="animate-fade-in space-y-6">
       <Dialog open={saludoAbierto && cumpleaneros.length > 0} onOpenChange={setSaludoAbierto}>
-        <DialogContent className="rounded-2xl border-gold-brand bg-card text-center sm:max-w-sm">
+        <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl border-gold-brand bg-card text-center sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-black">
-              🎂 ¡Feliz cumpleaños! 🎉
+            <DialogTitle className="text-3xl font-black leading-snug">
+              🎂⚽️ ¡Feliz cumpleaños! 🎉
             </DialogTitle>
           </DialogHeader>
           {cumpleaneros.map((c) => (
@@ -145,11 +145,11 @@ export function InicioPadre({
               {c.name}
             </p>
           ))}
-          <p className="text-lg font-semibold">
+          <p className="text-lg font-semibold leading-relaxed">
             De parte de toda la familia de Escuela de Fútbol Tic Tac Siempre Feliz, te deseamos un
-            hermoso día, lleno de alegría, cariño y muchos goles. 💙
+            hermoso día, lleno de alegría, cariño y muchos goles. 💙⚽️
           </p>
-          <p className="text-lg font-bold text-gold-brand">¡Que cumplas muchos más! 🎈</p>
+          <p className="text-xl font-bold text-gold-brand">¡Que cumplas muchos más! 🎈</p>
           <DialogFooter className="sm:justify-center">
             <Button
               variant="accion"
