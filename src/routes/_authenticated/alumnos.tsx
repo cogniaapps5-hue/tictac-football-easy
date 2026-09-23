@@ -166,17 +166,23 @@ function Alumnos() {
     );
   }
 
-  const texto = busqueda.trim().toLowerCase();
+  const norm = (s: string) =>
+    s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const texto = norm(busqueda.trim());
   const archivados = vista === "archivados";
+  const entrenaDia = (a: { training_day: string; training_tuesday?: boolean; training_thursday?: boolean }) =>
+    a.training_day === diaFiltro ||
+    (diaFiltro === "martes" && a.training_tuesday) ||
+    (diaFiltro === "jueves" && a.training_thursday);
   const lista = (data?.alumnos ?? []).filter(
     (a) =>
       (archivados ? a.access_status === "inactive" : a.access_status !== "inactive") &&
       (!texto ||
-        a.name.toLowerCase().includes(texto) ||
-        (a.rut ?? "").toLowerCase().includes(texto)) &&
+        norm(a.name).includes(texto) ||
+        norm(a.rut ?? "").replace(/[.\-]/g, "").includes(texto.replace(/[.\-]/g, ""))) &&
       (grupoFiltro === "todos" || a.age_group === grupoFiltro) &&
-      (archivados || a.training_day === diaFiltro) &&
-      (!soloAlDia || a.access_status === "active" || a.access_status === "exception"),
+      (archivados || texto !== "" || entrenaDia(a)) &&
+      (!soloAlDia || a.access_status === "active" || a.access_status === "exception" || a.is_scholarship),
   );
   const totalActivos = (data?.alumnos ?? []).filter((a) => a.access_status !== "inactive").length;
   const totalArchivados = (data?.alumnos ?? []).filter((a) => a.access_status === "inactive").length;
