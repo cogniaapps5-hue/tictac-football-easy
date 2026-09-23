@@ -1,0 +1,5 @@
+ALTER TABLE public.attendance DROP CONSTRAINT attendance_player_id_fkey, ADD CONSTRAINT attendance_player_id_fkey FOREIGN KEY (player_id) REFERENCES public.players(id) ON DELETE CASCADE;
+ALTER TABLE public.payments DROP CONSTRAINT payments_player_id_fkey, ADD CONSTRAINT payments_player_id_fkey FOREIGN KEY (player_id) REFERENCES public.players(id) ON DELETE CASCADE;
+ALTER TABLE public.notifications DROP CONSTRAINT notifications_player_id_fkey, ADD CONSTRAINT notifications_player_id_fkey FOREIGN KEY (player_id) REFERENCES public.players(id) ON DELETE CASCADE;
+ALTER TABLE public.payment_reminders DROP CONSTRAINT payment_reminders_player_id_fkey, ADD CONSTRAINT payment_reminders_player_id_fkey FOREIGN KEY (player_id) REFERENCES public.players(id) ON DELETE CASCADE;
+ALTER TABLE public.nutrition_sessions DROP CONSTRAINT nutrition_sessions_player_id_fkey, ADD CONSTRAINT nutrition_sessions_player_id_fkey FOREIGN KEY (player_id) REFERENCES public.players(id) ON DELETE CASCADE;
