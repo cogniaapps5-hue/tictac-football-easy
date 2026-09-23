@@ -135,7 +135,7 @@ function Alumnos() {
           : "Alumno eliminado. El apoderado mantiene su cuenta por sus otros hijos.",
       );
     },
-    onError: () => toast.error("No pudimos archivar al alumno"),
+    onError: (e: Error) => toast.error("No pudimos eliminar al alumno: " + (e?.message ?? "")),
   });
 
   const restablecer = useMutation({

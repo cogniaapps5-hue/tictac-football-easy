@@ -9,7 +9,7 @@ export function estiloAviso(categoria: string | null | undefined) {
   switch (categoria) {
     case "suspension":
       return {
-        emoji: "🌧️",
+        emoji: "⚠️",
         etiqueta: "Suspensión",
         clase: "border-danger bg-danger/20",
         texto: "text-danger",

@@ -165,7 +165,7 @@ export const CATEGORIAS_AVISO: {
   {
     valor: "suspension",
     etiqueta: "Suspensión",
-    emoji: "🌧️",
+    emoji: "⚠️",
     clase: "bg-danger/20 text-danger",
   },
   { valor: "otro", etiqueta: "Otro", emoji: "📝", clase: "bg-secondary text-muted-foreground" },
