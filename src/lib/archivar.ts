@@ -8,8 +8,17 @@ import { eliminarAlumnoTotal } from "@/lib/eliminar-alumno.functions";
  * sin conflictos.
  */
 export async function archivarAlumno(playerId: string) {
-  const resultado = await eliminarAlumnoTotal({ data: { playerId } });
-  return { apoderadoBloqueado: resultado.apoderadoEliminado };
+  try {
+    const resultado = await eliminarAlumnoTotal({ data: { playerId } });
+    return { apoderadoBloqueado: resultado.apoderadoEliminado };
+  } catch (e) {
+    console.warn("Eliminación completa falló, usando borrado directo:", e);
+    // Respaldo: borrado definitivo en la base de datos (alumno + pagos,
+    // asistencia, avisos, recordatorios y nutrición).
+    const { error } = await supabase.rpc("eliminar_alumno", { _player_id: playerId });
+    if (error) throw error;
+    return { apoderadoBloqueado: false };
+  }
 }
 
 /** Compatibilidad: ya no hay alumnos archivados, pero mantenemos la función
