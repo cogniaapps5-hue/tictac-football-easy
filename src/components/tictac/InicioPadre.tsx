@@ -88,7 +88,8 @@ export function InicioPadre({
   );
   const avisosVisibles = avisosOrdenados.slice(0, 2);
   const alumno = hijos.find((a) => a.id === hijoId) ?? hijos[0];
-  const proximo = proximoEntrenamiento(alumno?.training_day ?? null);
+  // Próxima clase cronológica (martes o jueves), igual que el contador del admin.
+  const proximo = proximoEntrenamiento();
   // Los alumnos becados nunca quedan bloqueados por pagos.
   const becado = alumno?.is_scholarship === true;
   const bloqueado = alumno?.access_status === "blocked" && !becado;
