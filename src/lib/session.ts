@@ -91,7 +91,9 @@ export function sedeDe(dia: string | null | undefined) {
 export function proximoEntrenamiento(dia?: string | null) {
   const hoy = new Date();
   const candidatos = (dia ? [sedeDe(dia)] : SEDES).map((slot) => {
-    const faltan = (slot.diaSemana - hoy.getDay() + 7) % 7;
+    let faltan = (slot.diaSemana - hoy.getDay() + 7) % 7;
+    // Si hoy es día de clase pero ya terminó (20:00), pasa a la siguiente semana.
+    if (faltan === 0 && hoy.getHours() >= 20) faltan = 7;
     const fecha = new Date(hoy);
     fecha.setDate(hoy.getDate() + faltan);
     return { slot, fecha, faltan };
