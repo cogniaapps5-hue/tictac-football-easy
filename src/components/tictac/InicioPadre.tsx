@@ -290,9 +290,15 @@ export function InicioPadre({
         </p>
 
         {alumno && bloqueado ? (
-          <Button asChild variant="neutro" size="gigante" className="mt-5">
-            <Link to="/mi-hijo">Regularizar pago para confirmar</Link>
-          </Button>
+          <div className="mt-5 space-y-4">
+            <p className="rounded-xl border-2 border-gold-brand bg-gold-brand/15 p-4 text-base font-bold">
+              ⚠️ Cuenta temporalmente restringida. Por favor, sube tu comprobante en la
+              sección Pagos para recuperar el acceso.
+            </p>
+            <Button asChild variant="accion" size="gigante">
+              <Link to="/mi-hijo">Regularizar pago para confirmar</Link>
+            </Button>
+          </div>
         ) : alumno ? (
           respuesta ? (
             <div className="mt-5">
