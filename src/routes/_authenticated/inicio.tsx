@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { PantallaCargando, PantallaError, EstadoVacio } from "@/components/tictac/Estados";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -114,7 +115,27 @@ function CumpleanosAdmin() {
 }
 
 function InicioAdmin() {
-  const proximo = proximoEntrenamiento();
+  // Día de clase visible hasta las 23:59; con flechas se ven días anteriores.
+  const [desfase, setDesfase] = useState(0);
+  const proximo = useMemo(() => {
+    const hoy = new Date();
+    const esClase = (d: Date) => d.getDay() === 2 || d.getDay() === 4;
+    const f = new Date(hoy);
+    f.setHours(12, 0, 0, 0);
+    while (!esClase(f)) f.setDate(f.getDate() + 1);
+    let n = desfase;
+    while (n !== 0) {
+      f.setDate(f.getDate() + (n > 0 ? 1 : -1));
+      if (esClase(f)) n += n > 0 ? -1 : 1;
+    }
+    const base = proximoEntrenamiento(f.getDay() === 2 ? "martes" : "jueves");
+    const iso = `${f.getFullYear()}-${String(f.getMonth() + 1).padStart(2, "0")}-${String(f.getDate()).padStart(2, "0")}`;
+    return {
+      ...base,
+      iso,
+      texto: f.toLocaleDateString("es-CL", { weekday: "long", day: "numeric", month: "long" }),
+    };
+  }, [desfase]);
   const queryClientAdmin = useQueryClient();
 
   // Validación diaria en frontend (reemplaza el cron): al abrir la app, la
@@ -249,7 +270,11 @@ function InicioAdmin() {
       <Tarjeta>
         <div className="flex items-center gap-3">
           <CalendarCheck className="size-7 text-cyan-brand" />
-          <h2 className="text-xl font-bold">Asistencia próxima clase</h2>
+          <h2 className="text-xl font-bold">Asistencia de la clase</h2>
+        </div>
+        <div className="mt-3 flex items-center justify-between gap-2">
+          <Button variant="neutro" onClick={() => setDesfase((d) => d - 1)}>◀ Anterior</Button>
+          <Button variant="neutro" disabled={desfase >= 0} onClick={() => setDesfase((d) => Math.min(0, d + 1))}>Siguiente ▶</Button>
         </div>
         <p className="mt-2 text-2xl font-extrabold">
           {data?.confirmados ?? 0} de {data?.total ?? 0} confirmados
@@ -265,18 +290,15 @@ function InicioAdmin() {
             : "alumnos confirmaron asistencia"}
         </p>
         {data?.nombresConfirmados?.length ? (
-          <details className="mt-2 rounded-xl bg-secondary p-4">
-            <summary className="cursor-pointer text-base font-bold">
-              Ver nombres de quienes confirmaron
-            </summary>
+          <div className="mt-2 rounded-xl bg-secondary p-4">
             <ul className="mt-3 space-y-2">
               {data.nombresConfirmados.map((nombre, i) => (
                 <li key={`${nombre}-${i}`} className="text-base font-semibold break-words">
-                  ✅ {nombre}
+                  <span className="text-success">✅</span> {nombre}
                 </li>
               ))}
             </ul>
-          </details>
+          </div>
         ) : (
           <p className="mt-2 text-base text-muted-foreground">
             Todavía nadie confirma para esta clase.
