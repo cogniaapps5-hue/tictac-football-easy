@@ -2,9 +2,14 @@
 // Estrategia: network-first para navegación (HTML siempre fresco),
 // cache-first solo para assets estáticos del mismo origen.
 
-const STATIC_CACHE = "tictac-static-v1";
+const STATIC_CACHE = "tictac-static-v2";
+const PRECACHE = ["/", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png", "/favicon.png", "/tictac-logo.jpg"];
 
-self.addEventListener("install", () => self.skipWaiting());
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(STATIC_CACHE).then((c) => Promise.allSettled(PRECACHE.map((u) => c.add(u)))).then(() => self.skipWaiting()),
+  );
+});
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
