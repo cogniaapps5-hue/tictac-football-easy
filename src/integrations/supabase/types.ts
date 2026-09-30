@@ -106,6 +106,30 @@ export type Database = {
         }
         Relationships: []
       }
+      contratos_firmados: {
+        Row: {
+          aceptado_en: string
+          dispositivo: string | null
+          id: string
+          parent_id: string
+          version: string
+        }
+        Insert: {
+          aceptado_en?: string
+          dispositivo?: string | null
+          id?: string
+          parent_id: string
+          version?: string
+        }
+        Update: {
+          aceptado_en?: string
+          dispositivo?: string | null
+          id?: string
+          parent_id?: string
+          version?: string
+        }
+        Relationships: []
+      }
       demo_accounts: {
         Row: {
           email: string
@@ -121,6 +145,39 @@ export type Database = {
           email?: string
           full_name?: string
           role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
+      historial_eventos: {
+        Row: {
+          detalle: string | null
+          id: string
+          monto: number | null
+          ocurrido_en: string
+          parent_id: string | null
+          player_id: string | null
+          realizado_por: string | null
+          tipo: string
+        }
+        Insert: {
+          detalle?: string | null
+          id?: string
+          monto?: number | null
+          ocurrido_en?: string
+          parent_id?: string | null
+          player_id?: string | null
+          realizado_por?: string | null
+          tipo: string
+        }
+        Update: {
+          detalle?: string | null
+          id?: string
+          monto?: number | null
+          ocurrido_en?: string
+          parent_id?: string | null
+          player_id?: string | null
+          realizado_por?: string | null
+          tipo?: string
         }
         Relationships: []
       }
@@ -428,6 +485,30 @@ export type Database = {
         }
         Relationships: []
       }
+      resumen_pagos_mensuales: {
+        Row: {
+          actualizado_en: string
+          morosos: number
+          pagos_recibidos: number
+          periodo: string
+          total_recaudado: number
+        }
+        Insert: {
+          actualizado_en?: string
+          morosos?: number
+          pagos_recibidos?: number
+          periodo: string
+          total_recaudado?: number
+        }
+        Update: {
+          actualizado_en?: string
+          morosos?: number
+          pagos_recibidos?: number
+          periodo?: string
+          total_recaudado?: number
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string
@@ -525,6 +606,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      actualizar_resumen_mes: { Args: { _periodo: string }; Returns: undefined }
       aplicar_bloqueos_morosidad: { Args: never; Returns: number }
       eliminar_alumno: { Args: { _player_id: string }; Returns: undefined }
       es_super_admin: { Args: never; Returns: boolean }
