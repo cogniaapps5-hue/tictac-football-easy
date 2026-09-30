@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { InstalarApp } from "@/components/tictac/InstalarApp";
 import { limpiarBorradores } from "@/lib/almacenamiento";
 import { limpiarSesion } from "@/lib/sesion";
 import { useAvisosNoLeidos } from "@/lib/avisos";
@@ -87,7 +88,10 @@ export function Shell({
         </div>
       </header>
 
-      <main className="mx-auto max-w-lg space-y-6 p-4">{children}</main>
+      <main className="mx-auto max-w-lg space-y-6 p-4">
+        <InstalarApp />
+        {children}
+      </main>
 
       <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-card">
         <div className="mx-auto flex max-w-lg gap-2 px-3 py-2">
