@@ -1,5 +1,8 @@
 {
+  "id": "/",
   "name": "Escuela TIC TAC",
+  "description": "Asistencia, pagos y avisos de la escuela de fútbol TIC TAC",
+  "orientation": "portrait",
   "short_name": "TIC TAC",
   "start_url": "/",
   "scope": "/",
