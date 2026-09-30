@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.actualizar_resumen_mes(date), public.log_pago(), public.log_asistencia(), public.log_contrato() FROM PUBLIC, anon, authenticated;
