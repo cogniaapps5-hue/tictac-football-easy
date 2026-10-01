@@ -148,6 +148,19 @@ function Alumnos() {
     onError: () => toast.error("No pudimos restablecer al alumno"),
   });
 
+  const cambiarBeca = useMutation({
+    mutationFn: async ({ playerId, beca }: { playerId: string; beca: boolean }) => {
+      const { error } = await supabase.from("players").update({ is_scholarship: beca }).eq("id", playerId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["alumnos"] });
+      queryClient.invalidateQueries({ queryKey: ["resumen-admin"] });
+      toast.success("Beca actualizada: el alumno queda exento de pagos");
+    },
+    onError: () => toast.error("No pudimos actualizar la beca"),
+  });
+
   if (cargandoSesion) return <PantallaCargando />;
   if (errorSesion || !sesion)
     return (
@@ -302,6 +315,15 @@ function Alumnos() {
             training_day: alumno.training_day,
           }}
         />
+        <Button
+          variant={alumno.is_scholarship ? "neutro" : "contorno"}
+          size="medio"
+          className="mt-3 h-auto min-h-[60px] w-full py-4 text-base"
+          disabled={cambiarBeca.isPending}
+          onClick={() => cambiarBeca.mutate({ playerId: alumno.id, beca: !alumno.is_scholarship })}
+        >
+          {alumno.is_scholarship ? "⭐ Quitar beca" : "🎓 Becar alumno"}
+        </Button>
         {alumno.access_status === "blocked" || alumno.access_status === "exception" ? (
           <Button
             variant={alumno.access_status === "exception" ? "alerta" : "contorno"}

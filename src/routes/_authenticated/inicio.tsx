@@ -117,6 +117,9 @@ function CumpleanosAdmin() {
 function InicioAdmin() {
   // Día de clase visible hasta las 23:59; con flechas se ven días anteriores.
   const [desfase, setDesfase] = useState(0);
+  const [filtroAsistencia, setFiltroAsistencia] = useState<"todos" | "pagados" | "pendientes">(
+    "todos",
+  );
   const proximo = useMemo(() => {
     const hoy = new Date();
     const esClase = (d: Date) => d.getDay() === 2 || d.getDay() === 4;
@@ -175,11 +178,11 @@ function InicioAdmin() {
           .neq("access_status", "inactive"),
         supabase
           .from("attendance")
-          .select("id, status, players(name)")
+          .select("id, status, player_id, players(name)")
           .eq("session_date", proximo.iso),
         supabase
           .from("payments")
-          .select("id, amount")
+          .select("id, amount, player_id, status")
           .eq("status", "approved")
           .gte("due_date", inicioMes)
           .lte("due_date", finMes),
@@ -198,6 +201,28 @@ function InicioAdmin() {
       const atrasados = pendientes.filter(
         (p) => new Date(p.due_date).getTime() < Date.now() - 1000 * 60 * 60 * 24 * 60,
       );
+      const activosPorId = new Map((alumnos.data ?? []).map((a) => [a.id, a]));
+      const aprobadosIds = new Set(
+        (aprobadosMes as { player_id: string }[]).map((p) => p.player_id),
+      );
+      const confirmadosLista = (asistencia.data ?? [])
+        .filter((a) => a.status === "confirmed")
+        .map((a) => {
+          const alumno = activosPorId.get(a.player_id) as
+            | { is_scholarship?: boolean | null; access_status?: string }
+            | undefined;
+          return {
+            id: a.id,
+            nombre: (a.players as { name?: string } | null)?.name ?? "Alumno",
+            // Verde solo cuando la dueña validó el pago (o el alumno está
+            // exento: becado o excepción); si no, queda como pago pendiente.
+            pago:
+              Boolean(alumno?.is_scholarship) ||
+              alumno?.access_status === "exception" ||
+              aprobadosIds.has(a.player_id),
+          };
+        })
+        .sort((x, y) => x.nombre.localeCompare(y.nombre, "es"));
       return {
         pendientes: pendientes.length,
         ingresos: aprobadosMes.reduce(
@@ -210,11 +235,9 @@ function InicioAdmin() {
         bloqueados: (alumnos.data ?? []).filter(
           (a) => a.access_status === "blocked" && !a.is_scholarship,
         ).length,
-        confirmados: (asistencia.data ?? []).filter((a) => a.status === "confirmed").length,
-        nombresConfirmados: (asistencia.data ?? [])
-          .filter((a) => a.status === "confirmed")
-          .map((a) => (a.players as { name?: string } | null)?.name ?? "Alumno")
-          .sort((x, y) => x.localeCompare(y, "es")),
+        confirmados: confirmadosLista.length,
+        conPago: confirmadosLista.filter((c) => c.pago).length,
+        nombresConfirmados: confirmadosLista,
       };
     },
   });
@@ -277,7 +300,10 @@ function InicioAdmin() {
           <Button variant="neutro" disabled={desfase >= 0} onClick={() => setDesfase((d) => Math.min(0, d + 1))}>Siguiente ▶</Button>
         </div>
         <p className="mt-2 text-2xl font-extrabold">
-          {data?.confirmados ?? 0} de {data?.total ?? 0} confirmados
+          {data?.confirmados ?? 0} de {data?.total ?? 0} confirmaron asistencia
+        </p>
+        <p className="text-base font-semibold text-success">
+          {data?.conPago ?? 0} con pago confirmado por la administradora
         </p>
         <p className="text-lg font-bold text-cyan-brand">{proximo.titulo}</p>
         <p className="text-base font-semibold">📍 {proximo.sede}</p>
@@ -290,15 +316,54 @@ function InicioAdmin() {
             : "alumnos confirmaron asistencia"}
         </p>
         {data?.nombresConfirmados?.length ? (
-          <div className="mt-2 rounded-xl bg-secondary p-4">
-            <ul className="mt-3 space-y-2">
-              {data.nombresConfirmados.map((nombre, i) => (
-                <li key={`${nombre}-${i}`} className="text-base font-semibold break-words">
-                  <span className="text-success">✅</span> {nombre}
-                </li>
+          <>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {(
+                [
+                  ["todos", "Todos"],
+                  ["pagados", "✅ Solo pagados"],
+                  ["pendientes", "🟡 Solo pendientes"],
+                ] as const
+              ).map(([valor, texto]) => (
+                <Button
+                  key={valor}
+                  variant={filtroAsistencia === valor ? "accion" : "neutro"}
+                  size="medio"
+                  className="h-auto min-h-[52px] flex-1 py-3 text-sm"
+                  onClick={() => setFiltroAsistencia(valor)}
+                >
+                  {texto}
+                </Button>
               ))}
-            </ul>
-          </div>
+            </div>
+            <div className="mt-2 rounded-xl bg-secondary p-4">
+              <ul className="mt-3 space-y-2">
+                {data.nombresConfirmados
+                  .filter((c) =>
+                    filtroAsistencia === "todos"
+                      ? true
+                      : filtroAsistencia === "pagados"
+                        ? c.pago
+                        : !c.pago,
+                  )
+                  .map((c) => (
+                    <li
+                      key={c.id}
+                      className={`text-base font-semibold break-words ${c.pago ? "text-success" : "text-gold-brand"}`}
+                    >
+                      {c.pago
+                        ? `✅ ${c.nombre} — Confirmado`
+                        : `🟡 ${c.nombre} — Asistencia confirmada · Pago pendiente`}
+                    </li>
+                  ))}
+                {!data.nombresConfirmados.some((c) =>
+                  filtroAsistencia === "pagados" ? c.pago : !c.pago,
+                ) ? (
+                  <li className="text-base text-muted-foreground">Nadie en este filtro.</li>
+                ) : null}
+              </ul>
+            </div>
+          </>
         ) : (
           <p className="mt-2 text-base text-muted-foreground">
             Todavía nadie confirma para esta clase.
