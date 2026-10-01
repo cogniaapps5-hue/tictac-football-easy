@@ -316,15 +316,54 @@ function InicioAdmin() {
             : "alumnos confirmaron asistencia"}
         </p>
         {data?.nombresConfirmados?.length ? (
-          <div className="mt-2 rounded-xl bg-secondary p-4">
-            <ul className="mt-3 space-y-2">
-              {data.nombresConfirmados.map((nombre, i) => (
-                <li key={`${nombre}-${i}`} className="text-base font-semibold break-words">
-                  <span className="text-success">✅</span> {nombre}
-                </li>
+          <>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {(
+                [
+                  ["todos", "Todos"],
+                  ["pagados", "✅ Solo pagados"],
+                  ["pendientes", "🟡 Solo pendientes"],
+                ] as const
+              ).map(([valor, texto]) => (
+                <Button
+                  key={valor}
+                  variant={filtroAsistencia === valor ? "accion" : "neutro"}
+                  size="medio"
+                  className="h-auto min-h-[52px] flex-1 py-3 text-sm"
+                  onClick={() => setFiltroAsistencia(valor)}
+                >
+                  {texto}
+                </Button>
               ))}
-            </ul>
-          </div>
+            </div>
+            <div className="mt-2 rounded-xl bg-secondary p-4">
+              <ul className="mt-3 space-y-2">
+                {data.nombresConfirmados
+                  .filter((c) =>
+                    filtroAsistencia === "todos"
+                      ? true
+                      : filtroAsistencia === "pagados"
+                        ? c.pago
+                        : !c.pago,
+                  )
+                  .map((c) => (
+                    <li
+                      key={c.id}
+                      className={`text-base font-semibold break-words ${c.pago ? "text-success" : "text-gold-brand"}`}
+                    >
+                      {c.pago
+                        ? `✅ ${c.nombre} — Confirmado`
+                        : `🟡 ${c.nombre} — Asistencia confirmada · Pago pendiente`}
+                    </li>
+                  ))}
+                {!data.nombresConfirmados.some((c) =>
+                  filtroAsistencia === "pagados" ? c.pago : !c.pago,
+                ) ? (
+                  <li className="text-base text-muted-foreground">Nadie en este filtro.</li>
+                ) : null}
+              </ul>
+            </div>
+          </>
         ) : (
           <p className="mt-2 text-base text-muted-foreground">
             Todavía nadie confirma para esta clase.
