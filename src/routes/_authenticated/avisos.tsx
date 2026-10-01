@@ -3,8 +3,18 @@ import { createFileRoute } from "@tanstack/react-router";
 import { exigirRol } from "@/lib/guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Send } from "lucide-react";
+import { Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -52,6 +62,20 @@ function Avisos() {
   const [mensaje, setMensaje] = useState("");
   const [destino, setDestino] = useState("all");
   const [categoria, setCategoria] = useState("informacion_importante");
+  const [porEliminar, setPorEliminar] = useState<{ id: string; titulo: string } | null>(null);
+
+  const eliminarAviso = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("notices").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["avisos"] });
+      setPorEliminar(null);
+      toast.success("Aviso eliminado");
+    },
+    onError: () => toast.error("No pudimos eliminar el aviso"),
+  });
 
   const {
     data: avisos,
@@ -202,11 +226,22 @@ function Avisos() {
         <ul className="mt-3 space-y-4">
           {(avisos ?? []).map((aviso) => (
             <li key={aviso.id} className="rounded-xl bg-secondary p-4">
-              <span
-                className={`mb-2 inline-block rounded-full px-3 py-1 text-sm font-bold ${categoriaAviso(aviso.category).clase}`}
-              >
-                {categoriaAviso(aviso.category).emoji} {categoriaAviso(aviso.category).etiqueta}
-              </span>
+              <div className="flex items-start justify-between gap-3">
+                <span
+                  className={`inline-block rounded-full px-3 py-1 text-sm font-bold ${categoriaAviso(aviso.category).clase}`}
+                >
+                  {categoriaAviso(aviso.category).emoji} {categoriaAviso(aviso.category).etiqueta}
+                </span>
+                <button
+                  type="button"
+                  aria-label={`Eliminar aviso: ${aviso.title}`}
+                  title="Eliminar aviso"
+                  className="flex size-[52px] shrink-0 items-center justify-center rounded-xl border border-danger/40 bg-danger/10 text-danger"
+                  onClick={() => setPorEliminar({ id: aviso.id, titulo: aviso.title })}
+                >
+                  <Trash2 className="size-5" />
+                </button>
+              </div>
               <p className="text-base font-bold">{aviso.title}</p>
               <p className="text-base text-muted-foreground">{aviso.content}</p>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -220,6 +255,28 @@ function Avisos() {
           ) : null}
         </ul>
       </Tarjeta>
+
+      <AlertDialog
+        open={Boolean(porEliminar)}
+        onOpenChange={(abierto) => !abierto && setPorEliminar(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar este aviso?</AlertDialogTitle>
+            <AlertDialogDescription>
+              “{porEliminar?.titulo}” — Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => porEliminar && eliminarAviso.mutate(porEliminar.id)}
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Shell>
   );
 }
