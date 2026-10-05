@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Correct circular logo across loading screen, app header, PWA icons and favicon; verify and publish.
+- [x] Correct circular logo across loading screen, app header, PWA icons and favicon; verified and publication requested.
 
 - [x] Reproduce the admin enrollment failure with the real authenticated flow
 - [x] Harden client/server validation, diagnostics, and exact error feedback
