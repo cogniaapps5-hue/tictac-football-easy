@@ -6,6 +6,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -36,7 +37,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -56,7 +57,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           <button
             onClick={() => {
               router.invalidate();
-              reset();
+              reset?.();
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
@@ -92,7 +93,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "msapplication-tap-highlight", content: "no" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "apple-mobile-web-app-title", content: "TIC TAC" },
-      { name: "theme-color", content: "#00E5FF" },
+      { name: "theme-color", content: "#000000" },
       { property: "og:title", content: "TIC TAC — Escuela de Fútbol" },
       {
         property: "og:description",
@@ -113,11 +114,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "icon", href: "/favicon-circular.png", type: "image/png" },
       { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
-      { rel: "icon", type: "image/png", sizes: "192x192", href: "/icon-192.png" },
-      { rel: "icon", type: "image/png", sizes: "512x512", href: "/icon-512.png" },
+      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon-circular.png" },
     ],
   }),
   shellComponent: RootShell,

@@ -7,6 +7,8 @@ export const Route = createFileRoute("/error-acceso")({
   ssr: false,
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Sin acceso — Escuela TIC TAC" },
       {
         name: "description",

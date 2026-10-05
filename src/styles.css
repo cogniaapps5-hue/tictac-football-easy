@@ -6,6 +6,7 @@
 
 @theme inline {
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-splash: oklch(0 0 0);
   --color-cyan-brand: var(--cyan-brand);
   --color-blue-brand: var(--blue-brand);
   --color-blue-brand-foreground: var(--blue-brand-foreground);

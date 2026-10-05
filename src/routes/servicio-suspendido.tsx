@@ -12,6 +12,8 @@ export const Route = createFileRoute("/servicio-suspendido")({
   ssr: false,
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Servicio suspendido — Escuela TIC TAC" },
       {
         name: "description",
