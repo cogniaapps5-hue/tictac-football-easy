@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { limpiarSesion, sesionValida } from "@/lib/sesion";
 import { accesoSuspendido } from "@/lib/suscripcion";
+import logo from "@/assets/tictac-circular.png.asset.json";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -21,6 +22,8 @@ export const Route = createFileRoute("/")({
           "Entra a la app de la escuela de fútbol TIC TAC para confirmar asistencia, pagar y ver avisos.",
       },
       { property: "og:title", content: "Entrar — Escuela de Fútbol TIC TAC" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       {
         property: "og:description",
         content: "Asistencia, pagos y avisos de la escuela de fútbol TIC TAC.",
@@ -92,11 +95,11 @@ function Entrar() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-10">
       <img
-        src="/tictac-logo.jpg"
+        src={logo.url}
         alt="Escuela de fútbol TIC TAC"
-        width={160}
-        height={160}
-        className="h-40 w-40 rounded-full border-4 border-cyan-brand object-cover"
+        width={224}
+        height={224}
+        className="size-56 shrink-0 object-contain"
       />
       <h1 className="mt-4 text-center text-3xl font-extrabold">TIC TAC</h1>
       <p className="mt-1 text-center text-lg text-muted-foreground">Siempre Feliz</p>

@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/tictac-circular.png.asset.json";
 
 /** Pantalla de carga a pantalla completa: evita el "negro" mientras llegan los datos. */
 export function PantallaCargando({ texto = "Cargando…" }: { texto?: string }) {
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-6 text-center">
+    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 bg-splash p-6 text-center">
+      <img src={logo.url} alt="TIC TAC Siempre Feliz" width={224} height={224} className="size-56 shrink-0 object-contain" />
       <div
         className="size-12 animate-spin rounded-full border-4 border-secondary border-t-cyan-brand"
         aria-hidden="true"
