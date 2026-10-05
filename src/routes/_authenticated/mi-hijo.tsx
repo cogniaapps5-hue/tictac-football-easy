@@ -18,6 +18,8 @@ export const Route = createFileRoute("/_authenticated/mi-hijo")({
   beforeLoad: exigirRol("parent"),
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Mi Hijo — Escuela TIC TAC" },
       {
         name: "description",

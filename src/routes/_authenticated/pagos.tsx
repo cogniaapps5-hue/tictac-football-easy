@@ -23,6 +23,8 @@ export const Route = createFileRoute("/_authenticated/pagos")({
   beforeLoad: exigirRol("admin"),
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Pagos — Escuela TIC TAC" },
       { name: "description", content: "Revisa y aprueba los comprobantes de pago de la escuela." },
       { property: "og:title", content: "Pagos — Escuela TIC TAC" },

@@ -17,6 +17,8 @@ export const Route = createFileRoute("/_authenticated/contrato")({
   beforeLoad: exigirRol("parent"),
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Contrato y Reglamento — Escuela TIC TAC" },
       { name: "description", content: "Lee y firma el reglamento interno de la escuela de fútbol TIC TAC." },
       { property: "og:title", content: "Contrato y Reglamento — Escuela TIC TAC" },

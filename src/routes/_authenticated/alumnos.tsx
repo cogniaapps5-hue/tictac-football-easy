@@ -40,6 +40,8 @@ export const Route = createFileRoute("/_authenticated/alumnos")({
   beforeLoad: exigirRol("admin"),
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Alumnos — Escuela TIC TAC" },
       { name: "description", content: "Lista de alumnos y asistencia de la escuela TIC TAC." },
       { property: "og:title", content: "Alumnos — Escuela TIC TAC" },

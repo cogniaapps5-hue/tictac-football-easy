@@ -25,6 +25,8 @@ import { esSuperAdmin } from "@/lib/suscripcion";
 export const Route = createFileRoute("/_authenticated/inicio")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Inicio — Escuela TIC TAC" },
       { name: "description", content: "Resumen del día en la escuela de fútbol TIC TAC." },
       { property: "og:title", content: "Inicio — Escuela TIC TAC" },

@@ -13,6 +13,8 @@ import { diasVencidos, esSuperAdmin, type Suscripcion } from "@/lib/suscripcion"
 export const Route = createFileRoute("/_authenticated/suscripciones")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Suscripciones — Panel TIC TAC" },
       {
         name: "description",
