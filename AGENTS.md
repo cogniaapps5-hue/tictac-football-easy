@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Derive app icons and favicon from the same transparent logo master used by screen images, with padded square exports; this preserves consistent branding without clipping.

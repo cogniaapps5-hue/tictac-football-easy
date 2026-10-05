@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Correct circular logo across loading screen, app header, PWA icons and favicon; verify and publish.
+
 - [x] Reproduce the admin enrollment failure with the real authenticated flow
 - [x] Harden client/server validation, diagnostics, and exact error feedback
 - [x] Add a temporary safe create/delete enrollment test
