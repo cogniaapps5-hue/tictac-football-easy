@@ -21,7 +21,7 @@ import { limpiarSesion } from "@/lib/sesion";
 import { useAvisosNoLeidos } from "@/lib/avisos";
 import { cn } from "@/lib/utils";
 import type { Rol } from "@/lib/session";
-import logo from "@/assets/tictac-exact.png.asset.json";
+import logo from "@/assets/tictac-original.jpg.asset.json";
 
 type Item = { to: string; label: string; icon: LucideIcon; avisos?: boolean };
 

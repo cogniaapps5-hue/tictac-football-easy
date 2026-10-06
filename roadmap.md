@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Install the unchanged uploaded original logo; identical file bytes, 250px container with 20px padding, PNG sizes and successful build verified; publication requested.
+
 - [x] Apply exact non-AI logo geometry, screen sizes, PWA exports and favicon; PNG dimensions and rendered contain sizing verified, publication requested.
 
 - [x] Correct circular logo across loading screen, app header, PWA icons and favicon; verified and publication requested.
