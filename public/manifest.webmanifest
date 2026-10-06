@@ -13,7 +13,7 @@
   "handle_links": "preferred",
   "launch_handler": { "client_mode": "focus-existing" },
   "icons": [
-    { "src": "/tictac-circular-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/tictac-circular-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    { "src": "/tictac-exact-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/tictac-exact-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
   ]
 }
