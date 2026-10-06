@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { limpiarSesion, sesionValida } from "@/lib/sesion";
 import { accesoSuspendido } from "@/lib/suscripcion";
-import logo from "@/assets/tictac-exact.png.asset.json";
+import logo from "@/assets/tictac-original.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -94,13 +94,15 @@ function Entrar() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-10">
+      <div className="flex size-[250px] shrink-0 items-center justify-center bg-splash p-5">
       <img
         src={logo.url}
         alt="Escuela de fútbol TIC TAC"
-        width={220}
-        height={220}
-        className="size-[220px] shrink-0 object-contain"
+        width={210}
+        height={210}
+        className="size-full object-contain"
       />
+      </div>
       <h1 className="mt-4 text-center text-3xl font-extrabold">TIC TAC</h1>
       <p className="mt-1 text-center text-lg text-muted-foreground">Siempre Feliz</p>
 
