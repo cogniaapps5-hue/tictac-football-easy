@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Apply exact non-AI logo geometry, screen sizes, PWA exports and favicon; PNG dimensions and rendered contain sizing verified, publication requested.
+
 - [x] Correct circular logo across loading screen, app header, PWA icons and favicon; verified and publication requested.
 
 - [x] Reproduce the admin enrollment failure with the real authenticated flow
