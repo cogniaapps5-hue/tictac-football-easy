@@ -184,6 +184,7 @@ function Alumnos() {
   const norm = (s: string) =>
     s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   const texto = norm(busqueda.trim());
+  const palabras = texto.split(/\s+/).filter(Boolean);
   const archivados = vista === "archivados";
   const entrenaDia = (a: { training_day: string; training_tuesday?: boolean; training_thursday?: boolean }) =>
     a.training_day === diaFiltro ||
@@ -193,8 +194,8 @@ function Alumnos() {
     (a) =>
       (archivados ? a.access_status === "inactive" : a.access_status !== "inactive") &&
       (!texto ||
-        norm(a.name).includes(texto) ||
-        norm(a.rut ?? "").replace(/[.\-]/g, "").includes(texto.replace(/[.\-]/g, ""))) &&
+        palabras.every((p) => norm(a.name).includes(p)) ||
+        norm(a.rut ?? "").replace(/[.\-]/g, "").includes(texto.replace(/[.\-\s]/g, ""))) &&
       (grupoFiltro === "todos" || a.age_group === grupoFiltro) &&
       (archivados || texto !== "" || entrenaDia(a)) &&
       (!soloAlDia || a.access_status === "active" || a.access_status === "exception" || a.is_scholarship),
@@ -434,7 +435,7 @@ function Alumnos() {
 
       <Tarjeta>
         <Label htmlFor="buscar" className="text-base">
-          Buscar alumno (nombre o RUT)
+          Buscar alumno (nombre, apellido o RUT)
         </Label>
         <div className="mt-2 flex items-center gap-2 rounded-xl bg-secondary px-4">
           <Search className="size-5 text-muted-foreground" />
